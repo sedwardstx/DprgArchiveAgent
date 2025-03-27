@@ -45,6 +45,7 @@ Options:
   -kw, --keyword TEXT         Filter by keyword (can be used multiple times)
   -s, --min-score FLOAT       Minimum score threshold
   -t, --type TEXT             Search type: dense, sparse, or hybrid  [default: dense]
+  -ti, --title TEXT           Search for documents by title
   --help                      Show this message and exit.
 ```
 
@@ -106,6 +107,32 @@ Set a minimum similarity score threshold (0-1):
 python -m src.cli search "robotics" --min-score 0.8
 ```
 
+### Title Search
+
+You can now search for documents by their title using the `--title` or `-ti` flag:
+
+```bash
+# Search for documents with titles containing "meeting notes"
+python -m src.cli search --title "meeting notes"
+
+# Shorthand version
+python -m src.cli search -ti "meeting notes"
+```
+
+The title search is case-insensitive and matches any documents where the title contains the specified text.
+
+#### Combining with Other Search Parameters
+
+Title search can be combined with other search parameters:
+
+```bash
+# Search for documents with "meeting" in the title and created after 2023-01-01
+python -m src.cli search -ti "meeting" --year 2007
+
+# Search for documents with "report" in the title and of specific type
+python -m src.cli search -ti "report" -t dense --author "eric@sssi.com"
+```
+
 ## Metadata Command
 
 The `metadata` command allows you to search the archive using only metadata filters, without a text query.
@@ -128,6 +155,7 @@ Options:
   -d, --day INTEGER           Filter by day
   -kw, --keyword TEXT         Filter by keyword (can be used multiple times)
   -k, --top-k INTEGER         Number of results to return  [default: 10]
+  -ti, --title TEXT           Search for documents by title
   --help                      Show this message and exit.
 ```
 
@@ -140,8 +168,11 @@ python -m src.cli metadata --year 2007
 # Find documents with specific keywords
 python -m src.cli metadata --keyword "dprg" --keyword "video"
 
+# Find documents with "meeting" in the title
+python -m src.cli metadata -ti "meeting"
+
 # Combined metadata filters
-python -m src.cli metadata --author "eric@sssi.com" --year 2007
+python -m src.cli metadata --author "eric@sssi.com" --year 2007 -ti "report"
 ```
 
 Note: At least one metadata filter must be provided when using the `metadata` command.
