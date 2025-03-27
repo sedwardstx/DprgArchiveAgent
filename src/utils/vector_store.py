@@ -81,8 +81,8 @@ class DenseVectorClient(BaseVectorClient):
         
         # Connect to the index
         try:
-            # Use the new Index() method instead of from_existing_index
-            self.index = self.pc.Index(host=index_url)
+            # This assumes the index is already created and we're connecting to it
+            self.index = self.pc.from_existing_index(host=index_url)
             logger.info(f"Connected to dense index at {index_url}")
         except Exception as e:
             logger.error(f"Error connecting to dense index: {str(e)}")
@@ -156,8 +156,8 @@ class SparseVectorClient(BaseVectorClient):
         
         # Connect to the index
         try:
-            # Use the new Index() method instead of from_existing_index
-            self.index = self.pc.Index(host=index_url)
+            # This assumes the index is already created and we're connecting to it
+            self.index = self.pc.from_existing_index(host=index_url)
             logger.info(f"Connected to sparse index at {index_url}")
         except Exception as e:
             logger.error(f"Error connecting to sparse index: {str(e)}")
