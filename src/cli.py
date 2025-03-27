@@ -5,6 +5,9 @@ import asyncio
 import logging
 import sys
 import atexit
+import os
+import platform
+import traceback
 from datetime import datetime
 from typing import Optional, List
 
@@ -26,8 +29,31 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Register cleanup function to run at exit
-atexit.register(cleanup_clients)
+# Set up debug logging for crash analysis
+DEBUG_LOG_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "crash_debug.log")
+
+def log_debug(message):
+    """Write a debug message to the log file with a timestamp."""
+    with open(DEBUG_LOG_FILE, "a") as f:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        f.write(f"{timestamp} - {message}\n")
+        f.flush()  # Force write to disk
+        os.fsync(f.fileno())  # Ensure it's written to the filesystem
+
+# Modify the cleanup function to log its activity
+@atexit.register
+def final_cleanup():
+    """Final cleanup before exit."""
+    log_debug("Entering final_cleanup from atexit handler")
+    try:
+        cleanup_clients()
+        log_debug("Successfully ran cleanup_clients from atexit handler")
+    except Exception as e:
+        log_debug(f"Error in final_cleanup: {str(e)}")
+    log_debug("Exiting final_cleanup from atexit handler")
+    
+# Remove the previous atexit registration to avoid double calls
+atexit.unregister(cleanup_clients)
 
 # Create Typer app
 app = typer.Typer(
@@ -42,15 +68,25 @@ console = Console()
 
 def run_async_safely(coro):
     """Run an async coroutine safely and handle cleanup properly."""
+    log_debug("Starting run_async_safely")
     try:
         # Create a new event loop each time to avoid issues with existing loops
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
+        log_debug("Created new event loop")
+        
         result = loop.run_until_complete(coro)
+        log_debug("Coroutine completed successfully")
         return result
+    except Exception as e:
+        log_debug(f"Exception in run_async_safely: {str(e)}")
+        log_debug(traceback.format_exc())
+        raise
     finally:
         # Always properly close the loop
+        log_debug("Closing event loop")
         loop.close()
+        log_debug("Event loop closed")
 
 
 def validate_environment():
@@ -161,7 +197,9 @@ def search(
     """
     try:
         # Validate environment
+        log_debug("Starting search function")
         if not validate_environment():
+            log_debug("Environment validation failed")
             sys.exit(1)
         
         # Handle no_filter option
@@ -169,6 +207,7 @@ def search(
             min_score = 0.0
         
         # Show search parameters
+        log_debug("Displaying search parameters")
         console.print(
             Panel(
                 f"Query: [bold]{query}[/bold]\n"
@@ -186,8 +225,10 @@ def search(
         )
         
         # Execute search
+        log_debug("Starting search execution")
         with console.status(f"Searching for '{query}'...", spinner="dots"):
             try:
+                log_debug(f"Running search with type: {search_type}")
                 if search_type == "hybrid":
                     result = run_async_safely(
                         archive_agent.search_hybrid(
@@ -230,26 +271,36 @@ def search(
                     
                 # Check for error
                 if isinstance(result, SearchError):
+                    log_debug(f"Search returned error: {result.error}")
                     console.print(f"Error: {result.error}", style="bold red")
                     sys.exit(1)
                     
                 # Display results
+                log_debug("Displaying search results")
                 display_results(result, query, search_type)
                     
                 # Explicitly attempt cleanup
+                log_debug("Running cleanup_clients from search function")
                 cleanup_clients()
+                log_debug("Cleanup completed")
                     
             except Exception as e:
+                log_debug(f"Exception during search execution: {str(e)}")
+                log_debug(traceback.format_exc())
                 console.print(f"Error: {str(e)}", style="bold red")
                 sys.exit(1)
         
+        log_debug("Search completed successfully, returning 0")
         # Add a clean exit to prevent segmentation fault
         return 0
     
     except KeyboardInterrupt:
+        log_debug("Search interrupted by user")
         console.print("\nSearch cancelled by user", style="yellow")
         return 1
     except Exception as e:
+        log_debug(f"Unexpected error in search: {str(e)}")
+        log_debug(traceback.format_exc())
         console.print(f"Unexpected error: {str(e)}", style="bold red")
         logger.exception("Unexpected error during search")
         return 1
@@ -342,17 +393,50 @@ def search_metadata(
 
 
 if __name__ == "__main__":
+    log_debug(f"Starting CLI with platform: {platform.system()} {platform.release()}")
+    log_debug(f"Python version: {sys.version}")
+    
+    # Special handling for Windows (especially MINGW environment)
+    windows_platform = platform.system().lower() == "windows"
+    mingw_detected = "mingw" in sys.platform.lower() or "MINGW" in os.environ.get("MSYSTEM", "")
+    
+    log_debug(f"Windows platform: {windows_platform}, MINGW detected: {mingw_detected}")
+    
     try:
         # Using a separate exit wrapper to ensure clean shutdown
+        log_debug("Calling app()")
         exit_code = app()
-        # Force exit with the code rather than letting Python's cleanup cause issues
-        sys.exit(exit_code)
+        log_debug(f"App returned exit code: {exit_code}")
+        
+        # Force immediate exit on Windows with MINGW to avoid segmentation fault
+        if windows_platform and mingw_detected:
+            log_debug("Windows/MINGW detected, using os._exit to avoid segmentation fault")
+            # Force immediate process termination without Python cleanup
+            # This avoids segmentation faults in the MINGW environment
+            os._exit(exit_code)
+        else:
+            # Force exit with the code rather than letting Python's cleanup cause issues
+            log_debug("Calling sys.exit with exit code")
+            sys.exit(exit_code)
     except KeyboardInterrupt:
         # Handle keyboard interrupt cleanly
+        log_debug("KeyboardInterrupt in main")
         console.print("\nOperation cancelled by user", style="yellow")
-        sys.exit(1)
+        
+        # Force immediate exit on Windows with MINGW
+        if windows_platform and mingw_detected:
+            os._exit(1)
+        else:
+            sys.exit(1)
     except Exception as e:
         # Catch and report any unexpected exceptions
+        log_debug(f"Fatal error in main: {str(e)}")
+        log_debug(traceback.format_exc())
         console.print(f"Unexpected error: {str(e)}", style="bold red")
         logger.exception("Fatal error in main application")
-        sys.exit(1)
+        
+        # Force immediate exit on Windows with MINGW
+        if windows_platform and mingw_detected:
+            os._exit(1)
+        else:
+            sys.exit(1)
