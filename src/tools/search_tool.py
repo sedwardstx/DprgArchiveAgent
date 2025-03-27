@@ -29,6 +29,20 @@ class SearchTool:
         start_time = time.time()
         
         try:
+            # Log the actual query for debugging
+            logger.info(f"Search query: '{query.query}', Search type: {query.use_dense=}, {query.use_sparse=}, {query.use_hybrid=}")
+            if query.title:
+                logger.info(f"Searching with title filter: '{query.title}'")
+                
+            # More filter logging
+            if query.author or query.year or query.month or query.day or query.keywords:
+                logger.info("Additional filters: " + 
+                           (f"author='{query.author}' " if query.author else "") +
+                           (f"year={query.year} " if query.year else "") +
+                           (f"month={query.month} " if query.month else "") +
+                           (f"day={query.day} " if query.day else "") +
+                           (f"keywords={query.keywords} " if query.keywords else ""))
+            
             # Determine search type
             if query.use_hybrid:
                 search_type = "hybrid"
@@ -53,11 +67,10 @@ class SearchTool:
                 filter_dict["day"] = {"$eq": query.day}
                 
             if query.title:
-                # For title, we want a partial match (containment)
-                filter_dict["title"] = {"$eq": query.title}
-                # Note: Pinecone doesn't support partial matching with $contains
-                # We'll need to post-filter for partial matches
+                # Don't use Pinecone's filtering for titles - it's too strict with $eq
+                # Instead, we'll do post-filtering only for partial matches
                 need_title_post_filter = True
+                logger.info(f"Will post-filter for title containing: {query.title}")
             else:
                 need_title_post_filter = False
                 
@@ -112,12 +125,23 @@ class SearchTool:
             if need_title_post_filter and query.title:
                 logger.info(f"Post-filtering for title containing: {query.title}")
                 pre_title_filter_count = len(documents)
+                # Add debug logging to see what titles we're checking
+                for doc in documents[:5]:  # Log just the first few to avoid flooding
+                    if doc.metadata and doc.metadata.title:
+                        logger.info(f"Document title for filtering: '{doc.metadata.title}'")
+                
                 documents = [
                     doc for doc in documents 
-                    if doc.metadata.title and query.title.lower() in doc.metadata.title.lower()
+                    if doc.metadata and doc.metadata.title and query.title.lower() in doc.metadata.title.lower()
                 ]
                 post_title_filter_count = len(documents)
                 logger.info(f"Title post-filtering: {pre_title_filter_count} -> {post_title_filter_count} documents")
+                
+                # Log the titles that matched for debugging
+                if post_title_filter_count > 0:
+                    logger.info("Matched titles:")
+                    for doc in documents[:5]:  # Just log the first few
+                        logger.info(f"- {doc.metadata.title}")
             
             # Filter by minimum score if necessary
             filtered_docs = documents

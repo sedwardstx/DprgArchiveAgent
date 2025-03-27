@@ -162,9 +162,19 @@ class ArchiveAgent:
         Returns:
             SearchResponse with results or SearchError if an error occurred
         """
-        # Construct a dummy query just to search by metadata
+        # If we're searching by title, use it as the query to get better semantic matches
+        query_text = title if title else "*"
+        
+        # For title searches, we want to use a regular query as it will work better
+        # than the metadata filter
+        if title:
+            logger.info(f"Metadata search with title as query: {title}")
+        else:
+            logger.info("Metadata search with wildcard query")
+        
+        # Construct a query with metadata filters
         search_query = SearchQuery(
-            query="*",  # Wildcard query
+            query=query_text,  # Use title as query if available
             top_k=top_k,
             author=author,
             year=year,
@@ -176,7 +186,6 @@ class ArchiveAgent:
             use_dense=True,  # Using dense by default
         )
         
-        logger.info(f"Metadata search")
         return await self.search(search_query)
 
 
