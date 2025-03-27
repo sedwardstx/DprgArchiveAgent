@@ -6,17 +6,20 @@ This guide walks you through setting up the DprgArchiveAgent and configuring it 
 
 Before you begin, ensure you have the following:
 
-- Python 3.10 or higher
-- A Pinecone account with API key
-- An OpenAI account with API key
-- Git (for cloning the repository)
+- [Python 3.10 or 3.11, higher versions not yet validated](prerequisites/python_setup.md)
+- [Rust and Cargo](prerequisites/rust_setup.md) (required for some Python dependencies)
+- [A Pinecone account with API key](prerequisites/pinecone_setup.md)
+- [An OpenAI account with API key](prerequisites/openai_setup.md)
+- [Git](prerequisites/git_setup.md) (for cloning the repository)
+
+Click on each prerequisite link above for detailed setup instructions specific to your operating system.
 
 ## Installation
 
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/DprgArchiveAgent.git
+git clone https://github.com/sedwardstx/DprgArchiveAgent.git
 cd DprgArchiveAgent
 ```
 
@@ -156,4 +159,30 @@ After completing the setup and configuration, you can proceed to:
 
 4. **OpenAI API errors**:
    - Check that your OpenAI API key is valid
-   - Verify you have sufficient quota for embeddings 
+   - Verify you have sufficient quota for embeddings
+
+5. **Rust compilation errors during pip install**:
+   - This occurs because some dependencies require Rust for compilation
+   - Ensure you have installed Rust and Cargo as described in the [Rust Setup Guide](prerequisites/rust_setup.md)
+   - After installing Rust, try installing dependencies again:
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+6. **Missing C compiler or build tools**:
+   - Some dependencies require a C compiler during installation
+   - On Windows: Install Visual C++ Build Tools as described in the Rust guide
+   - On macOS: Install Xcode Command Line Tools (`xcode-select --install`)
+   - On Linux: Install build-essential (Ubuntu/Debian) or equivalent
+
+7. **Permission errors during installation**:
+   - On Windows: Run command prompt/PowerShell as administrator
+   - On macOS/Linux: Use `sudo` if installing system-wide, or use a virtual environment
+
+8. **Import errors after successful installation**:
+   - Ensure all dependencies are installed correctly
+   - Try reinstalling the problematic package:
+     ```bash
+     pip uninstall package_name
+     pip install package_name
+     ``` 

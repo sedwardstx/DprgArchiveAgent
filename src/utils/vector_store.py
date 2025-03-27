@@ -39,7 +39,8 @@ class BaseVectorClient:
         self.api_key = api_key
         self.environment = environment
         self.namespace = namespace
-        self.pc = Pinecone(api_key=api_key, environment=environment)
+        # Initialize Pinecone without environment parameter in SDK v6+
+        self.pc = Pinecone(api_key=api_key)
         
     async def search(
         self,
@@ -80,8 +81,8 @@ class DenseVectorClient(BaseVectorClient):
         
         # Connect to the index
         try:
-            # This assumes the index is already created and we're connecting to it
-            self.index = self.pc.from_existing_index(host=index_url)
+            # Use the new Index() method instead of from_existing_index
+            self.index = self.pc.Index(host=index_url)
             logger.info(f"Connected to dense index at {index_url}")
         except Exception as e:
             logger.error(f"Error connecting to dense index: {str(e)}")
@@ -155,8 +156,8 @@ class SparseVectorClient(BaseVectorClient):
         
         # Connect to the index
         try:
-            # This assumes the index is already created and we're connecting to it
-            self.index = self.pc.from_existing_index(host=index_url)
+            # Use the new Index() method instead of from_existing_index
+            self.index = self.pc.Index(host=index_url)
             logger.info(f"Connected to sparse index at {index_url}")
         except Exception as e:
             logger.error(f"Error connecting to sparse index: {str(e)}")
@@ -197,12 +198,22 @@ class SparseVectorClient(BaseVectorClient):
                 include_metadata=True,
             )
             
+            # Handle both old and new response formats
+            if hasattr(response, "results"):
+                # New Pinecone SDK v6+ format
+                results = response.results[0].matches
+                result_count = len(results)
+            else:
+                # Old format
+                results = response.matches
+                result_count = len(results)
+            
             logger.info(
                 f"Sparse search completed in {time.time() - start_time:.2f}s. "
-                f"Found {len(response.results[0].matches)} results."
+                f"Found {result_count} results."
             )
             
-            return response.results[0].matches
+            return results
         except Exception as e:
             logger.error(f"Error in sparse search: {str(e)}")
             raise

@@ -47,8 +47,8 @@ def validate_config() -> Dict[str, Any]:
     if not PINECONE_API_KEY:
         missing.append("PINECONE_API_KEY")
     
-    if not PINECONE_ENVIRONMENT:
-        missing.append("PINECONE_ENVIRONMENT")
+    # Pinecone SDK v6+ no longer requires environment parameter
+    # Kept for backward compatibility but not enforced
     
     if not OPENAI_API_KEY:
         missing.append("OPENAI_API_KEY")

@@ -28,8 +28,17 @@ class ArchiveDocument(BaseModel):
     @classmethod
     def from_pinecone_match(cls, match: Dict[str, Any]) -> "ArchiveDocument":
         """Create an ArchiveDocument from a Pinecone match."""
-        # Extract the metadata
-        metadata = match.get("metadata", {})
+        # Extract the metadata - handle both old and new Pinecone SDK response formats
+        if hasattr(match, "metadata"):
+            # New Pinecone SDK v6+ object response
+            metadata = match.metadata
+            match_id = match.id
+            score = match.score
+        else:
+            # Dictionary response or older format
+            metadata = match.get("metadata", {})
+            match_id = match.get("id", "")
+            score = match.get("score")
         
         # Create metadata object
         archive_metadata = ArchiveMetadata(
@@ -45,10 +54,10 @@ class ArchiveDocument(BaseModel):
         
         # Create and return document
         return cls(
-            id=match.get("id", ""),
+            id=match_id,
             text_excerpt=metadata.get("text_excerpt", ""),
             metadata=archive_metadata,
-            score=match.get("score"),
+            score=score,
         )
 
 

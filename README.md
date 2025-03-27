@@ -18,7 +18,7 @@ DprgArchiveAgent provides a seamless interface to search through DPRG archives u
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/DprgArchiveAgent.git
+git clone https://github.com/sedwardstx/DprgArchiveAgent.git
 cd DprgArchiveAgent
 
 # Create a virtual environment
