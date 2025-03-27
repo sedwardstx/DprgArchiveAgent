@@ -2,7 +2,7 @@
 Pydantic models for DprgArchiveAgent.
 """
 from datetime import datetime
-from typing import List, Optional, Dict, Any, Union
+from typing import List, Optional, Dict, Any, Union, Literal
 from pydantic import BaseModel, Field, validator
 
 
@@ -88,5 +88,35 @@ class SearchResponse(BaseModel):
 
 class SearchError(BaseModel):
     """Error response for search queries."""
+    error: str
+    details: Optional[Dict[str, Any]] = None
+
+
+# Chat completion models
+class ChatMessage(BaseModel):
+    """A message in a chat conversation."""
+    role: Literal["system", "user", "assistant"] = Field(..., description="The role of the message sender")
+    content: str = Field(..., description="The content of the message")
+
+
+class ChatCompletionRequest(BaseModel):
+    """Request model for chat completions."""
+    messages: List[ChatMessage] = Field(..., description="The messages in the conversation so far")
+    model: Optional[str] = Field(None, description="The model to use for chat completion")
+    max_tokens: Optional[int] = Field(None, description="Maximum number of tokens to generate")
+    temperature: Optional[float] = Field(0.7, description="Sampling temperature")
+    search_top_k: Optional[int] = Field(5, description="Number of archive documents to retrieve")
+    use_search_type: Optional[str] = Field("dense", description="Search type to use: dense, sparse, or hybrid")
+
+
+class ChatCompletionResponse(BaseModel):
+    """Response model for chat completions."""
+    message: ChatMessage = Field(..., description="The generated assistant message")
+    referenced_documents: List[ArchiveDocument] = Field([], description="Documents referenced in the response")
+    elapsed_time: float = Field(..., description="Time taken to generate the response in seconds")
+
+
+class ChatCompletionError(BaseModel):
+    """Error response for chat completions."""
     error: str
     details: Optional[Dict[str, Any]] = None 

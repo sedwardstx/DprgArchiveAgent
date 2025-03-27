@@ -1,5 +1,6 @@
 """
 Command-line interface for the DPRG Archive Agent.
+Uses Typer and Rich for a nice CLI experience.
 """
 import asyncio
 import logging
@@ -9,17 +10,20 @@ import os
 import platform
 import traceback
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Any, Dict
 
 import typer
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 from rich.text import Text
+from rich.markdown import Markdown
+from rich.prompt import Prompt
+from rich import box
 
-from .config import validate_config
+from .config import validate_config, DEFAULT_TOP_K
 from .agent.archive_agent import archive_agent
-from .schema.models import SearchError
+from .schema.models import SearchError, SearchQuery, ChatMessage, ChatCompletionRequest
 from .utils.vector_store import cleanup_clients
 
 # Set up logger
@@ -393,6 +397,112 @@ def search_metadata(
         console.print(f"Unexpected error: {str(e)}", style="bold red")
         logger.exception("Unexpected error during metadata search")
         return 1
+
+
+# Add a chat command
+@app.command()
+def chat(
+    ctx: typer.Context,
+    search_type: str = typer.Option(
+        "dense", "--type", "-t", 
+        help="Search type to use for retrieving context: dense, sparse, or hybrid"
+    ),
+    top_k: int = typer.Option(
+        5, "--top-k", "-k", 
+        help="Number of documents to retrieve for context"
+    ),
+    temperature: float = typer.Option(
+        0.7, "--temperature", 
+        help="Temperature for response generation"
+    ),
+):
+    """
+    Start an interactive chat session with the DPRG Archive Agent.
+    The agent will answer questions using information from the archive.
+    """
+    console = Console()
+    
+    console.print(
+        Panel.fit(
+            "[bold blue]DPRG Archive Agent Chat[/bold blue]\n"
+            "Ask questions about the DPRG archive. Type 'exit' or 'quit' to end the session.",
+            title="Chat Mode",
+            border_style="blue"
+        )
+    )
+    
+    # Initialize conversation history
+    conversation = [
+        ChatMessage(
+            role="system",
+            content="You are an expert on the DPRG (Dallas Personal Robotics Group) archive."
+        )
+    ]
+    
+    # Chat loop
+    while True:
+        # Get user input
+        user_input = Prompt.ask("\n[bold green]You[/bold green]")
+        
+        # Check for exit command
+        if user_input.lower() in ["exit", "quit", "bye", "goodbye"]:
+            console.print("[bold blue]Agent[/bold blue]: Goodbye! Thanks for chatting.")
+            break
+        
+        # Add user message to conversation
+        conversation.append(ChatMessage(role="user", content=user_input))
+        
+        try:
+            # Create chat request
+            request = ChatCompletionRequest(
+                messages=conversation,
+                search_top_k=top_k,
+                use_search_type=search_type,
+                temperature=temperature
+            )
+            
+            # Indicate that we're thinking
+            with console.status("[bold blue]Thinking...[/bold blue]", spinner="dots"):
+                # Get response from agent
+                response = asyncio.run(archive_agent.chat(request))
+            
+            # Display referenced documents if any
+            if hasattr(response, "referenced_documents") and response.referenced_documents:
+                docs_table = Table(title="Referenced Documents", box=box.ROUNDED)
+                docs_table.add_column("Title", style="cyan")
+                docs_table.add_column("Author", style="green")
+                docs_table.add_column("Date", style="yellow")
+                
+                for doc in response.referenced_documents[:3]:  # Show top 3 docs
+                    # Format date if available
+                    date_str = ""
+                    if doc.metadata.year:
+                        date_str = f"{doc.metadata.year}"
+                        if doc.metadata.month:
+                            date_str += f"-{doc.metadata.month}"
+                            if doc.metadata.day:
+                                date_str += f"-{doc.metadata.day}"
+                    
+                    docs_table.add_row(
+                        doc.metadata.title or "Untitled",
+                        doc.metadata.author or "Unknown",
+                        date_str or "Unknown"
+                    )
+                
+                console.print(docs_table)
+            
+            # Display agent response
+            if hasattr(response, "message"):
+                console.print("\n[bold blue]Agent[/bold blue]:")
+                console.print(Markdown(response.message.content))
+                
+                # Add assistant message to conversation history
+                conversation.append(response.message)
+            else:
+                console.print("[bold red]Error:[/bold red] Failed to get a response")
+        
+        except Exception as e:
+            console.print(f"[bold red]Error:[/bold red] {str(e)}")
 
 
 if __name__ == "__main__":

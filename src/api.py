@@ -6,12 +6,15 @@ import logging
 from typing import Optional, List, Dict, Any, Union
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Query, HTTPException, Depends
+from fastapi import FastAPI, Query, HTTPException, Depends, Body
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 from .config import get_api_settings, validate_config
-from .schema.models import SearchQuery, SearchResponse, SearchError, ArchiveDocument
+from .schema.models import (
+    SearchQuery, SearchResponse, SearchError, ArchiveDocument,
+    ChatMessage, ChatCompletionRequest, ChatCompletionResponse, ChatCompletionError
+)
 from .agent.archive_agent import archive_agent
 
 # Set up logger
@@ -227,6 +230,43 @@ async def search_by_metadata(
     except Exception as e:
         logger.error(f"Error in metadata search endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Metadata search failed: {str(e)}")
+
+
+@app.post("/chat", response_model=Union[ChatCompletionResponse, ChatCompletionError])
+async def chat_completion(
+    request: ChatCompletionRequest = Body(..., description="Chat completion request")
+):
+    """
+    Generate a chat completion based on the conversation history,
+    using relevant documents from the DPRG archive.
+    
+    Args:
+        request: Chat completion request with messages and parameters
+        
+    Returns:
+        ChatCompletionResponse with generated message or ChatCompletionError
+    """
+    try:
+        logger.info("Received chat completion request")
+        
+        # Validate the request
+        if not request.messages:
+            raise HTTPException(status_code=400, detail="No messages provided in the request")
+        
+        # Process the chat request
+        result = await archive_agent.chat(request)
+        
+        # Check for error response
+        if isinstance(result, ChatCompletionError):
+            raise HTTPException(status_code=500, detail=result.error)
+        
+        return result
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in chat completion endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Chat completion failed: {str(e)}")
 
 
 def start():

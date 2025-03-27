@@ -26,6 +26,17 @@ SPARSE_INDEX_URL = os.getenv(
 # OpenAI settings
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-large")
+CHAT_MODEL = os.getenv("CHAT_MODEL", "gpt-4o")
+CHAT_MAX_TOKENS = int(os.getenv("CHAT_MAX_TOKENS", "1024"))
+CHAT_TEMPERATURE = float(os.getenv("CHAT_TEMPERATURE", "0.7"))
+CHAT_SYSTEM_PROMPT = os.getenv(
+    "CHAT_SYSTEM_PROMPT", 
+    "You are an expert on the DPRG (Dallas Personal Robotics Group) archive. "
+    "Answer questions using only the specific information provided in the retrieved documents. "
+    "If you don't have enough information to answer, say so clearly rather than making up information. "
+    "When referencing information, cite the source document titles. "
+    "You should focus on providing accurate, helpful information about robotics, DPRG history, and related topics."
+)
 
 # API settings
 API_HOST = os.getenv("API_HOST", "0.0.0.0")
@@ -87,4 +98,13 @@ def get_search_settings() -> Dict[str, Any]:
         "min_score": MIN_SCORE_THRESHOLD,
         "dense_weight": DENSE_WEIGHT,
         "sparse_weight": SPARSE_WEIGHT,
+    }
+
+def get_chat_settings() -> Dict[str, Any]:
+    """Return settings related to chat completions."""
+    return {
+        "model": CHAT_MODEL,
+        "max_tokens": CHAT_MAX_TOKENS,
+        "temperature": CHAT_TEMPERATURE,
+        "system_prompt": CHAT_SYSTEM_PROMPT,
     }

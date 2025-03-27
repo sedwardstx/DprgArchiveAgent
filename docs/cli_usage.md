@@ -191,6 +191,50 @@ For each query, you'll also see:
 - Total number of results found
 - Search time in seconds
 
+## Chat Command
+
+The CLI now supports an interactive chat mode where you can have a conversation with an AI assistant that has access to the DPRG archive.
+
+### Basic Chat Usage
+
+```bash
+python -m src.cli chat
+```
+
+This starts an interactive chat session where you can ask questions about the DPRG archive.
+
+### Chat Options
+
+```
+Options:
+  -t, --type TEXT          Search type to use for retrieving context: dense, sparse, or hybrid  [default: dense]
+  -k, --top-k INTEGER      Number of documents to retrieve for context  [default: 5]
+  --temperature FLOAT      Temperature for response generation  [default: 0.7]
+  --help                   Show this message and exit.
+```
+
+### Example Chat Session
+
+```bash
+# Start a chat session with default parameters
+python -m src.cli chat
+
+# Use sparse search for document retrieval
+python -m src.cli chat -t sparse
+
+# Retrieve more documents for better context
+python -m src.cli chat -k 10
+
+# Use a lower temperature for more deterministic responses
+python -m src.cli chat --temperature 0.3
+```
+
+During the chat session:
+- Type your questions or statements about the DPRG archive
+- The agent will retrieve relevant documents and answer based on those documents
+- The agent will show you which documents it referenced
+- Type 'exit' or 'quit' to end the session
+
 ## Environment Configuration
 
 The CLI respects the configuration set in your `.env` file. If you encounter errors:
