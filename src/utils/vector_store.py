@@ -269,56 +269,71 @@ class HybridSearchClient:
         """
         start_time = time.time()
         
-        # Execute searches in parallel
-        dense_task = asyncio.create_task(
-            self.dense_client.search(query, top_k=top_k*2, filter=filter, namespace=namespace)
-        )
-        sparse_task = asyncio.create_task(
-            self.sparse_client.search(query, top_k=top_k*2, filter=filter, namespace=namespace)
-        )
-        
-        # Wait for both searches to complete
-        dense_results, sparse_results = await asyncio.gather(dense_task, sparse_task)
-        
-        # Create a combined result set with weighted scores
-        id_to_result = {}
-        
-        # Process dense results
-        for result in dense_results:
-            id_to_result[result.id] = {
-                "id": result.id,
-                "score": result.score * self.dense_weight,
-                "metadata": result.metadata,
-                "source": "dense"
-            }
-        
-        # Process sparse results
-        for result in sparse_results:
-            if result.id in id_to_result:
-                # Combine scores if document exists in both result sets
-                id_to_result[result.id]["score"] += result.score * self.sparse_weight
-                id_to_result[result.id]["source"] = "hybrid"
-            else:
+        try:
+            # Execute searches in parallel
+            dense_task = asyncio.create_task(
+                self.dense_client.search(query, top_k=top_k*2, filter=filter, namespace=namespace)
+            )
+            sparse_task = asyncio.create_task(
+                self.sparse_client.search(query, top_k=top_k*2, filter=filter, namespace=namespace)
+            )
+            
+            # Wait for both searches to complete
+            dense_results, sparse_results = await asyncio.gather(dense_task, sparse_task)
+            
+            # Create a combined result set with weighted scores
+            id_to_result = {}
+            
+            # Process dense results
+            for result in dense_results:
                 id_to_result[result.id] = {
                     "id": result.id,
-                    "score": result.score * self.sparse_weight,
+                    "score": result.score * self.dense_weight,
                     "metadata": result.metadata,
-                    "source": "sparse"
+                    "source": "dense"
                 }
-        
-        # Convert to list and sort by score
-        combined_results = list(id_to_result.values())
-        combined_results.sort(key=lambda x: x["score"], reverse=True)
-        
-        # Apply minimum score threshold and limit to top_k
-        filtered_results = [r for r in combined_results if r["score"] >= min_score][:top_k]
-        
-        logger.info(
-            f"Hybrid search completed in {time.time() - start_time:.2f}s. "
-            f"Found {len(filtered_results)} results after combining."
-        )
-        
-        return filtered_results
+            
+            # Process sparse results
+            for result in sparse_results:
+                if result.id in id_to_result:
+                    # Combine scores if document exists in both result sets
+                    id_to_result[result.id]["score"] += result.score * self.sparse_weight
+                    id_to_result[result.id]["source"] = "hybrid"
+                else:
+                    id_to_result[result.id] = {
+                        "id": result.id,
+                        "score": result.score * self.sparse_weight,
+                        "metadata": result.metadata,
+                        "source": "sparse"
+                    }
+            
+            # Convert to list and sort by score
+            combined_results = list(id_to_result.values())
+            combined_results.sort(key=lambda x: x["score"], reverse=True)
+            
+            # Apply minimum score threshold and limit to top_k
+            filtered_results = [r for r in combined_results if r["score"] >= min_score][:top_k]
+            
+            logger.info(
+                f"Hybrid search completed in {time.time() - start_time:.2f}s. "
+                f"Found {len(filtered_results)} results after combining."
+            )
+            
+            return filtered_results
+        except Exception as e:
+            logger.error(f"Error in hybrid search: {str(e)}")
+            raise
+        # No need for explicit cleanup - garbage collection handles this
+
+
+# Custom cleanup function to ensure resources are released
+def cleanup_clients():
+    """Clean up client connections - call this when shutting down the application."""
+    # This is a placeholder - in a real app with persistent connections,
+    # you would implement proper cleanup here
+    logger.info("Cleaning up vector store clients")
+    # Nothing to do for simple clients, but could be needed for more complex ones
+    pass
 
 
 # Create singleton instances

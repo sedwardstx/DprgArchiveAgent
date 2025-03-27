@@ -4,6 +4,7 @@ Command-line interface for the DPRG Archive Agent.
 import asyncio
 import logging
 import sys
+import atexit
 from datetime import datetime
 from typing import Optional, List
 
@@ -16,6 +17,7 @@ from rich.text import Text
 from .config import validate_config
 from .agent.archive_agent import archive_agent
 from .schema.models import SearchError
+from .utils.vector_store import cleanup_clients
 
 # Set up logger
 logging.basicConfig(
@@ -23,6 +25,9 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Register cleanup function to run at exit
+atexit.register(cleanup_clients)
 
 # Create Typer app
 app = typer.Typer(
@@ -33,6 +38,19 @@ app = typer.Typer(
 
 # Create Rich console for pretty output
 console = Console()
+
+
+def run_async_safely(coro):
+    """Run an async coroutine safely and handle cleanup properly."""
+    try:
+        # Create a new event loop each time to avoid issues with existing loops
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        result = loop.run_until_complete(coro)
+        return result
+    finally:
+        # Always properly close the loop
+        loop.close()
 
 
 def validate_environment():
@@ -171,7 +189,7 @@ def search(
         with console.status(f"Searching for '{query}'...", spinner="dots"):
             try:
                 if search_type == "hybrid":
-                    result = asyncio.run(
+                    result = run_async_safely(
                         archive_agent.search_hybrid(
                             query=query,
                             top_k=top_k,
@@ -184,7 +202,7 @@ def search(
                         )
                     )
                 elif search_type == "sparse":
-                    result = asyncio.run(
+                    result = run_async_safely(
                         archive_agent.search_sparse(
                             query=query,
                             top_k=top_k,
@@ -197,7 +215,7 @@ def search(
                         )
                     )
                 else:  # dense
-                    result = asyncio.run(
+                    result = run_async_safely(
                         archive_agent.search_dense(
                             query=query,
                             top_k=top_k,
@@ -217,6 +235,9 @@ def search(
                     
                 # Display results
                 display_results(result, query, search_type)
+                    
+                # Explicitly attempt cleanup
+                cleanup_clients()
                     
             except Exception as e:
                 console.print(f"Error: {str(e)}", style="bold red")
@@ -281,7 +302,7 @@ def search_metadata(
         # Execute search
         with console.status("Searching by metadata...", spinner="dots"):
             try:
-                result = asyncio.run(
+                result = run_async_safely(
                     archive_agent.search_by_metadata(
                         author=author,
                         year=year,
@@ -301,6 +322,9 @@ def search_metadata(
                 # Display results
                 display_results(result, "Metadata Search", "metadata")
                     
+                # Explicitly attempt cleanup
+                cleanup_clients()
+                    
             except Exception as e:
                 console.print(f"Error: {str(e)}", style="bold red")
                 sys.exit(1)
@@ -318,4 +342,17 @@ def search_metadata(
 
 
 if __name__ == "__main__":
-    app()
+    try:
+        # Using a separate exit wrapper to ensure clean shutdown
+        exit_code = app()
+        # Force exit with the code rather than letting Python's cleanup cause issues
+        sys.exit(exit_code)
+    except KeyboardInterrupt:
+        # Handle keyboard interrupt cleanly
+        console.print("\nOperation cancelled by user", style="yellow")
+        sys.exit(1)
+    except Exception as e:
+        # Catch and report any unexpected exceptions
+        console.print(f"Unexpected error: {str(e)}", style="bold red")
+        logger.exception("Fatal error in main application")
+        sys.exit(1)
