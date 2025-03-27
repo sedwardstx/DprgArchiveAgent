@@ -4,6 +4,7 @@ FastAPI REST API for the DPRG Archive Agent.
 import asyncio
 import logging
 from typing import Optional, List, Dict, Any, Union
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Query, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,11 +21,24 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Initialize FastAPI app with lifespan handler
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for application startup and shutdown events."""
+    # Validate configuration
+    config_status = validate_config()
+    if not config_status["valid"]:
+        logger.error(f"Invalid configuration: {config_status['message']}")
+        # We'll continue, but log the error
+    yield
+    # Shutdown logic can be added here if needed
+
 # Initialize FastAPI app
 app = FastAPI(
     title="DPRG Archive Agent API",
     description="API for querying the DPRG archive using vector search",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Add CORS middleware
@@ -35,16 +49,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Run on API startup."""
-    # Validate configuration
-    config_status = validate_config()
-    if not config_status["valid"]:
-        logger.error(f"Invalid configuration: {config_status['message']}")
-        # We'll continue, but log the error
 
 
 @app.get("/")
