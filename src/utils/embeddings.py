@@ -6,12 +6,14 @@ from typing import List, Dict, Any, Optional
 
 import openai
 from openai import OpenAI
+from openai import AsyncOpenAI
 
 from ..config import OPENAI_API_KEY, EMBEDDING_MODEL
 
 
-# Initialize the OpenAI client
+# Initialize the OpenAI clients
 client = OpenAI(api_key=OPENAI_API_KEY)
+async_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 
 async def get_embedding(text: str, model: str = EMBEDDING_MODEL) -> List[float]:
@@ -34,7 +36,7 @@ async def get_embedding(text: str, model: str = EMBEDDING_MODEL) -> List[float]:
         text = text[:32000]
     
     try:
-        response = await client.embeddings.create(
+        response = await async_client.embeddings.create(
             model=model,
             input=text,
             encoding_format="float"
@@ -59,13 +61,13 @@ async def get_embeddings(texts: List[str], model: str = EMBEDDING_MODEL) -> List
         return []
     
     # Filter out empty texts
-    valid_texts = [t for t in t.strip() for t in texts if t.strip()]
+    valid_texts = [t for t in texts if t.strip()]
     
     if not valid_texts:
         return []
     
     try:
-        response = await client.embeddings.create(
+        response = await async_client.embeddings.create(
             model=model,
             input=valid_texts,
             encoding_format="float"
