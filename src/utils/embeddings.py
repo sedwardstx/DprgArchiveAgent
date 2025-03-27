@@ -2,8 +2,12 @@
 Utility functions for generating embeddings.
 """
 import time
-from typing import List, Dict, Any, Optional
+import re
+from typing import List, Dict, Any, Optional, Tuple
+from collections import Counter
+import math
 
+import numpy as np
 import openai
 from openai import OpenAI
 from openai import AsyncOpenAI
@@ -14,6 +18,118 @@ from ..config import OPENAI_API_KEY, EMBEDDING_MODEL
 # Initialize the OpenAI clients
 client = OpenAI(api_key=OPENAI_API_KEY)
 async_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+
+# nltk stopwords (common English words to ignore)
+STOPWORDS = {
+    "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "aren't", "as", "at",
+    "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can't", "cannot", "could",
+    "couldn't", "did", "didn't", "do", "does", "doesn't", "doing", "don't", "down", "during", "each", "few", "for",
+    "from", "further", "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he'd", "he'll", "he's",
+    "her", "here", "here's", "hers", "herself", "him", "himself", "his", "how", "how's", "i", "i'd", "i'll", "i'm",
+    "i've", "if", "in", "into", "is", "isn't", "it", "it's", "its", "itself", "let's", "me", "more", "most", "mustn't",
+    "my", "myself", "no", "nor", "not", "of", "off", "on", "once", "only", "or", "other", "ought", "our", "ours",
+    "ourselves", "out", "over", "own", "same", "shan't", "she", "she'd", "she'll", "she's", "should", "shouldn't",
+    "so", "some", "such", "than", "that", "that's", "the", "their", "theirs", "them", "themselves", "then", "there",
+    "there's", "these", "they", "they'd", "they'll", "they're", "they've", "this", "those", "through", "to", "too",
+    "under", "until", "up", "very", "was", "wasn't", "we", "we'd", "we'll", "we're", "we've", "were", "weren't",
+    "what", "what's", "when", "when's", "where", "where's", "which", "while", "who", "who's", "whom", "why", "why's",
+    "with", "won't", "would", "wouldn't", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself",
+    "yourselves"
+}
+
+
+def tokenize_text(text: str) -> List[str]:
+    """
+    Basic tokenization function for text.
+    
+    Args:
+        text: The text to tokenize
+        
+    Returns:
+        List of tokens
+    """
+    # Convert to lowercase
+    text = text.lower()
+    
+    # Replace non-alphanumeric with spaces
+    text = re.sub(r'[^a-z0-9\s]', ' ', text)
+    
+    # Split on whitespace
+    tokens = text.split()
+    
+    # Remove stopwords and very short tokens
+    tokens = [t for t in tokens if t not in STOPWORDS and len(t) > 2]
+    
+    return tokens
+
+
+def compute_idf(corpus_tokens: List[List[str]]) -> Dict[str, float]:
+    """
+    Compute Inverse Document Frequency (IDF) values.
+    
+    Args:
+        corpus_tokens: A list of tokenized documents
+        
+    Returns:
+        Dictionary mapping tokens to IDF values
+    """
+    # Number of documents
+    N = len(corpus_tokens)
+    
+    # Count documents containing each token
+    doc_freq = {}
+    for doc_tokens in corpus_tokens:
+        for token in set(doc_tokens):  # Use set to count each token only once per document
+            doc_freq[token] = doc_freq.get(token, 0) + 1
+    
+    # Compute IDF value for each token
+    idf = {}
+    for token, freq in doc_freq.items():
+        idf[token] = math.log((N + 1) / (freq + 1)) + 1  # Smoothed IDF
+    
+    return idf
+
+
+async def generate_sparse_vector(text: str) -> Tuple[List[int], List[float]]:
+    """
+    Generate a sparse vector for text using a simplified BM25-like approach.
+    
+    Args:
+        text: The text to convert to a sparse vector
+        
+    Returns:
+        A tuple of (indices, values) representing the sparse vector
+    """
+    # Step 1: Tokenize the text
+    tokens = tokenize_text(text)
+    
+    # Step 2: Count term frequencies
+    term_freq = Counter(tokens)
+    
+    # Step 3: Compute TF-IDF-like weights
+    # In a real BM25 implementation, we would compute proper IDF values from a corpus
+    # Here we use a simplified approach that just uses the term frequency with diminishing returns
+    
+    # Sort by tokens to ensure consistent ordering
+    sorted_items = sorted(term_freq.items())
+    
+    # Get indices and values
+    indices = []
+    values = []
+    
+    for token, count in sorted_items:
+        # Compute hash of token to get index
+        # Using hash % 1000 to limit the dimensionality of the sparse vector
+        index = abs(hash(token) % 1000)
+        
+        # Calculate the value using a simplified formula
+        # Higher frequency means higher value, but with diminishing returns
+        value = 1.0 + math.log(count)
+        
+        indices.append(index)
+        values.append(value)
+    
+    return indices, values
 
 
 async def get_embedding(text: str, model: str = EMBEDDING_MODEL) -> List[float]:
