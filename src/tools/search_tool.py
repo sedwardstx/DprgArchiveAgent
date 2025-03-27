@@ -52,6 +52,15 @@ class SearchTool:
             if query.day:
                 filter_dict["day"] = {"$eq": query.day}
                 
+            if query.title:
+                # For title, we want a partial match (containment)
+                filter_dict["title"] = {"$eq": query.title}
+                # Note: Pinecone doesn't support partial matching with $contains
+                # We'll need to post-filter for partial matches
+                need_title_post_filter = True
+            else:
+                need_title_post_filter = False
+                
             if query.keywords and len(query.keywords) > 0:
                 # Pinecone v6+ doesn't support $all, use $in instead and implement post-filtering
                 # $in will match ANY of the keywords, then we'll filter for ALL later
@@ -99,6 +108,17 @@ class SearchTool:
                 post_keyword_filter_count = len(documents)
                 logger.info(f"Keyword post-filtering: {pre_keyword_filter_count} -> {post_keyword_filter_count} documents")
             
+            # Post-process for title partial matching if needed
+            if need_title_post_filter and query.title:
+                logger.info(f"Post-filtering for title containing: {query.title}")
+                pre_title_filter_count = len(documents)
+                documents = [
+                    doc for doc in documents 
+                    if doc.metadata.title and query.title.lower() in doc.metadata.title.lower()
+                ]
+                post_title_filter_count = len(documents)
+                logger.info(f"Title post-filtering: {pre_title_filter_count} -> {post_title_filter_count} documents")
+            
             # Filter by minimum score if necessary
             filtered_docs = documents
             if min_score > 0 and search_type != "hybrid":  # hybrid already filters
@@ -139,6 +159,7 @@ class SearchTool:
         month: Optional[int] = None,
         day: Optional[int] = None,
         keywords: Optional[List[str]] = None,
+        title: Optional[str] = None,
     ) -> List[ArchiveDocument]:
         """
         Filter search results by metadata.
@@ -150,6 +171,7 @@ class SearchTool:
             month: Filter by month
             day: Filter by day
             keywords: Filter by keywords (must contain all specified keywords)
+            title: Filter by title (partial match)
             
         Returns:
             Filtered results
@@ -172,6 +194,12 @@ class SearchTool:
             filtered = [
                 doc for doc in filtered 
                 if doc.metadata.keywords and all(kw in doc.metadata.keywords for kw in keywords)
+            ]
+
+        if title:
+            filtered = [
+                doc for doc in filtered 
+                if doc.metadata.title and title.lower() in doc.metadata.title.lower()
             ]
             
         return filtered

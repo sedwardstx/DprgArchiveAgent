@@ -70,6 +70,7 @@ class SearchQuery(BaseModel):
     month: Optional[int] = Field(None, description="Filter by month")
     day: Optional[int] = Field(None, description="Filter by day")
     keywords: Optional[List[str]] = Field(None, description="Filter by keywords")
+    title: Optional[str] = Field(None, description="Filter by title (partial match)")
     min_score: Optional[float] = Field(None, description="Minimum score threshold")
     use_dense: Optional[bool] = Field(True, description="Use dense vector search")
     use_sparse: Optional[bool] = Field(False, description="Use sparse vector search")

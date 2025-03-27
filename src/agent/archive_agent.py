@@ -142,6 +142,7 @@ class ArchiveAgent:
         month: Optional[int] = None,
         day: Optional[int] = None,
         keywords: Optional[List[str]] = None,
+        title: Optional[str] = None,
         top_k: int = 10,
         min_score: Optional[float] = None,
     ) -> Union[SearchResponse, SearchError]:
@@ -154,6 +155,7 @@ class ArchiveAgent:
             month: Filter by month
             day: Filter by day
             keywords: Filter by keywords
+            title: Filter by title (partial match)
             top_k: Number of results to return
             min_score: Minimum score threshold
             
@@ -169,6 +171,7 @@ class ArchiveAgent:
             month=month,
             day=day,
             keywords=keywords,
+            title=title,
             min_score=min_score,
             use_dense=True,  # Using dense by default
         )

@@ -313,6 +313,7 @@ def search_metadata(
     month: Optional[int] = typer.Option(None, "--month", "-m", help="Filter by month"),
     day: Optional[int] = typer.Option(None, "--day", "-d", help="Filter by day"),
     keywords: Optional[List[str]] = typer.Option(None, "--keyword", "-kw", help="Filter by keyword (can be used multiple times)"),
+    title: Optional[str] = typer.Option(None, "--title", "-t", help="Filter by title (partial match)"),
     top_k: int = typer.Option(10, "--top-k", "-k", help="Number of results to return"),
     min_score: Optional[float] = typer.Option(0.3, "--min-score", "-s", help="Minimum score threshold"),
     no_filter: bool = typer.Option(False, "--no-filter", help="Disable minimum score filtering"),
@@ -330,7 +331,7 @@ def search_metadata(
             min_score = 0.0
             
         # At least one metadata field must be provided
-        if not any([author, year, month, day, keywords]):
+        if not any([author, year, month, day, keywords, title]):
             console.print("Error: At least one metadata filter must be provided", style="bold red")
             sys.exit(1)
         
@@ -344,7 +345,8 @@ def search_metadata(
                 f"{f'Year=[blue]{year}[/blue]' if year else ''} "
                 f"{f'Month=[blue]{month}[/blue]' if month else ''} "
                 f"{f'Day=[blue]{day}[/blue]' if day else ''} "
-                f"{f'Keywords=[blue]{keywords}[/blue]' if keywords else ''}",
+                f"{f'Keywords=[blue]{keywords}[/blue]' if keywords else ''} "
+                f"{f'Title=[blue]{title}[/blue]' if title else ''}",
                 title="Search Parameters",
                 expand=False,
             )
@@ -360,6 +362,7 @@ def search_metadata(
                         month=month,
                         day=day,
                         keywords=keywords,
+                        title=title,
                         top_k=top_k,
                         min_score=min_score,
                     )
