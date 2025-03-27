@@ -189,9 +189,14 @@ class SparseVectorClient(BaseVectorClient):
         ns = namespace or self.namespace
         
         try:
-            # Execute the query - sparse indexes can handle text queries directly
+            # For Pinecone v6+, we need to use a dense vector for sparse search too
+            # This is a workaround until we implement a proper sparse tokenizer
+            # Get a dense embedding and use it for the query
+            vector = await get_embedding(query)
+            
+            # Execute the query with the dense vector instead of text
             response = self.index.query(
-                queries=[query],
+                vector=vector,  # Use dense vector instead of text query
                 top_k=top_k,
                 namespace=ns,
                 filter=filter,
@@ -268,19 +273,36 @@ class HybridSearchClient:
             List of matches with scores weighted by search type
         """
         start_time = time.time()
+        dense_results = []
+        sparse_results = []
         
         try:
-            # Execute searches in parallel
-            dense_task = asyncio.create_task(
-                self.dense_client.search(query, top_k=top_k*2, filter=filter, namespace=namespace)
-            )
-            sparse_task = asyncio.create_task(
-                self.sparse_client.search(query, top_k=top_k*2, filter=filter, namespace=namespace)
-            )
+            # Execute dense search first
+            try:
+                dense_task = asyncio.create_task(
+                    self.dense_client.search(query, top_k=top_k*2, filter=filter, namespace=namespace)
+                )
+                dense_results = await dense_task
+                logger.info(f"Hybrid: Dense search completed with {len(dense_results)} results.")
+            except Exception as e:
+                logger.error(f"Hybrid: Dense search failed: {str(e)}")
+                # Continue with sparse search
             
-            # Wait for both searches to complete
-            dense_results, sparse_results = await asyncio.gather(dense_task, sparse_task)
+            # Execute sparse search
+            try:
+                sparse_task = asyncio.create_task(
+                    self.sparse_client.search(query, top_k=top_k*2, filter=filter, namespace=namespace)
+                )
+                sparse_results = await sparse_task
+                logger.info(f"Hybrid: Sparse search completed with {len(sparse_results)} results.")
+            except Exception as e:
+                logger.error(f"Hybrid: Sparse search failed: {str(e)}")
+                # Continue with dense results only
             
+            # If both searches failed, raise an exception
+            if not dense_results and not sparse_results:
+                raise Exception("Both dense and sparse searches failed")
+                
             # Create a combined result set with weighted scores
             id_to_result = {}
             
@@ -314,8 +336,14 @@ class HybridSearchClient:
             # Apply minimum score threshold and limit to top_k
             filtered_results = [r for r in combined_results if r["score"] >= min_score][:top_k]
             
+            search_type = "hybrid"
+            if not sparse_results:
+                search_type = "dense-only"
+            elif not dense_results:
+                search_type = "sparse-only"
+                
             logger.info(
-                f"Hybrid search completed in {time.time() - start_time:.2f}s. "
+                f"{search_type} search completed in {time.time() - start_time:.2f}s. "
                 f"Found {len(filtered_results)} results after combining."
             )
             
