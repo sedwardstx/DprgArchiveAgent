@@ -129,12 +129,41 @@ class DenseVectorClient(BaseVectorClient):
                 include_metadata=True,
             )
             
+            # Handle both old and new response formats - with safer access
+            results = []
+            
+            if response is None:
+                logger.warning("Received None response from Pinecone")
+                return []
+                
+            # Check for new Pinecone SDK v6+ format first
+            if hasattr(response, "results") and response.results:
+                try:
+                    # Make sure results list is not empty before accessing
+                    if len(response.results) > 0 and hasattr(response.results[0], "matches"):
+                        results = response.results[0].matches
+                        logger.info(f"Successfully parsed results using v6+ format, found {len(results)} matches")
+                    else:
+                        logger.warning("Response has results attribute but no matches")
+                        results = []
+                except Exception as e:
+                    logger.warning(f"Error extracting matches from response.results: {str(e)}")
+                    results = []
+            # Check for the matches attribute directly
+            elif hasattr(response, "matches"):
+                results = response.matches
+                logger.info(f"Successfully parsed results using legacy format, found {len(results)} matches")
+            else:
+                # Unknown response format
+                logger.warning(f"Unknown response format from Pinecone: {type(response)}")
+                results = []
+                
             logger.info(
                 f"Dense search completed in {time.time() - start_time:.2f}s. "
-                f"Found {len(response.matches)} results."
+                f"Found {len(results)} results."
             )
             
-            return response.matches
+            return results
         except Exception as e:
             logger.error(f"Error in dense search: {str(e)}")
             raise
@@ -238,15 +267,36 @@ class SparseVectorClient(BaseVectorClient):
                     )
                     logger.info("Fallback to dense vector search succeeded")
             
-            # Handle both old and new response formats
-            if hasattr(response, "results"):
-                # New Pinecone SDK v6+ format
-                results = response.results[0].matches if hasattr(response, "results") else response.matches
-                result_count = len(results)
-            else:
-                # Old format
+            # Handle both old and new response formats - with safer access
+            results = []
+            
+            if response is None:
+                logger.warning("Received None response from Pinecone")
+                return []
+                
+            # Check for new Pinecone SDK v6+ format first
+            if hasattr(response, "results") and response.results:
+                try:
+                    # Make sure results list is not empty before accessing
+                    if len(response.results) > 0 and hasattr(response.results[0], "matches"):
+                        results = response.results[0].matches
+                        logger.info(f"Successfully parsed results using v6+ format, found {len(results)} matches")
+                    else:
+                        logger.warning("Response has results attribute but no matches")
+                        results = []
+                except Exception as e:
+                    logger.warning(f"Error extracting matches from response.results: {str(e)}")
+                    results = []
+            # Check for the matches attribute directly
+            elif hasattr(response, "matches"):
                 results = response.matches
-                result_count = len(results)
+                logger.info(f"Successfully parsed results using legacy format, found {len(results)} matches")
+            else:
+                # Unknown response format
+                logger.warning(f"Unknown response format from Pinecone: {type(response)}")
+                results = []
+            
+            result_count = len(results)
             
             logger.info(
                 f"Sparse search completed in {time.time() - start_time:.2f}s. "
@@ -317,8 +367,14 @@ class HybridSearchClient:
                 dense_task = asyncio.create_task(
                     self.dense_client.search(query, top_k=top_k*2, filter=filter, namespace=namespace)
                 )
-                dense_results = await dense_task
-                logger.info(f"Hybrid: Dense search completed with {len(dense_results)} results.")
+                dense_result_objects = await dense_task
+                
+                # Safely process dense results
+                if dense_result_objects:
+                    dense_results = dense_result_objects
+                    logger.info(f"Hybrid: Dense search completed with {len(dense_results)} results.")
+                else:
+                    logger.warning("Hybrid: Dense search returned empty results")
             except Exception as e:
                 logger.error(f"Hybrid: Dense search failed: {str(e)}")
                 # Continue with sparse search
@@ -328,8 +384,14 @@ class HybridSearchClient:
                 sparse_task = asyncio.create_task(
                     self.sparse_client.search(query, top_k=top_k*2, filter=filter, namespace=namespace)
                 )
-                sparse_results = await sparse_task
-                logger.info(f"Hybrid: Sparse search completed with {len(sparse_results)} results.")
+                sparse_result_objects = await sparse_task
+                
+                # Safely process sparse results
+                if sparse_result_objects:
+                    sparse_results = sparse_result_objects
+                    logger.info(f"Hybrid: Sparse search completed with {len(sparse_results)} results.")
+                else:
+                    logger.warning("Hybrid: Sparse search returned empty results")
             except Exception as e:
                 logger.error(f"Hybrid: Sparse search failed: {str(e)}")
                 # Continue with dense results only
@@ -343,24 +405,50 @@ class HybridSearchClient:
             
             # Process dense results
             for result in dense_results:
-                id_to_result[result.id] = {
-                    "id": result.id,
-                    "score": result.score * self.dense_weight,
-                    "metadata": result.metadata,
+                # Handle different possible result object types
+                if hasattr(result, 'id') and hasattr(result, 'score') and hasattr(result, 'metadata'):
+                    result_id = result.id
+                    result_score = result.score
+                    result_metadata = result.metadata
+                elif isinstance(result, dict) and 'id' in result and 'score' in result and 'metadata' in result:
+                    result_id = result['id']
+                    result_score = result['score']
+                    result_metadata = result['metadata']
+                else:
+                    logger.warning(f"Skipping invalid dense result format: {type(result)}")
+                    continue
+                
+                id_to_result[result_id] = {
+                    "id": result_id,
+                    "score": result_score * self.dense_weight,
+                    "metadata": result_metadata,
                     "source": "dense"
                 }
             
             # Process sparse results
             for result in sparse_results:
-                if result.id in id_to_result:
-                    # Combine scores if document exists in both result sets
-                    id_to_result[result.id]["score"] += result.score * self.sparse_weight
-                    id_to_result[result.id]["source"] = "hybrid"
+                # Handle different possible result object types
+                if hasattr(result, 'id') and hasattr(result, 'score') and hasattr(result, 'metadata'):
+                    result_id = result.id
+                    result_score = result.score
+                    result_metadata = result.metadata
+                elif isinstance(result, dict) and 'id' in result and 'score' in result and 'metadata' in result:
+                    result_id = result['id']
+                    result_score = result['score']
+                    result_metadata = result['metadata']
                 else:
-                    id_to_result[result.id] = {
-                        "id": result.id,
-                        "score": result.score * self.sparse_weight,
-                        "metadata": result.metadata,
+                    logger.warning(f"Skipping invalid sparse result format: {type(result)}")
+                    continue
+                
+                if result_id in id_to_result:
+                    # Combine scores if document exists in both result sets
+                    id_to_result[result_id]["score"] += result_score * self.sparse_weight
+                    id_to_result[result_id]["source"] = "hybrid"
+                else:
+                    id_to_result[result_id] = {
+                        "id": result_id,
+                        "score": result_score * self.sparse_weight,
+                        "metadata": result_metadata,
                         "source": "sparse"
                     }
             
