@@ -84,13 +84,25 @@ class SearchTool:
             documents = [ArchiveDocument.from_pinecone_match(match) for match in results]
             
             # Filter by minimum score if necessary
+            filtered_docs = documents
             if min_score > 0 and search_type != "hybrid":  # hybrid already filters
-                documents = [doc for doc in documents if doc.score and doc.score >= min_score]
+                pre_filter_count = len(documents)
+                filtered_docs = [doc for doc in documents if doc.score and doc.score >= min_score]
+                post_filter_count = len(filtered_docs)
+                
+                if pre_filter_count > 0 and post_filter_count == 0:
+                    logger.warning(
+                        f"All {pre_filter_count} results were filtered out by min_score={min_score}. "
+                        f"Score range: {min([doc.score for doc in documents if doc.score]):.2f} - "
+                        f"{max([doc.score for doc in documents if doc.score]):.2f}"
+                    )
+                    # Use original results but warn in logs
+                    filtered_docs = documents
             
             # Create response
             response = SearchResponse(
-                results=documents,
-                total=len(documents),
+                results=filtered_docs,
+                total=len(filtered_docs),
                 query=query.query,
                 search_type=search_type,
                 elapsed_time=time.time() - start_time,

@@ -143,6 +143,7 @@ class ArchiveAgent:
         day: Optional[int] = None,
         keywords: Optional[List[str]] = None,
         top_k: int = 10,
+        min_score: Optional[float] = None,
     ) -> Union[SearchResponse, SearchError]:
         """
         Search the DPRG archive by metadata only.
@@ -154,6 +155,7 @@ class ArchiveAgent:
             day: Filter by day
             keywords: Filter by keywords
             top_k: Number of results to return
+            min_score: Minimum score threshold
             
         Returns:
             SearchResponse with results or SearchError if an error occurred
@@ -167,6 +169,7 @@ class ArchiveAgent:
             month=month,
             day=day,
             keywords=keywords,
+            min_score=min_score,
             use_dense=True,  # Using dense by default
         )
         

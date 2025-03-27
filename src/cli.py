@@ -134,86 +134,104 @@ def search(
     month: Optional[int] = typer.Option(None, "--month", "-m", help="Filter by month"),
     day: Optional[int] = typer.Option(None, "--day", "-d", help="Filter by day"),
     keywords: Optional[List[str]] = typer.Option(None, "--keyword", "-kw", help="Filter by keyword (can be used multiple times)"),
-    min_score: Optional[float] = typer.Option(0.5, "--min-score", "-s", help="Minimum score threshold"),
+    min_score: Optional[float] = typer.Option(0.3, "--min-score", "-s", help="Minimum score threshold"),
     search_type: str = typer.Option("dense", "--type", "-t", help="Search type: dense, sparse, or hybrid"),
+    no_filter: bool = typer.Option(False, "--no-filter", help="Disable minimum score filtering"),
 ):
     """
     Search the DPRG archive.
     """
-    # Validate environment
-    if not validate_environment():
-        sys.exit(1)
-    
-    # Show search parameters
-    console.print(
-        Panel(
-            f"Query: [bold]{query}[/bold]\n"
-            f"Search Type: [cyan]{search_type}[/cyan]\n"
-            f"Filters: "
-            f"{f'Author=[blue]{author}[/blue]' if author else ''} "
-            f"{f'Year=[blue]{year}[/blue]' if year else ''} "
-            f"{f'Month=[blue]{month}[/blue]' if month else ''} "
-            f"{f'Day=[blue]{day}[/blue]' if day else ''} "
-            f"{f'Keywords=[blue]{keywords}[/blue]' if keywords else ''}",
-            title="Search Parameters",
-            expand=False,
-        )
-    )
-    
-    # Execute search
-    with console.status(f"Searching for '{query}'...", spinner="dots"):
-        try:
-            if search_type == "hybrid":
-                result = asyncio.run(
-                    archive_agent.search_hybrid(
-                        query=query,
-                        top_k=top_k,
-                        author=author,
-                        year=year,
-                        month=month,
-                        day=day,
-                        keywords=keywords,
-                        min_score=min_score,
-                    )
-                )
-            elif search_type == "sparse":
-                result = asyncio.run(
-                    archive_agent.search_sparse(
-                        query=query,
-                        top_k=top_k,
-                        author=author,
-                        year=year,
-                        month=month,
-                        day=day,
-                        keywords=keywords,
-                        min_score=min_score,
-                    )
-                )
-            else:  # dense
-                result = asyncio.run(
-                    archive_agent.search_dense(
-                        query=query,
-                        top_k=top_k,
-                        author=author,
-                        year=year,
-                        month=month,
-                        day=day,
-                        keywords=keywords,
-                        min_score=min_score,
-                    )
-                )
-                
-            # Check for error
-            if isinstance(result, SearchError):
-                console.print(f"Error: {result.error}", style="bold red")
-                sys.exit(1)
-                
-            # Display results
-            display_results(result, query, search_type)
-                
-        except Exception as e:
-            console.print(f"Error: {str(e)}", style="bold red")
+    try:
+        # Validate environment
+        if not validate_environment():
             sys.exit(1)
+        
+        # Handle no_filter option
+        if no_filter:
+            min_score = 0.0
+        
+        # Show search parameters
+        console.print(
+            Panel(
+                f"Query: [bold]{query}[/bold]\n"
+                f"Search Type: [cyan]{search_type}[/cyan]\n"
+                f"Min Score: [cyan]{min_score if min_score else 'None'}[/cyan]\n"
+                f"Filters: "
+                f"{f'Author=[blue]{author}[/blue]' if author else ''} "
+                f"{f'Year=[blue]{year}[/blue]' if year else ''} "
+                f"{f'Month=[blue]{month}[/blue]' if month else ''} "
+                f"{f'Day=[blue]{day}[/blue]' if day else ''} "
+                f"{f'Keywords=[blue]{keywords}[/blue]' if keywords else ''}",
+                title="Search Parameters",
+                expand=False,
+            )
+        )
+        
+        # Execute search
+        with console.status(f"Searching for '{query}'...", spinner="dots"):
+            try:
+                if search_type == "hybrid":
+                    result = asyncio.run(
+                        archive_agent.search_hybrid(
+                            query=query,
+                            top_k=top_k,
+                            author=author,
+                            year=year,
+                            month=month,
+                            day=day,
+                            keywords=keywords,
+                            min_score=min_score,
+                        )
+                    )
+                elif search_type == "sparse":
+                    result = asyncio.run(
+                        archive_agent.search_sparse(
+                            query=query,
+                            top_k=top_k,
+                            author=author,
+                            year=year,
+                            month=month,
+                            day=day,
+                            keywords=keywords,
+                            min_score=min_score,
+                        )
+                    )
+                else:  # dense
+                    result = asyncio.run(
+                        archive_agent.search_dense(
+                            query=query,
+                            top_k=top_k,
+                            author=author,
+                            year=year,
+                            month=month,
+                            day=day,
+                            keywords=keywords,
+                            min_score=min_score,
+                        )
+                    )
+                    
+                # Check for error
+                if isinstance(result, SearchError):
+                    console.print(f"Error: {result.error}", style="bold red")
+                    sys.exit(1)
+                    
+                # Display results
+                display_results(result, query, search_type)
+                    
+            except Exception as e:
+                console.print(f"Error: {str(e)}", style="bold red")
+                sys.exit(1)
+        
+        # Add a clean exit to prevent segmentation fault
+        return 0
+    
+    except KeyboardInterrupt:
+        console.print("\nSearch cancelled by user", style="yellow")
+        return 1
+    except Exception as e:
+        console.print(f"Unexpected error: {str(e)}", style="bold red")
+        logger.exception("Unexpected error during search")
+        return 1
 
 
 @app.command("metadata")
@@ -224,59 +242,79 @@ def search_metadata(
     day: Optional[int] = typer.Option(None, "--day", "-d", help="Filter by day"),
     keywords: Optional[List[str]] = typer.Option(None, "--keyword", "-kw", help="Filter by keyword (can be used multiple times)"),
     top_k: int = typer.Option(10, "--top-k", "-k", help="Number of results to return"),
+    min_score: Optional[float] = typer.Option(0.3, "--min-score", "-s", help="Minimum score threshold"),
+    no_filter: bool = typer.Option(False, "--no-filter", help="Disable minimum score filtering"),
 ):
     """
     Search the DPRG archive by metadata only.
     """
-    # Validate environment
-    if not validate_environment():
-        sys.exit(1)
-        
-    # At least one metadata field must be provided
-    if not any([author, year, month, day, keywords]):
-        console.print("Error: At least one metadata filter must be provided", style="bold red")
-        sys.exit(1)
-    
-    # Show search parameters
-    console.print(
-        Panel(
-            f"Metadata Search\n"
-            f"Filters: "
-            f"{f'Author=[blue]{author}[/blue]' if author else ''} "
-            f"{f'Year=[blue]{year}[/blue]' if year else ''} "
-            f"{f'Month=[blue]{month}[/blue]' if month else ''} "
-            f"{f'Day=[blue]{day}[/blue]' if day else ''} "
-            f"{f'Keywords=[blue]{keywords}[/blue]' if keywords else ''}",
-            title="Search Parameters",
-            expand=False,
-        )
-    )
-    
-    # Execute search
-    with console.status("Searching by metadata...", spinner="dots"):
-        try:
-            result = asyncio.run(
-                archive_agent.search_by_metadata(
-                    author=author,
-                    year=year,
-                    month=month,
-                    day=day,
-                    keywords=keywords,
-                    top_k=top_k,
-                )
-            )
-                
-            # Check for error
-            if isinstance(result, SearchError):
-                console.print(f"Error: {result.error}", style="bold red")
-                sys.exit(1)
-                
-            # Display results
-            display_results(result, "Metadata Search", "metadata")
-                
-        except Exception as e:
-            console.print(f"Error: {str(e)}", style="bold red")
+    try:
+        # Validate environment
+        if not validate_environment():
             sys.exit(1)
+            
+        # Handle no_filter option
+        if no_filter:
+            min_score = 0.0
+            
+        # At least one metadata field must be provided
+        if not any([author, year, month, day, keywords]):
+            console.print("Error: At least one metadata filter must be provided", style="bold red")
+            sys.exit(1)
+        
+        # Show search parameters
+        console.print(
+            Panel(
+                f"Metadata Search\n"
+                f"Min Score: [cyan]{min_score if min_score else 'None'}[/cyan]\n"
+                f"Filters: "
+                f"{f'Author=[blue]{author}[/blue]' if author else ''} "
+                f"{f'Year=[blue]{year}[/blue]' if year else ''} "
+                f"{f'Month=[blue]{month}[/blue]' if month else ''} "
+                f"{f'Day=[blue]{day}[/blue]' if day else ''} "
+                f"{f'Keywords=[blue]{keywords}[/blue]' if keywords else ''}",
+                title="Search Parameters",
+                expand=False,
+            )
+        )
+        
+        # Execute search
+        with console.status("Searching by metadata...", spinner="dots"):
+            try:
+                result = asyncio.run(
+                    archive_agent.search_by_metadata(
+                        author=author,
+                        year=year,
+                        month=month,
+                        day=day,
+                        keywords=keywords,
+                        top_k=top_k,
+                        min_score=min_score,
+                    )
+                )
+                    
+                # Check for error
+                if isinstance(result, SearchError):
+                    console.print(f"Error: {result.error}", style="bold red")
+                    sys.exit(1)
+                    
+                # Display results
+                display_results(result, "Metadata Search", "metadata")
+                    
+            except Exception as e:
+                console.print(f"Error: {str(e)}", style="bold red")
+                sys.exit(1)
+        
+        # Add a clean exit to prevent segmentation fault
+        return 0
+        
+    except KeyboardInterrupt:
+        console.print("\nSearch cancelled by user", style="yellow")
+        return 1
+    except Exception as e:
+        console.print(f"Unexpected error: {str(e)}", style="bold red")
+        logger.exception("Unexpected error during metadata search")
+        return 1
 
 
 if __name__ == "__main__":
