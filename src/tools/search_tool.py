@@ -53,8 +53,13 @@ class SearchTool:
                 filter_dict["day"] = {"$eq": query.day}
                 
             if query.keywords and len(query.keywords) > 0:
-                # Filter for documents that contain ALL specified keywords
-                filter_dict["keywords"] = {"$all": query.keywords}
+                # Pinecone v6+ doesn't support $all, use $in instead and implement post-filtering
+                # $in will match ANY of the keywords, then we'll filter for ALL later
+                filter_dict["keywords"] = {"$in": query.keywords}
+                # Remember that we need to post-filter results for ALL keywords
+                need_post_keyword_filter = len(query.keywords) > 1
+            else:
+                need_post_keyword_filter = False
             
             # Set minimum score
             min_score = query.min_score or MIN_SCORE_THRESHOLD
@@ -82,6 +87,17 @@ class SearchTool:
             
             # Convert results to ArchiveDocument objects
             documents = [ArchiveDocument.from_pinecone_match(match) for match in results]
+            
+            # Post-process to enforce ALL keywords if needed
+            if need_post_keyword_filter and query.keywords and len(query.keywords) > 1:
+                logger.info(f"Post-filtering for ALL keywords: {query.keywords}")
+                pre_keyword_filter_count = len(documents)
+                documents = [
+                    doc for doc in documents 
+                    if doc.metadata.keywords and all(kw in doc.metadata.keywords for kw in query.keywords)
+                ]
+                post_keyword_filter_count = len(documents)
+                logger.info(f"Keyword post-filtering: {pre_keyword_filter_count} -> {post_keyword_filter_count} documents")
             
             # Filter by minimum score if necessary
             filtered_docs = documents
