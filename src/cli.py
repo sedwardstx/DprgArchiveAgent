@@ -56,10 +56,17 @@ def format_date(date_str: Optional[str]) -> str:
         return "N/A"
     
     try:
+        # Handle datetime objects directly
+        if isinstance(date_str, datetime):
+            return date_str.strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Handle string dates
         date = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
         return date.strftime("%Y-%m-%d %H:%M:%S")
-    except ValueError:
-        return date_str
+    except (ValueError, TypeError, AttributeError) as e:
+        # Fall back to returning the original value if conversion fails
+        logger.warning(f"Failed to format date: {date_str}, error: {str(e)}")
+        return str(date_str)
 
 
 def display_results(results, query: str, search_type: str):
@@ -90,13 +97,23 @@ def display_results(results, query: str, search_type: str):
     
     # Add rows
     for doc in results.results:
-        table.add_row(
-            f"{doc.score:.2f}" if doc.score else "N/A",
-            doc.metadata.title or "No Title",
-            doc.metadata.author or "Unknown",
-            format_date(doc.metadata.date.isoformat() if doc.metadata.date else None),
-            doc.text_excerpt[:100] + "..." if len(doc.text_excerpt) > 100 else doc.text_excerpt,
-        )
+        try:
+            # Handle date formatting safely
+            date_display = "N/A"
+            if doc.metadata.date:
+                date_display = format_date(doc.metadata.date) 
+
+            table.add_row(
+                f"{doc.score:.2f}" if doc.score else "N/A",
+                doc.metadata.title or "No Title",
+                doc.metadata.author or "Unknown",
+                date_display,
+                doc.text_excerpt[:100] + "..." if len(doc.text_excerpt) > 100 else doc.text_excerpt,
+            )
+        except Exception as e:
+            # Log the error but continue processing other results
+            logger.error(f"Error formatting result: {str(e)}")
+            continue
     
     # Add search stats
     console.print(
@@ -117,7 +134,7 @@ def search(
     month: Optional[int] = typer.Option(None, "--month", "-m", help="Filter by month"),
     day: Optional[int] = typer.Option(None, "--day", "-d", help="Filter by day"),
     keywords: Optional[List[str]] = typer.Option(None, "--keyword", "-kw", help="Filter by keyword (can be used multiple times)"),
-    min_score: Optional[float] = typer.Option(None, "--min-score", "-s", help="Minimum score threshold"),
+    min_score: Optional[float] = typer.Option(0.5, "--min-score", "-s", help="Minimum score threshold"),
     search_type: str = typer.Option("dense", "--type", "-t", help="Search type: dense, sparse, or hybrid"),
 ):
     """

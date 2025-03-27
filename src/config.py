@@ -34,7 +34,7 @@ API_WORKERS = int(os.getenv("API_WORKERS", "4"))
 
 # Search settings
 DEFAULT_TOP_K = int(os.getenv("DEFAULT_TOP_K", "10"))
-MIN_SCORE_THRESHOLD = float(os.getenv("MIN_SCORE_THRESHOLD", "0.7"))
+MIN_SCORE_THRESHOLD = float(os.getenv("MIN_SCORE_THRESHOLD", "0.5"))
 
 # Hybrid search weights
 DENSE_WEIGHT = float(os.getenv("DENSE_WEIGHT", "0.7"))
