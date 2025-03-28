@@ -1,523 +1,179 @@
 """
-Vector store client implementations for Pinecone indexes.
+Vector store implementation for the DPRG Archive Agent.
 """
-import asyncio
-import time
-from typing import Dict, List, Any, Optional, Tuple, Union
 import logging
+from typing import Dict, List, Any, Optional, Tuple, Union
+from abc import ABC, abstractmethod
 
 from pinecone import Pinecone, ServerlessSpec
-import httpx
-
 from ..config import (
     PINECONE_API_KEY,
     PINECONE_ENVIRONMENT,
-    PINECONE_NAMESPACE,
-    DENSE_INDEX_URL,
-    SPARSE_INDEX_URL,
-    DEFAULT_TOP_K,
-    MIN_SCORE_THRESHOLD,
+    DENSE_INDEX_NAME,
+    SPARSE_INDEX_NAME,
     DENSE_WEIGHT,
     SPARSE_WEIGHT,
+    MIN_SCORE_THRESHOLD
 )
-from .embeddings import get_embedding, generate_sparse_vector
 
 # Set up logger
 logger = logging.getLogger(__name__)
 
-
-class BaseVectorClient:
+class BaseVectorClient(ABC):
     """Base class for vector index clients."""
     
-    def __init__(
-        self,
-        api_key: str = PINECONE_API_KEY,
-        environment: str = PINECONE_ENVIRONMENT,
-        namespace: str = PINECONE_NAMESPACE,
-    ):
-        """Initialize the base vector client."""
-        self.api_key = api_key
-        self.environment = environment
-        self.namespace = namespace
-        # Initialize Pinecone without environment parameter in SDK v6+
-        self.pc = Pinecone(api_key=api_key)
-        
+    def __init__(self):
+        """Initialize the vector client."""
+        self.pc = Pinecone(api_key=PINECONE_API_KEY)
+        logger.info(f"Initialized {self.__class__.__name__}")
+
+    @abstractmethod
     async def search(
         self,
-        query: Union[str, List[float]],
-        top_k: int = DEFAULT_TOP_K,
-        filter: Optional[Dict[str, Any]] = None,
-        namespace: Optional[str] = None,
-        **kwargs
+        query: str,
+        top_k: int = 10,
+        filter: Optional[Dict[str, Any]] = None
     ) -> List[Dict[str, Any]]:
-        """
-        Base search method, to be implemented by subclasses.
-        
-        Args:
-            query: The search query, either as text or vector
-            top_k: Number of results to return
-            filter: Metadata filter to apply
-            namespace: Namespace to search (defaults to self.namespace)
-            
-        Returns:
-            List of matches
-        """
-        raise NotImplementedError("Subclasses must implement search")
-
+        """Search the vector index."""
+        pass
 
 class DenseVectorClient(BaseVectorClient):
-    """Client for the dense vector index."""
+    """Client for dense vector index."""
     
-    def __init__(
-        self,
-        index_url: str = DENSE_INDEX_URL,
-        api_key: str = PINECONE_API_KEY,
-        environment: str = PINECONE_ENVIRONMENT,
-        namespace: str = PINECONE_NAMESPACE,
-    ):
+    def __init__(self):
         """Initialize the dense vector client."""
-        super().__init__(api_key, environment, namespace)
-        self.index_url = index_url
-        
-        # Connect to the index
-        try:
-            # Use the new Index() method instead of from_existing_index
-            self.index = self.pc.Index(host=index_url)
-            logger.info(f"Connected to dense index at {index_url}")
-        except Exception as e:
-            logger.error(f"Error connecting to dense index: {str(e)}")
-            raise
+        super().__init__()
+        self.index = self.pc.Index(DENSE_INDEX_NAME)
+        logger.info(f"Initialized {self.__class__.__name__} with index {DENSE_INDEX_NAME}")
     
     async def search(
         self,
-        query: Union[str, List[float]],
-        top_k: int = DEFAULT_TOP_K,
-        filter: Optional[Dict[str, Any]] = None,
-        namespace: Optional[str] = None,
-        **kwargs
+        query: str,
+        top_k: int = 10,
+        filter: Optional[Dict[str, Any]] = None
     ) -> List[Dict[str, Any]]:
         """
         Search the dense vector index.
         
         Args:
-            query: The search query, either as text or vector
+            query: The search query
             top_k: Number of results to return
-            filter: Metadata filter to apply
-            namespace: Namespace to search (defaults to self.namespace)
+            filter: Optional filter dictionary
             
         Returns:
-            List of matches
+            List of search results
         """
-        start_time = time.time()
-        
-        # If query is a string, convert to vector
-        if isinstance(query, str):
-            vector = await get_embedding(query)
-        else:
-            vector = query
-            
-        # Use the provided namespace or fall back to default
-        ns = namespace or self.namespace
-        
         try:
-            # Execute the query
-            response = self.index.query(
-                vector=vector,
+            results = self.index.query(
+                vector=query,
                 top_k=top_k,
-                namespace=ns,
                 filter=filter,
-                include_metadata=True,
+                include_metadata=True
             )
-            
-            # Handle both old and new response formats - with safer access
-            results = []
-            
-            if response is None:
-                logger.warning("Received None response from Pinecone")
-                return []
-                
-            # Check for new Pinecone SDK v6+ format first
-            if hasattr(response, "results") and response.results:
-                try:
-                    # Make sure results list is not empty before accessing
-                    if len(response.results) > 0 and hasattr(response.results[0], "matches"):
-                        results = response.results[0].matches
-                        logger.info(f"Successfully parsed results using v6+ format, found {len(results)} matches")
-                    else:
-                        logger.warning("Response has results attribute but no matches")
-                        results = []
-                except Exception as e:
-                    logger.warning(f"Error extracting matches from response.results: {str(e)}")
-                    results = []
-            # Check for the matches attribute directly
-            elif hasattr(response, "matches"):
-                results = response.matches
-                logger.info(f"Successfully parsed results using legacy format, found {len(results)} matches")
-            else:
-                # Unknown response format
-                logger.warning(f"Unknown response format from Pinecone: {type(response)}")
-                results = []
-                
-            logger.info(
-                f"Dense search completed in {time.time() - start_time:.2f}s. "
-                f"Found {len(results)} results."
-            )
-            
-            return results
+            return results.matches
         except Exception as e:
             logger.error(f"Error in dense search: {str(e)}")
-            raise
-
+            return []
 
 class SparseVectorClient(BaseVectorClient):
-    """Client for the sparse vector index."""
+    """Client for sparse vector index."""
     
-    def __init__(
-        self,
-        index_url: str = SPARSE_INDEX_URL,
-        api_key: str = PINECONE_API_KEY,
-        environment: str = PINECONE_ENVIRONMENT,
-        namespace: str = PINECONE_NAMESPACE,
-    ):
+    def __init__(self):
         """Initialize the sparse vector client."""
-        super().__init__(api_key, environment, namespace)
-        self.index_url = index_url
-        self.sparse_enabled = True  # We now have sparse vector generation capability
-        
-        # Connect to the index
-        try:
-            # Use the new Index() method instead of from_existing_index
-            self.index = self.pc.Index(host=index_url)
-            logger.info(f"Connected to sparse index at {index_url}")
-            logger.info("Sparse search is now enabled with custom tokenization")
-        except Exception as e:
-            logger.error(f"Error connecting to sparse index: {str(e)}")
-            raise
+        super().__init__()
+        self.index = self.pc.Index(SPARSE_INDEX_NAME)
+        logger.info(f"Initialized {self.__class__.__name__} with index {SPARSE_INDEX_NAME}")
     
     async def search(
         self,
         query: str,
-        top_k: int = DEFAULT_TOP_K,
-        filter: Optional[Dict[str, Any]] = None,
-        namespace: Optional[str] = None,
-        **kwargs
+        top_k: int = 10,
+        filter: Optional[Dict[str, Any]] = None
     ) -> List[Dict[str, Any]]:
         """
         Search the sparse vector index.
         
         Args:
-            query: The search query as text
+            query: The search query
             top_k: Number of results to return
-            filter: Metadata filter to apply
-            namespace: Namespace to search (defaults to self.namespace)
+            filter: Optional filter dictionary
             
         Returns:
-            List of matches
+            List of search results
         """
-        start_time = time.time()
-            
-        # Use the provided namespace or fall back to default
-        ns = namespace or self.namespace
-        
         try:
-            # Generate a sparse vector representation
-            indices, values = await generate_sparse_vector(query)
-            
-            # Create a sparse vector dictionary for Pinecone
-            sparse_vector = {"indices": indices, "values": values}
-            
-            # Get a dense vector as fallback (some Pinecone indexes require both)
-            dense_vector = await get_embedding(query)
-            
-            # Execute query with sparse vectors
-            try:
-                # First try with sparse_vector only
-                response = self.index.query(
-                    sparse_vector=sparse_vector,
-                    top_k=top_k,
-                    namespace=ns,
-                    filter=filter,
-                    include_metadata=True,
-                )
-                logger.info("Sparse search using sparse vector succeeded")
-            except Exception as sparse_error:
-                logger.warning(f"Pure sparse search failed: {str(sparse_error)}")
-                
-                # Try with both sparse and dense vectors
-                try:
-                    logger.info("Attempting hybrid sparse+dense search")
-                    response = self.index.query(
-                        vector=dense_vector,
-                        sparse_vector=sparse_vector,
-                        top_k=top_k,
-                        namespace=ns,
-                        filter=filter,
-                        include_metadata=True,
-                    )
-                    logger.info("Hybrid sparse+dense search succeeded")
-                except Exception as hybrid_error:
-                    # Finally, fall back to dense vector only
-                    logger.warning(f"Hybrid search failed: {str(hybrid_error)}")
-                    response = self.index.query(
-                        vector=dense_vector,
-                        top_k=top_k,
-                        namespace=ns,
-                        filter=filter,
-                        include_metadata=True,
-                    )
-                    logger.info("Fallback to dense vector search succeeded")
-            
-            # Handle both old and new response formats - with safer access
-            results = []
-            
-            if response is None:
-                logger.warning("Received None response from Pinecone")
-                return []
-                
-            # Check for new Pinecone SDK v6+ format first
-            if hasattr(response, "results") and response.results:
-                try:
-                    # Make sure results list is not empty before accessing
-                    if len(response.results) > 0 and hasattr(response.results[0], "matches"):
-                        results = response.results[0].matches
-                        logger.info(f"Successfully parsed results using v6+ format, found {len(results)} matches")
-                    else:
-                        logger.warning("Response has results attribute but no matches")
-                        results = []
-                except Exception as e:
-                    logger.warning(f"Error extracting matches from response.results: {str(e)}")
-                    results = []
-            # Check for the matches attribute directly
-            elif hasattr(response, "matches"):
-                results = response.matches
-                logger.info(f"Successfully parsed results using legacy format, found {len(results)} matches")
-            else:
-                # Unknown response format
-                logger.warning(f"Unknown response format from Pinecone: {type(response)}")
-                results = []
-            
-            result_count = len(results)
-            
-            logger.info(
-                f"Sparse search completed in {time.time() - start_time:.2f}s. "
-                f"Found {result_count} results."
+            results = self.index.query(
+                vector=query,
+                top_k=top_k,
+                filter=filter,
+                include_metadata=True
             )
-            
-            return results
+            return results.matches
         except Exception as e:
             logger.error(f"Error in sparse search: {str(e)}")
-            raise
+            return []
 
-
-class HybridSearchClient:
-    """Client for hybrid search using both dense and sparse vectors."""
+class HybridSearchClient(BaseVectorClient):
+    """Client for hybrid search combining dense and sparse results."""
     
-    def __init__(
-        self,
-        dense_client: Optional[DenseVectorClient] = None,
-        sparse_client: Optional[SparseVectorClient] = None,
-        dense_weight: float = DENSE_WEIGHT,
-        sparse_weight: float = SPARSE_WEIGHT,
-    ):
-        """
-        Initialize the hybrid search client.
-        
-        Args:
-            dense_client: Client for dense vector search
-            sparse_client: Client for sparse vector search
-            dense_weight: Weight to give to dense search results (0-1)
-            sparse_weight: Weight to give to sparse search results (0-1)
-        """
-        self.dense_client = dense_client or DenseVectorClient()
-        self.sparse_client = sparse_client or SparseVectorClient()
-        
-        # Normalize weights to sum to 1
-        total = dense_weight + sparse_weight
-        self.dense_weight = dense_weight / total
-        self.sparse_weight = sparse_weight / total
+    def __init__(self):
+        """Initialize the hybrid search client."""
+        super().__init__()
+        self.dense_client = DenseVectorClient()
+        self.sparse_client = SparseVectorClient()
+        logger.info(f"Initialized {self.__class__.__name__}")
     
     async def search(
         self,
         query: str,
-        top_k: int = DEFAULT_TOP_K,
-        filter: Optional[Dict[str, Any]] = None,
-        namespace: Optional[str] = None,
-        min_score: float = MIN_SCORE_THRESHOLD,
+        top_k: int = 10,
+        filter: Optional[Dict[str, Any]] = None
     ) -> List[Dict[str, Any]]:
         """
-        Perform a hybrid search using both dense and sparse indexes.
+        Perform hybrid search combining dense and sparse results.
         
         Args:
             query: The search query
             top_k: Number of results to return
-            filter: Metadata filter to apply
-            namespace: Namespace to search
-            min_score: Minimum score threshold for results
+            filter: Optional filter dictionary
             
         Returns:
-            List of matches with scores weighted by search type
+            List of search results
         """
-        start_time = time.time()
-        dense_results = []
-        sparse_results = []
-        
         try:
-            # Execute dense search first
-            try:
-                dense_task = asyncio.create_task(
-                    self.dense_client.search(query, top_k=top_k*2, filter=filter, namespace=namespace)
-                )
-                dense_result_objects = await dense_task
-                
-                # Safely process dense results
-                if dense_result_objects:
-                    dense_results = dense_result_objects
-                    logger.info(f"Hybrid: Dense search completed with {len(dense_results)} results.")
-                else:
-                    logger.warning("Hybrid: Dense search returned empty results")
-            except Exception as e:
-                logger.error(f"Hybrid: Dense search failed: {str(e)}")
-                # Continue with sparse search
+            # Execute both searches in parallel
+            dense_results = await self.dense_client.search(query, top_k, filter)
+            sparse_results = await self.sparse_client.search(query, top_k, filter)
             
-            # Execute sparse search
-            try:
-                sparse_task = asyncio.create_task(
-                    self.sparse_client.search(query, top_k=top_k*2, filter=filter, namespace=namespace)
-                )
-                sparse_result_objects = await sparse_task
-                
-                # Safely process sparse results
-                if sparse_result_objects:
-                    sparse_results = sparse_result_objects
-                    logger.info(f"Hybrid: Sparse search completed with {len(sparse_results)} results.")
-                else:
-                    logger.warning("Hybrid: Sparse search returned empty results")
-            except Exception as e:
-                logger.error(f"Hybrid: Sparse search failed: {str(e)}")
-                # Continue with dense results only
-            
-            # If both searches failed, raise an exception
-            if not dense_results and not sparse_results:
-                raise Exception("Both dense and sparse searches failed")
-                
-            # Create a combined result set with weighted scores
-            id_to_result = {}
-            
-            # Process dense results
+            # Combine results
+            combined_results = {}
             for result in dense_results:
-                # Handle different possible result object types
-                if hasattr(result, 'id') and hasattr(result, 'score') and hasattr(result, 'metadata'):
-                    result_id = result.id
-                    result_score = result.score
-                    result_metadata = result.metadata
-                elif isinstance(result, dict) and 'id' in result and 'score' in result and 'metadata' in result:
-                    result_id = result['id']
-                    result_score = result['score']
-                    result_metadata = result['metadata']
-                else:
-                    logger.warning(f"Skipping invalid dense result format: {type(result)}")
-                    continue
-                
-                id_to_result[result_id] = {
-                    "id": result_id,
-                    "score": result_score * self.dense_weight,
-                    "metadata": result_metadata,
-                    "source": "dense"
+                combined_results[result['id']] = {
+                    'id': result['id'],
+                    'metadata': result['metadata'],
+                    'score': result['score'] * DENSE_WEIGHT
                 }
             
-            # Process sparse results
             for result in sparse_results:
-                # Handle different possible result object types
-                if hasattr(result, 'id') and hasattr(result, 'score') and hasattr(result, 'metadata'):
-                    result_id = result.id
-                    result_score = result.score
-                    result_metadata = result.metadata
-                elif isinstance(result, dict) and 'id' in result and 'score' in result and 'metadata' in result:
-                    result_id = result['id']
-                    result_score = result['score']
-                    result_metadata = result['metadata']
+                if result['id'] in combined_results:
+                    combined_results[result['id']]['score'] += result['score'] * SPARSE_WEIGHT
                 else:
-                    logger.warning(f"Skipping invalid sparse result format: {type(result)}")
-                    continue
-                
-                if result_id in id_to_result:
-                    # Combine scores if document exists in both result sets
-                    id_to_result[result_id]["score"] += result_score * self.sparse_weight
-                    id_to_result[result_id]["source"] = "hybrid"
-                else:
-                    id_to_result[result_id] = {
-                        "id": result_id,
-                        "score": result_score * self.sparse_weight,
-                        "metadata": result_metadata,
-                        "source": "sparse"
+                    combined_results[result['id']] = {
+                        'id': result['id'],
+                        'metadata': result['metadata'],
+                        'score': result['score'] * SPARSE_WEIGHT
                     }
             
             # Convert to list and sort by score
-            combined_results = list(id_to_result.values())
-            combined_results.sort(key=lambda x: x["score"], reverse=True)
+            results = list(combined_results.values())
+            results.sort(key=lambda x: x['score'], reverse=True)
             
-            # Apply minimum score threshold and limit to top_k
-            filtered_results = [r for r in combined_results if r["score"] >= min_score][:top_k]
+            # Filter by minimum score
+            results = [r for r in results if r['score'] >= MIN_SCORE_THRESHOLD]
             
-            search_type = "hybrid"
-            if not sparse_results:
-                search_type = "dense-only"
-            elif not dense_results:
-                search_type = "sparse-only"
-                
-            logger.info(
-                f"{search_type} search completed in {time.time() - start_time:.2f}s. "
-                f"Found {len(filtered_results)} results after combining."
-            )
+            # Return top k results
+            return results[:top_k]
             
-            return filtered_results
         except Exception as e:
             logger.error(f"Error in hybrid search: {str(e)}")
-            raise
-        # No need for explicit cleanup - garbage collection handles this
-
-
-# Custom cleanup function to ensure resources are released
-def cleanup_clients():
-    """Clean up client connections - call this when shutting down the application."""
-    logger.info("Cleaning up vector store clients")
-    
-    try:
-        # Log cleanup status
-        logger.info("Cleanup started")
-        
-        # Nothing to do for simple clients, but for real clients we might:
-        # 1. Close any open connections
-        # 2. Release any resources
-        # 3. Wait for pending operations to complete
-        
-        # For now, just log what we're doing
-        logger.info("Cleanup: Checking for dense client")
-        if 'dense_client' in globals() and dense_client is not None:
-            logger.info("Cleanup: Processing dense client")
-            # Close connection if needed
-            pass
-            
-        logger.info("Cleanup: Checking for sparse client")
-        if 'sparse_client' in globals() and sparse_client is not None:
-            logger.info("Cleanup: Processing sparse client")
-            # Close connection if needed
-            pass
-            
-        logger.info("Cleanup: Checking for hybrid client")
-        if 'hybrid_client' in globals() and hybrid_client is not None:
-            logger.info("Cleanup: Processing hybrid client")
-            # Close connections if needed
-            pass
-            
-        logger.info("Cleanup completed successfully")
-    except Exception as e:
-        logger.error(f"Error during cleanup: {str(e)}")
-        # Don't raise the exception - we want cleanup to always proceed
-        pass
-
-
-# Create singleton instances
-dense_client = DenseVectorClient()
-sparse_client = SparseVectorClient()
-hybrid_client = HybridSearchClient(dense_client, sparse_client) 
+            return [] 

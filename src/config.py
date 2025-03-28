@@ -13,15 +13,9 @@ PINECONE_API_KEY = os.getenv("PINECONE_API_KEY", "")
 PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT", "")
 PINECONE_NAMESPACE = os.getenv("PINECONE_NAMESPACE", "dprg-archive")
 
-# Vector index URLs
-DENSE_INDEX_URL = os.getenv(
-    "DENSE_INDEX_URL", 
-    "https://dprg-list-archive-dense-4p4f7lg.svc.aped-4627-b74a.pinecone.io"
-)
-SPARSE_INDEX_URL = os.getenv(
-    "SPARSE_INDEX_URL", 
-    "https://dprg-list-archive-sparse-4p4f7lg.svc.aped-4627-b74a.pinecone.io"
-)
+# Vector index names
+DENSE_INDEX_NAME = os.getenv("DENSE_INDEX_NAME", "dprg-list-archive-dense")
+SPARSE_INDEX_NAME = os.getenv("SPARSE_INDEX_NAME", "dprg-list-archive-sparse")
 
 # OpenAI settings
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
@@ -76,8 +70,8 @@ def validate_config() -> Dict[str, Any]:
 def get_vector_index_settings() -> Dict[str, Any]:
     """Return settings related to vector indexes."""
     return {
-        "dense_index_url": DENSE_INDEX_URL,
-        "sparse_index_url": SPARSE_INDEX_URL,
+        "dense_index_name": DENSE_INDEX_NAME,
+        "sparse_index_name": SPARSE_INDEX_NAME,
         "namespace": PINECONE_NAMESPACE,
         "api_key": PINECONE_API_KEY,
         "environment": PINECONE_ENVIRONMENT,
