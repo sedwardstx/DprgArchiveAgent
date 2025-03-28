@@ -23,7 +23,7 @@ from rich import box
 
 from .config import validate_config, DEFAULT_TOP_K
 from .agent.archive_agent import archive_agent
-from .schema.models import SearchError, SearchQuery, ChatMessage, ChatCompletionRequest
+from .schema.models import SearchError, SearchQuery, ChatMessage, ChatCompletionRequest, SearchResponse
 
 # Set up logger
 logging.basicConfig(
@@ -69,11 +69,18 @@ def run_async_safely(coro):
     """Run an async coroutine safely and handle cleanup properly."""
     log_debug("Starting run_async_safely")
     try:
-        # Create a new event loop each time to avoid issues with existing loops
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        log_debug("Created new event loop")
+        # Try to get the current event loop
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                raise RuntimeError("Event loop is closed")
+        except RuntimeError:
+            # Create a new event loop if there isn't one or it's closed
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            log_debug("Created new event loop")
         
+        # Run the coroutine
         result = loop.run_until_complete(coro)
         log_debug("Coroutine completed successfully")
         return result
@@ -82,10 +89,11 @@ def run_async_safely(coro):
         log_debug(traceback.format_exc())
         raise
     finally:
-        # Always properly close the loop
-        log_debug("Closing event loop")
-        loop.close()
-        log_debug("Event loop closed")
+        # Don't close the loop if we didn't create it
+        if loop.is_closed():
+            log_debug("Event loop was already closed")
+        else:
+            log_debug("Event loop still running")
 
 
 def validate_environment():
@@ -122,73 +130,61 @@ def format_date(date_str: Optional[str]) -> str:
         return str(date_str)
 
 
-def display_results(results, query: str, search_type: str):
-    """Display search results in a pretty table."""
-    if not results or len(results.results) == 0:
-        console.print(
-            Panel(
-                f"No results found for query: [bold]{query}[/bold]",
-                title="Search Results",
-                expand=False,
-            )
-        )
+def display_results(results: SearchResponse, query: str, search_type: str, min_score: Optional[float] = None, top_k: Optional[int] = None):
+    """
+    Display search results in a formatted table.
+    """
+    if not results.results:
+        console.print("No results found.")
         return
-    
+
     # Print search parameters
-    console.print(
-        f"Search parameters:",
-        style="bold",
-    )
-    console.print(f"  Query: {query}")
-    console.print(f"  Search type: {search_type}")
-    console.print(f"  Total results: {results.total}")
-    if hasattr(results, 'min_score'):
-        console.print(f"  min_score: {results.min_score}")
-    if hasattr(results, 'top_k'):
-        console.print(f"  top_k: {results.top_k}")
+    console.print(f"\nQuery: {query}")
+    console.print(f"Search type: {search_type}")
+    console.print(f"Total: {results.total}")
+    console.print(f"elapsed_time: {results.elapsed_time:.2f}")
     
-    # Create table
-    table = Table(
-        title=f"Search Results for: '{query}' (using {search_type} search)",
-        show_header=True,
-        header_style="bold magenta",
-    )
-    
-    # Add columns
-    table.add_column("Score", justify="right")
-    table.add_column("Title")
-    table.add_column("Author")
-    table.add_column("Date")
-    table.add_column("Excerpt", no_wrap=False)
-    
-    # Add rows
-    for doc in results.results:
+    if min_score is not None:
+        console.print(f"min_score: {min_score}")
+    if top_k is not None:
+        console.print(f"top_k: {top_k}")
+
+    # Create table for results
+    table = Table(show_header=True, header_style="bold")
+    table.add_column("Score", justify="right", style="cyan")
+    table.add_column("Title", style="green")
+    table.add_column("Author", style="yellow")
+    table.add_column("Date", style="magenta")
+    table.add_column("Excerpt", style="white")
+
+    # Add results to table
+    for result in results.results:
         try:
-            # Handle date formatting safely
-            date_display = "N/A"
-            if doc.metadata.date:
-                date_display = format_date(doc.metadata.date) 
+            # Format date if available
+            date_str = ""
+            if result.metadata.get("year"):
+                date_parts = []
+                date_parts.append(str(result.metadata["year"]))
+                if result.metadata.get("month"):
+                    date_parts.append(str(result.metadata["month"]).zfill(2))
+                if result.metadata.get("day"):
+                    date_parts.append(str(result.metadata["day"]).zfill(2))
+                date_str = "-".join(date_parts)
 
             table.add_row(
-                f"{doc.score:.2f}" if doc.score else "N/A",
-                doc.metadata.title or "No Title",
-                doc.metadata.author or "Unknown",
-                date_display,
-                doc.text_excerpt[:100] + "..." if len(doc.text_excerpt) > 100 else doc.text_excerpt,
+                f"{result.score:.3f}",
+                result.metadata.get("title", ""),
+                result.metadata.get("author", ""),
+                date_str,
+                result.text_excerpt[:100] + "..." if len(result.text_excerpt) > 100 else result.text_excerpt
             )
         except Exception as e:
-            # Log the error but continue processing other results
-            logger.error(f"Error formatting result: {str(e)}")
+            log_debug(f"Error formatting result: {str(e)}")
             continue
-    
-    # Add search stats
-    console.print(
-        f"Found {results.total} results in {results.elapsed_time:.2f}s",
-        style="italic",
-    )
-    
-    # Print table
+
+    console.print("\n")
     console.print(table)
+    console.print(f"\nFound {results.total} results in {results.elapsed_time:.2f} seconds")
 
 
 @app.command("search")
@@ -199,9 +195,10 @@ def search(
     year: Optional[int] = typer.Option(None, "--year", "-y", help="Filter by year"),
     month: Optional[int] = typer.Option(None, "--month", "-m", help="Filter by month"),
     day: Optional[int] = typer.Option(None, "--day", "-d", help="Filter by day"),
-    keywords: Optional[List[str]] = typer.Option(None, "--keyword", "-kw", help="Filter by keyword (can be used multiple times)"),
+    keywords: Optional[str] = typer.Option(None, "--keywords", "-kw", help="Comma-separated list of keywords"),
+    title: Optional[str] = typer.Option(None, "--title", "-t", help="Filter by title"),
     min_score: Optional[float] = typer.Option(0.3, "--min-score", "-s", help="Minimum score threshold"),
-    search_type: str = typer.Option("dense", "--type", "-t", help="Search type: dense, sparse, or hybrid"),
+    search_type: str = typer.Option("dense", "--type", "-st", help="Search type: dense, sparse, or hybrid"),
     no_filter: bool = typer.Option(False, "--no-filter", help="Disable minimum score filtering"),
 ):
     """
@@ -213,10 +210,34 @@ def search(
         if not validate_environment():
             return
 
+        # Validate search type
+        if search_type not in ["dense", "sparse", "hybrid"]:
+            console.print("[bold red]error:[/bold red] Invalid search type. Must be one of: dense, sparse, hybrid")
+            raise typer.Exit(code=1)
+
+        # Validate query
+        if not query or len(query.strip()) == 0:
+            console.print("[bold red]error:[/bold red] Search query cannot be empty")
+            raise typer.Exit(code=1)
+
+        if len(query) > 1000:
+            console.print("[bold red]error:[/bold red] Search query is too long (max 1000 characters)")
+            raise typer.Exit(code=1)
+
         # Set min_score to None if no_filter is True
         if no_filter:
             min_score = None
+            console.print("No filters applied", style="italic")
             log_debug("No filter option enabled, setting min_score to None")
+
+        # Process keywords if provided
+        keyword_list = None
+        if keywords:
+            try:
+                keyword_list = [k.strip() for k in keywords.split(",") if k.strip()]
+            except Exception as e:
+                console.print(f"[bold red]error:[/bold red] Invalid keywords format: {str(e)}")
+                raise typer.Exit(code=1)
 
         # Build search query
         search_query = SearchQuery(
@@ -226,9 +247,11 @@ def search(
             year=year,
             month=month,
             day=day,
-            keywords=keywords,
+            keywords=keyword_list,
+            title=title,
             min_score=min_score,
-            search_type=search_type
+            search_type=search_type,
+            no_filter=no_filter
         )
 
         # Execute search
@@ -237,17 +260,21 @@ def search(
         log_debug("Search completed successfully")
 
         # Display results
-        display_results(results, query, search_type)
+        display_results(results, query, search_type, min_score, top_k)
 
+    except (ValueError, TypeError) as e:
+        console.print(f"[bold red]error:[/bold red] Invalid input: {str(e)}")
+        log_debug(f"ValueError/TypeError: {str(e)}")
+        raise typer.Exit(code=1)
     except SearchError as e:
-        console.print(f"[bold red]Search Error:[/bold red] {str(e)}")
+        console.print(f"[bold red]error:[/bold red] {str(e)}")
         log_debug(f"SearchError: {str(e)}")
-        sys.exit(1)
+        raise typer.Exit(code=1)
     except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {str(e)}")
+        console.print(f"[bold red]error:[/bold red] {str(e)}")
         log_debug(f"Unexpected error: {str(e)}")
         log_debug(traceback.format_exc())
-        sys.exit(1)
+        raise typer.Exit(code=1)
 
 
 @app.command("metadata")
