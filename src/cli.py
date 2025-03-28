@@ -226,9 +226,9 @@ def search(
 
         # Set min_score to None if no_filter is True
         if no_filter:
-            min_score = None
+            min_score = 0.0  # Set to a very low value instead of None to avoid validation errors
             console.print("No filters applied", style="italic")
-            log_debug("No filter option enabled, setting min_score to None")
+            log_debug("No filter option enabled, setting min_score to 0.0")
 
         # Process keywords if provided
         keyword_list = None
