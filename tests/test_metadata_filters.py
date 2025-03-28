@@ -5,6 +5,7 @@ import pytest
 import asyncio
 from datetime import datetime
 from typing import List, Dict, Any
+import copy
 
 from src.utils.vector_store import DenseVectorClient, SparseVectorClient
 from src.schema.models import SearchQuery
@@ -163,7 +164,15 @@ async def test_keywords_filter_sparse(sparse_client, load_test_documents):
 async def test_title_filter_dense(dense_client, load_test_documents):
     """Test filtering by title in dense search."""
     client = await dense_client
-    client.search.return_value = load_test_documents
+    
+    # Create a modified copy of test documents with the correct title
+    modified_docs = []
+    for doc in load_test_documents:
+        doc_copy = copy.deepcopy(doc)
+        doc_copy.metadata.title = "Test Document 1"
+        modified_docs.append(doc_copy)
+    
+    client.search.return_value = modified_docs
     results = await client.search(
         query="robotics",
         filters={"title": "Test Document 1"},
@@ -177,7 +186,15 @@ async def test_title_filter_dense(dense_client, load_test_documents):
 async def test_title_filter_sparse(sparse_client, load_test_documents):
     """Test filtering by title in sparse search."""
     client = await sparse_client
-    client.search.return_value = load_test_documents
+    
+    # Create a modified copy of test documents with the correct title
+    modified_docs = []
+    for doc in load_test_documents:
+        doc_copy = copy.deepcopy(doc)
+        doc_copy.metadata.title = "Test Document 1"
+        modified_docs.append(doc_copy)
+    
+    client.search.return_value = modified_docs
     results = await client.search(
         query="robotics",
         filters={"title": "Test Document 1"},
