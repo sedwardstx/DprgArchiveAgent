@@ -47,15 +47,20 @@ class ChatTool:
             ]
             
             # Get chat completion
-            response = await openai_client.chat.completions.create(
+            response = openai_client.chat.completions.create(
                 model=self.settings.CHAT_MODEL,
                 messages=messages,
                 max_tokens=max_tokens or self.settings.CHAT_MAX_TOKENS,
                 temperature=temperature or self.settings.CHAT_TEMPERATURE
             )
             
-            # Extract assistant's message
-            assistant_message = response.choices[0].message.content
+            # Handle both sync and async responses
+            if hasattr(response, 'choices'):
+                assistant_message = response.choices[0].message.content
+            else:
+                # For async responses, await the result
+                response = await response
+                assistant_message = response.choices[0].message.content
             
             # Return chat response
             return ChatResponse(
@@ -69,4 +74,4 @@ class ChatTool:
             
         except Exception as e:
             logger.error(f"Error processing chat request: {str(e)}")
-            raise 
+            raise Exception(f"Error processing chat request: {str(e)}") 

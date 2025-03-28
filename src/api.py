@@ -107,7 +107,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/metadata")
-async def metadata(query: SearchQuery) -> SearchResponse:
+async def metadata(query: SearchQuery) -> Dict[str, Any]:
     """Metadata endpoint."""
     try:
         response = await search_tool.search(query)
