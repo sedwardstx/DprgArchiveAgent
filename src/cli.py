@@ -196,9 +196,9 @@ def search(
     month: Optional[int] = typer.Option(None, "--month", "-m", help="Filter by month"),
     day: Optional[int] = typer.Option(None, "--day", "-d", help="Filter by day"),
     keywords: Optional[str] = typer.Option(None, "--keywords", "-kw", help="Comma-separated list of keywords"),
-    title: Optional[str] = typer.Option(None, "--title", "-t", help="Filter by title"),
+    title: Optional[str] = typer.Option(None, "--title", help="Filter by title"),
     min_score: Optional[float] = typer.Option(0.3, "--min-score", "-s", help="Minimum score threshold"),
-    search_type: str = typer.Option("dense", "--type", "-st", help="Search type: dense, sparse, or hybrid"),
+    search_type: str = typer.Option("dense", "--type", "-t", help="Search type: dense, sparse, or hybrid"),
     no_filter: bool = typer.Option(False, "--no-filter", help="Disable minimum score filtering"),
 ):
     """
