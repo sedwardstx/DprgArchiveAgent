@@ -87,13 +87,30 @@ class SearchTool:
             # Convert results to ArchiveDocument objects
             documents = []
             for result in results:
-                # Handle Pinecone ScoredVector objects
-                if hasattr(result, 'id') and hasattr(result, 'metadata') and hasattr(result, 'score'):
-                    documents.append(ArchiveDocument.from_pinecone_match(result))
-                # Handle dictionary results (for backward compatibility)
+                # Handle any type of result by converting to dict first if needed
+                if hasattr(result, '__dict__'):
+                    result_dict = {
+                        'id': getattr(result, 'id', ''),
+                        'metadata': {
+                            'author': getattr(result.metadata, 'author', None),
+                            'date': getattr(result.metadata, 'date', None),
+                            'day': getattr(result.metadata, 'day', None),
+                            'month': getattr(result.metadata, 'month', None),
+                            'year': getattr(result.metadata, 'year', None),
+                            'has_url': getattr(result.metadata, 'has_url', None),
+                            'keywords': getattr(result.metadata, 'keywords', None),
+                            'title': getattr(result.metadata, 'title', None)
+                        },
+                        'score': getattr(result, 'score', None)
+                    }
+                    # Add text_excerpt at the top level
+                    text_excerpt = getattr(result, 'text_excerpt', '')
+                    if text_excerpt is None:
+                        text_excerpt = ''  # Ensure text_excerpt is never None
+                    result_dict['text_excerpt'] = text_excerpt
+                    documents.append(ArchiveDocument.from_pinecone_match(result_dict))
                 elif isinstance(result, dict):
                     documents.append(ArchiveDocument.from_pinecone_match(result))
-                # Handle ArchiveDocument objects directly
                 elif isinstance(result, ArchiveDocument):
                     documents.append(result)
             
@@ -178,9 +195,9 @@ class SearchTool:
                 continue
             if day and result.metadata.day != day:
                 continue
-            if keywords and not all(k in result.metadata.keywords for k in keywords):
+            if keywords and not all(k in (result.metadata.keywords or []) for k in keywords):
                 continue
-            if title and title.lower() not in result.metadata.title.lower():
+            if title and result.metadata.title != title:
                 continue
                 
             filtered_results.append(result)

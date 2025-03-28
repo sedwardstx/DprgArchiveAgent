@@ -34,28 +34,45 @@ class ArchiveDocument(BaseModel):
             metadata = match.metadata
             match_id = match.id
             score = match.score
+            text_excerpt = getattr(match, "text_excerpt", "")
         else:
             # Dictionary response or older format
             metadata = match.get("metadata", {})
             match_id = match.get("id", "")
             score = match.get("score")
+            text_excerpt = match.get("text_excerpt", "")
+        
+        # Handle metadata that might be a dictionary or an object
+        if isinstance(metadata, dict):
+            metadata_dict = metadata
+        else:
+            metadata_dict = {
+                "author": getattr(metadata, "author", None),
+                "date": getattr(metadata, "date", None),
+                "day": getattr(metadata, "day", None),
+                "month": getattr(metadata, "month", None),
+                "year": getattr(metadata, "year", None),
+                "has_url": getattr(metadata, "has_url", None),
+                "keywords": getattr(metadata, "keywords", None),
+                "title": getattr(metadata, "title", None)
+            }
         
         # Create metadata object
         archive_metadata = ArchiveMetadata(
-            author=metadata.get("author"),
-            date=metadata.get("date"),
-            day=metadata.get("day"),
-            month=metadata.get("month"),
-            year=metadata.get("year"),
-            has_url=metadata.get("has_url"),
-            keywords=metadata.get("keywords"),
-            title=metadata.get("title"),
+            author=metadata_dict.get("author"),
+            date=metadata_dict.get("date"),
+            day=metadata_dict.get("day"),
+            month=metadata_dict.get("month"),
+            year=metadata_dict.get("year"),
+            has_url=metadata_dict.get("has_url"),
+            keywords=metadata_dict.get("keywords"),
+            title=metadata_dict.get("title"),
         )
         
         # Create and return document
         return cls(
             id=match_id,
-            text_excerpt=metadata.get("text_excerpt", ""),
+            text_excerpt=text_excerpt,
             metadata=archive_metadata,
             score=score,
         )
