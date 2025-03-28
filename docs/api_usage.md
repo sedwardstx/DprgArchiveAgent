@@ -68,6 +68,7 @@ GET /search?query=your+search+query&[additional parameters]
 | keywords    | string  | Comma-separated keywords to filter by               | null    |
 | min_score   | float   | Minimum score threshold (0-1)                       | 0.7     |
 | search_type | string  | Search type: "dense", "sparse", or "hybrid"         | "dense" |
+| title       | string  | Search for documents by title                       | null    |
 
 #### Response Format
 
@@ -115,6 +116,7 @@ GET /metadata?[metadata parameters]
 | day       | integer | Filter by day                         | null    |
 | keywords  | string  | Comma-separated keywords to filter by | null    |
 | top_k     | integer | Number of results to return           | 10      |
+| title     | string  | Search for documents by title         | null    |
 
 Note: At least one metadata filter must be provided.
 
@@ -145,7 +147,7 @@ The `/chat` endpoint enables conversational AI interactions with the DPRG archiv
       "content": "How can I test if my robot's PID controller is working correctly?"
     }
   ],
-  "model": "gpt-4o",
+  "model": "gpt-4",
   "max_tokens": 1024,
   "temperature": 0.7,
   "search_top_k": 5,
@@ -181,8 +183,7 @@ The `/chat` endpoint enables conversational AI interactions with the DPRG archiv
         "keywords": ["robotics", "pid", "testing", "controller"]
       },
       "score": 0.89
-    },
-    // Additional documents...
+    }
   ],
   "elapsed_time": 2.45
 }
@@ -249,60 +250,92 @@ curl -X GET "http://localhost:8000/search?query=robotics+competition"
 # Search with filters
 curl -X GET "http://localhost:8000/search?query=progress+video&author=eric@sssi.com&year=2007"
 
+# Search by title
+curl -X GET "http://localhost:8000/search?title=meeting+notes"
+
 # Metadata search
-curl -X GET "http://localhost:8000/metadata?author=eric@sssi.com&year=2007"
+curl -X GET "http://localhost:8000/metadata?year=2007&keywords=dprg,video"
 ```
 
 ### Using Python Requests
 
 ```python
 import requests
+import json
 
 # Basic search
 response = requests.get(
     "http://localhost:8000/search",
     params={"query": "robotics competition"}
 )
-results = response.json()
-print(f"Found {results['total']} results")
+print(json.dumps(response.json(), indent=2))
 
-# Search with metadata filters
-response = requests.get(
-    "http://localhost:8000/search",
-    params={
-        "query": "progress video",
-        "author": "eric@sssi.com",
-        "year": 2007,
-        "search_type": "hybrid"
-    }
-)
-results = response.json()
+# Search with filters
+params = {
+    "query": "progress video",
+    "author": "eric@sssi.com",
+    "year": 2007,
+    "search_type": "hybrid",
+    "top_k": 5,
+    "min_score": 0.75
+}
+response = requests.get("http://localhost:8000/search", params=params)
+print(json.dumps(response.json(), indent=2))
+
+# Metadata search
+params = {
+    "year": 2007,
+    "keywords": "dprg,progress,video",
+    "top_k": 10
+}
+response = requests.get("http://localhost:8000/metadata", params=params)
+print(json.dumps(response.json(), indent=2))
 ```
 
-### Using JavaScript/Fetch
+### Using JavaScript/Node.js
 
 ```javascript
 // Basic search
 fetch('http://localhost:8000/search?query=robotics+competition')
   .then(response => response.json())
   .then(data => {
-    console.log(`Found ${data.total} results`);
-    data.results.forEach(result => {
-      console.log(`${result.metadata.title} (Score: ${result.score})`);
+    console.log(`Found ${data.total} results in ${data.elapsed_time.toFixed(2)}s`);
+    data.results.forEach(doc => {
+      console.log(`Score: ${doc.score.toFixed(2)} - ${doc.metadata.title}`);
+      console.log(`Author: ${doc.metadata.author}`);
+      console.log(`Date: ${doc.metadata.date}`);
+      console.log(`Excerpt: ${doc.text_excerpt.substring(0, 100)}...`);
+      console.log('-'.repeat(40));
     });
-  });
+  })
+  .catch(error => console.error('Error:', error));
 
 // Search with filters
 const params = new URLSearchParams({
   query: 'progress video',
   author: 'eric@sssi.com',
   year: 2007,
-  search_type: 'hybrid'
+  search_type: 'hybrid',
+  top_k: 5,
+  min_score: 0.75
 });
 
 fetch(`http://localhost:8000/search?${params.toString()}`)
   .then(response => response.json())
-  .then(data => console.log(data));
+  .then(data => {
+    console.log(`Search query: "${data.query}" (${data.search_type} search)`);
+    console.log(`Found ${data.total} results`);
+    
+    data.results.forEach((doc, idx) => {
+      console.log(`\nResult ${idx + 1}:`);
+      console.log(`Title: ${doc.metadata.title}`);
+      console.log(`Author: ${doc.metadata.author}`);
+      console.log(`Date: ${doc.metadata.date}`);
+      console.log(`Score: ${doc.score.toFixed(2)}`);
+      console.log(`Excerpt: ${doc.text_excerpt.substring(0, 100)}...`);
+    });
+  })
+  .catch(error => console.error('Error:', error));
 ```
 
 ## Error Handling

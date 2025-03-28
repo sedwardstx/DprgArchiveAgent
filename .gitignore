@@ -27,6 +27,7 @@ ENV/
 *.swo
 
 # Testing
+.log
 .pytest_cache/
 .coverage
 htmlcov/

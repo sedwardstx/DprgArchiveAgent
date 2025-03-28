@@ -9,10 +9,18 @@ DprgArchiveAgent provides a seamless interface to search through DPRG archives u
 ## Features
 
 - Search DPRG archives with natural language queries
-- Access both dense and sparse vector indexes
-- Filter results by metadata (author, date, keywords, etc.)
+- Multiple search types:
+  - Dense vector search (semantic similarity)
+  - Sparse vector search (keyword matching)
+  - Hybrid search (combines both approaches)
+- Rich metadata filtering:
+  - Author
+  - Date (year, month, day)
+  - Keywords
+  - Title
 - CLI interface for quick searches
 - REST API for integration with other applications
+- Comprehensive test suite
 
 ## Installation
 
@@ -41,12 +49,19 @@ PINECONE_ENVIRONMENT=your_pinecone_environment
 # OpenAI API key (for embeddings)
 OPENAI_API_KEY=your_openai_api_key
 
-# Vector index URLs
-DENSE_INDEX_URL=https://dprg-list-archive-dense-4p4f7lg.svc.aped-4627-b74a.pinecone.io
-SPARSE_INDEX_URL=https://dprg-list-archive-sparse-4p4f7lg.svc.aped-4627-b74a.pinecone.io
+# Vector index configuration
+DENSE_INDEX_NAME=your_dense_index_name
+SPARSE_INDEX_NAME=your_sparse_index_name
+DENSE_INDEX_URL=your_dense_index_url
+SPARSE_INDEX_URL=your_sparse_index_url
 
 # Namespace
-PINECONE_NAMESPACE=dprg-archive
+PINECONE_NAMESPACE=your_namespace
+
+# Optional settings
+MIN_SCORE_THRESHOLD=0.7  # Minimum score for search results
+DENSE_WEIGHT=0.5        # Weight for dense results in hybrid search
+SPARSE_WEIGHT=0.5       # Weight for sparse results in hybrid search
 ```
 
 ## Usage
@@ -59,6 +74,11 @@ python -m src.cli search "DPRG robotics competition"
 
 # Search with metadata filters
 python -m src.cli search "progress video" --author "eric@sssi.com" --year 2007
+
+# Specify search type
+python -m src.cli search "robotics" --type dense    # Semantic search
+python -m src.cli search "robotics" --type sparse   # Keyword search
+python -m src.cli search "robotics" --type hybrid   # Combined search
 
 # Get help
 python -m src.cli --help
@@ -79,7 +99,7 @@ python -m src.api
 ### Search Endpoint
 
 ```
-GET /search?query=robotics+competition&limit=10
+GET /search?query=robotics+competition&type=hybrid&limit=10
 ```
 
 Response:
@@ -94,22 +114,43 @@ Response:
       "keywords": ["dprg", "yatu4b", "progress", "video", "cadence", "com"],
       "score": 0.89
     }
-  ]
+  ],
+  "total": 1,
+  "query": "robotics competition",
+  "search_type": "hybrid",
+  "elapsed_time": 0.543
 }
 ```
 
 ## Development
 
-```bash
-# Run tests
-pytest
+### Code Quality
 
+```bash
 # Format code
 black src tests
 
 # Run linter
 ruff check src tests
 ```
+
+### Testing
+
+```bash
+# Run all tests
+pytest
+
+# Run with verbose output
+pytest -v
+
+# Run with coverage report
+pytest --cov=src
+
+# Run specific test file
+pytest tests/test_metadata_filters.py
+```
+
+For detailed testing documentation, see [docs/testing.md](docs/testing.md).
 
 ## License
 
