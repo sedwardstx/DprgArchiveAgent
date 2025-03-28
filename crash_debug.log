@@ -281,3 +281,1068 @@
 2025-03-28 07:39:59.298980 - Entering final_cleanup from atexit handler
 2025-03-28 07:39:59.299988 - Successfully ran cleanup from atexit handler
 2025-03-28 07:39:59.300987 - Exiting final_cleanup from atexit handler
+2025-03-28 08:50:30.844227 - Entering final_cleanup from atexit handler
+2025-03-28 08:50:30.846750 - Successfully ran cleanup from atexit handler
+2025-03-28 08:50:30.848743 - Exiting final_cleanup from atexit handler
+2025-03-28 08:52:32.737595 - Starting search function
+2025-03-28 08:52:32.740021 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:52:32.741189 - Starting run_async_safely
+2025-03-28 08:52:32.743720 - Created new event loop
+2025-03-28 08:52:32.745628 - Coroutine completed successfully
+2025-03-28 08:52:32.747135 - Closing event loop
+2025-03-28 08:52:32.749245 - Event loop closed
+2025-03-28 08:52:32.751246 - Search completed successfully
+2025-03-28 08:52:32.794742 - Starting search function
+2025-03-28 08:52:32.795652 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:52:32.797158 - Starting run_async_safely
+2025-03-28 08:52:32.801171 - Created new event loop
+2025-03-28 08:52:32.803164 - Coroutine completed successfully
+2025-03-28 08:52:32.804165 - Closing event loop
+2025-03-28 08:52:32.805166 - Event loop closed
+2025-03-28 08:52:32.807164 - Search completed successfully
+2025-03-28 08:52:32.824596 - Starting search function
+2025-03-28 08:52:32.825594 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:52:32.827830 - Starting run_async_safely
+2025-03-28 08:52:32.830828 - Created new event loop
+2025-03-28 08:52:32.831830 - Coroutine completed successfully
+2025-03-28 08:52:32.832924 - Closing event loop
+2025-03-28 08:52:32.834832 - Event loop closed
+2025-03-28 08:52:32.835868 - Search completed successfully
+2025-03-28 08:52:32.851286 - Starting search function
+2025-03-28 08:52:32.852285 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False
+2025-03-28 08:52:32.853286 - Starting run_async_safely
+2025-03-28 08:52:32.856812 - Created new event loop
+2025-03-28 08:52:32.858133 - Coroutine completed successfully
+2025-03-28 08:52:32.860142 - Closing event loop
+2025-03-28 08:52:32.861141 - Event loop closed
+2025-03-28 08:52:32.863447 - Search completed successfully
+2025-03-28 08:52:32.880527 - Starting search function
+2025-03-28 08:52:32.881796 - No filter option enabled, setting min_score to None
+2025-03-28 08:52:32.896874 - Starting search function
+2025-03-28 08:52:32.897883 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False
+2025-03-28 08:52:32.898880 - Starting run_async_safely
+2025-03-28 08:52:32.901884 - Created new event loop
+2025-03-28 08:52:32.903975 - Coroutine completed successfully
+2025-03-28 08:52:32.904885 - Closing event loop
+2025-03-28 08:52:32.906887 - Event loop closed
+2025-03-28 08:52:32.906887 - Search completed successfully
+2025-03-28 08:52:32.944491 - Starting search function
+2025-03-28 08:52:32.945369 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:52:32.947885 - Starting run_async_safely
+2025-03-28 08:52:32.950934 - Created new event loop
+2025-03-28 08:52:32.952165 - Coroutine completed successfully
+2025-03-28 08:52:32.954404 - Closing event loop
+2025-03-28 08:52:32.955413 - Event loop closed
+2025-03-28 08:52:32.957068 - Search completed successfully
+2025-03-28 08:52:32.973314 - Starting search function
+2025-03-28 08:52:32.974812 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:52:32.976818 - Starting run_async_safely
+2025-03-28 08:52:32.979956 - Created new event loop
+2025-03-28 08:52:32.982332 - Coroutine completed successfully
+2025-03-28 08:52:32.983247 - Closing event loop
+2025-03-28 08:52:32.985248 - Event loop closed
+2025-03-28 08:52:32.986250 - Search completed successfully
+2025-03-28 08:52:33.008132 - Starting search function
+2025-03-28 08:52:33.009133 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:52:33.011134 - Starting run_async_safely
+2025-03-28 08:52:33.014197 - Created new event loop
+2025-03-28 08:52:33.016143 - Coroutine completed successfully
+2025-03-28 08:52:33.017648 - Closing event loop
+2025-03-28 08:52:33.018653 - Event loop closed
+2025-03-28 08:52:33.020657 - Search completed successfully
+2025-03-28 08:52:33.037256 - Starting search function
+2025-03-28 08:53:29.364239 - Entering final_cleanup from atexit handler
+2025-03-28 08:53:29.366242 - Successfully ran cleanup from atexit handler
+2025-03-28 08:53:29.367748 - Exiting final_cleanup from atexit handler
+2025-03-28 08:57:47.106455 - Starting search function
+2025-03-28 08:57:47.115900 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:57:47.117902 - Starting run_async_safely
+2025-03-28 08:57:47.121548 - Created new event loop
+2025-03-28 08:57:47.124042 - Coroutine completed successfully
+2025-03-28 08:57:47.125090 - Closing event loop
+2025-03-28 08:57:47.127050 - Event loop closed
+2025-03-28 08:57:47.128047 - Search completed successfully
+2025-03-28 08:57:47.165322 - Starting search function
+2025-03-28 08:57:47.166321 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:57:47.168322 - Starting run_async_safely
+2025-03-28 08:57:47.170867 - Created new event loop
+2025-03-28 08:57:47.171872 - Coroutine completed successfully
+2025-03-28 08:57:47.173874 - Closing event loop
+2025-03-28 08:57:47.175881 - Event loop closed
+2025-03-28 08:57:47.176873 - Search completed successfully
+2025-03-28 08:57:47.238990 - Starting search function
+2025-03-28 08:57:47.241507 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:57:47.242503 - Starting run_async_safely
+2025-03-28 08:57:47.246017 - Created new event loop
+2025-03-28 08:57:47.247025 - Coroutine completed successfully
+2025-03-28 08:57:47.248025 - Closing event loop
+2025-03-28 08:57:47.251040 - Event loop closed
+2025-03-28 08:57:47.252045 - Search completed successfully
+2025-03-28 08:57:47.267595 - Starting search function
+2025-03-28 08:57:47.269596 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False
+2025-03-28 08:57:47.270596 - Starting run_async_safely
+2025-03-28 08:57:47.273115 - Created new event loop
+2025-03-28 08:57:47.275113 - Coroutine completed successfully
+2025-03-28 08:57:47.276619 - Closing event loop
+2025-03-28 08:57:47.278628 - Event loop closed
+2025-03-28 08:57:47.279629 - Search completed successfully
+2025-03-28 08:57:47.295164 - Starting search function
+2025-03-28 08:57:47.297138 - No filter option enabled, setting min_score to None
+2025-03-28 08:57:47.310670 - Starting search function
+2025-03-28 08:57:47.312675 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False
+2025-03-28 08:57:47.313681 - Starting run_async_safely
+2025-03-28 08:57:47.316684 - Created new event loop
+2025-03-28 08:57:47.318683 - Coroutine completed successfully
+2025-03-28 08:57:47.319681 - Closing event loop
+2025-03-28 08:57:47.321842 - Event loop closed
+2025-03-28 08:57:47.322844 - Search completed successfully
+2025-03-28 08:57:47.349235 - Starting search function
+2025-03-28 08:57:47.351749 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:57:47.352746 - Starting run_async_safely
+2025-03-28 08:57:47.355765 - Created new event loop
+2025-03-28 08:57:47.357988 - Coroutine completed successfully
+2025-03-28 08:57:47.359282 - Closing event loop
+2025-03-28 08:57:47.361793 - Event loop closed
+2025-03-28 08:57:47.362793 - Search completed successfully
+2025-03-28 08:57:47.375816 - Starting search function
+2025-03-28 08:57:47.378340 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:57:47.379345 - Starting run_async_safely
+2025-03-28 08:57:47.382866 - Created new event loop
+2025-03-28 08:57:47.384865 - Coroutine completed successfully
+2025-03-28 08:57:47.385864 - Closing event loop
+2025-03-28 08:57:47.387921 - Event loop closed
+2025-03-28 08:57:47.388875 - Search completed successfully
+2025-03-28 08:57:47.405003 - Starting search function
+2025-03-28 08:57:47.407003 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:57:47.408003 - Starting run_async_safely
+2025-03-28 08:57:47.411516 - Created new event loop
+2025-03-28 08:57:47.412517 - Coroutine completed successfully
+2025-03-28 08:57:47.414516 - Closing event loop
+2025-03-28 08:57:47.415516 - Event loop closed
+2025-03-28 08:57:47.417517 - Search completed successfully
+2025-03-28 08:57:47.434154 - Starting search function
+2025-03-28 08:57:57.770750 - Entering final_cleanup from atexit handler
+2025-03-28 08:57:57.771758 - Successfully ran cleanup from atexit handler
+2025-03-28 08:57:57.772758 - Exiting final_cleanup from atexit handler
+2025-03-28 08:59:39.752266 - Starting search function
+2025-03-28 08:59:39.754273 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:59:39.755760 - Starting run_async_safely
+2025-03-28 08:59:39.758277 - Created new event loop
+2025-03-28 08:59:39.760730 - Coroutine completed successfully
+2025-03-28 08:59:39.762781 - Closing event loop
+2025-03-28 08:59:39.764850 - Event loop closed
+2025-03-28 08:59:39.766358 - Search completed successfully
+2025-03-28 08:59:39.818475 - Starting search function
+2025-03-28 08:59:39.821865 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:59:39.823288 - Starting run_async_safely
+2025-03-28 08:59:39.826297 - Created new event loop
+2025-03-28 08:59:39.828340 - Coroutine completed successfully
+2025-03-28 08:59:39.829507 - Closing event loop
+2025-03-28 08:59:39.832040 - Event loop closed
+2025-03-28 08:59:39.833048 - Search completed successfully
+2025-03-28 08:59:39.854761 - Starting search function
+2025-03-28 08:59:39.857053 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:59:39.858434 - Starting run_async_safely
+2025-03-28 08:59:39.860493 - Created new event loop
+2025-03-28 08:59:39.863711 - Coroutine completed successfully
+2025-03-28 08:59:39.865307 - Closing event loop
+2025-03-28 08:59:39.866312 - Event loop closed
+2025-03-28 08:59:39.868901 - Search completed successfully
+2025-03-28 08:59:39.892965 - Starting search function
+2025-03-28 08:59:39.894972 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False
+2025-03-28 08:59:39.897059 - Starting run_async_safely
+2025-03-28 08:59:39.899770 - Created new event loop
+2025-03-28 08:59:39.901683 - Coroutine completed successfully
+2025-03-28 08:59:39.903993 - Closing event loop
+2025-03-28 08:59:39.905000 - Event loop closed
+2025-03-28 08:59:39.907006 - Search completed successfully
+2025-03-28 08:59:39.929917 - Starting search function
+2025-03-28 08:59:39.931916 - No filter option enabled, setting min_score to None
+2025-03-28 08:59:39.956105 - Starting search function
+2025-03-28 08:59:39.958167 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False
+2025-03-28 08:59:39.959174 - Starting run_async_safely
+2025-03-28 08:59:39.962315 - Created new event loop
+2025-03-28 08:59:39.964864 - Coroutine completed successfully
+2025-03-28 08:59:39.966294 - Closing event loop
+2025-03-28 08:59:39.968299 - Event loop closed
+2025-03-28 08:59:39.970714 - Search completed successfully
+2025-03-28 08:59:40.015751 - Starting search function
+2025-03-28 08:59:40.017757 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:59:40.018754 - Starting run_async_safely
+2025-03-28 08:59:40.022270 - Created new event loop
+2025-03-28 08:59:40.023473 - Coroutine completed successfully
+2025-03-28 08:59:40.025635 - Closing event loop
+2025-03-28 08:59:40.027644 - Event loop closed
+2025-03-28 08:59:40.028645 - Search completed successfully
+2025-03-28 08:59:40.054907 - Starting search function
+2025-03-28 08:59:40.056823 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:59:40.058822 - Starting run_async_safely
+2025-03-28 08:59:40.061669 - Created new event loop
+2025-03-28 08:59:40.064187 - Coroutine completed successfully
+2025-03-28 08:59:40.066211 - Closing event loop
+2025-03-28 08:59:40.068256 - Event loop closed
+2025-03-28 08:59:40.069194 - Search completed successfully
+2025-03-28 08:59:40.088434 - Starting search function
+2025-03-28 08:59:40.090344 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 08:59:40.092859 - Starting run_async_safely
+2025-03-28 08:59:40.095857 - Created new event loop
+2025-03-28 08:59:40.097897 - Coroutine completed successfully
+2025-03-28 08:59:40.100023 - Closing event loop
+2025-03-28 08:59:40.102029 - Event loop closed
+2025-03-28 08:59:40.103174 - Search completed successfully
+2025-03-28 08:59:40.120849 - Starting search function
+2025-03-28 08:59:51.015112 - Entering final_cleanup from atexit handler
+2025-03-28 08:59:51.024784 - Successfully ran cleanup from atexit handler
+2025-03-28 08:59:51.025776 - Exiting final_cleanup from atexit handler
+2025-03-28 09:02:01.190890 - Starting search function
+2025-03-28 09:02:01.199534 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 09:02:01.201532 - Starting run_async_safely
+2025-03-28 09:02:01.204055 - Created new event loop
+2025-03-28 09:02:01.206502 - Coroutine completed successfully
+2025-03-28 09:02:01.207528 - Closing event loop
+2025-03-28 09:02:01.210055 - Event loop closed
+2025-03-28 09:02:01.211568 - Search completed successfully
+2025-03-28 09:02:01.268614 - Starting search function
+2025-03-28 09:02:01.270539 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 09:02:01.272579 - Starting run_async_safely
+2025-03-28 09:02:01.275651 - Created new event loop
+2025-03-28 09:02:01.278938 - Coroutine completed successfully
+2025-03-28 09:02:01.280948 - Closing event loop
+2025-03-28 09:02:01.283227 - Event loop closed
+2025-03-28 09:02:01.287304 - Search completed successfully
+2025-03-28 09:02:01.311216 - Starting search function
+2025-03-28 09:02:01.313408 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False
+2025-03-28 09:02:01.314449 - Starting run_async_safely
+2025-03-28 09:02:01.317450 - Created new event loop
+2025-03-28 09:02:01.319457 - Coroutine completed successfully
+2025-03-28 09:02:01.321451 - Closing event loop
+2025-03-28 09:02:01.322455 - Event loop closed
+2025-03-28 09:02:01.323487 - Search completed successfully
+2025-03-28 09:02:01.345831 - Starting search function
+2025-03-28 09:02:01.347847 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False
+2025-03-28 09:02:01.350061 - Starting run_async_safely
+2025-03-28 09:02:01.353580 - Created new event loop
+2025-03-28 09:02:01.356590 - Coroutine completed successfully
+2025-03-28 09:02:01.357587 - Closing event loop
+2025-03-28 09:02:01.360630 - Event loop closed
+2025-03-28 09:02:01.362121 - Search completed successfully
+2025-03-28 09:02:01.379999 - Starting search function
+2025-03-28 09:02:01.380994 - No filter option enabled, setting min_score to None
+2025-03-28 09:02:01.400545 - Starting search function
+2025-03-28 09:02:01.401541 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False
+2025-03-28 09:02:01.403537 - Starting run_async_safely
+2025-03-28 09:02:01.405550 - Created new event loop
+2025-03-28 09:02:01.408664 - Coroutine completed successfully
+2025-03-28 09:02:01.409790 - Closing event loop
+2025-03-28 09:02:01.411262 - Event loop closed
+2025-03-28 09:02:01.412503 - Search completed successfully
+2025-03-28 09:02:01.452386 - Starting search function
+2025-03-28 09:02:01.454370 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 09:02:01.455593 - Starting run_async_safely
+2025-03-28 09:02:01.457604 - Created new event loop
+2025-03-28 09:02:01.460610 - Coroutine completed successfully
+2025-03-28 09:02:01.461690 - Closing event loop
+2025-03-28 09:02:01.463698 - Event loop closed
+2025-03-28 09:02:01.464912 - Search completed successfully
+2025-03-28 09:02:01.480953 - Starting search function
+2025-03-28 09:02:01.481940 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 09:02:01.483449 - Starting run_async_safely
+2025-03-28 09:02:01.486456 - Created new event loop
+2025-03-28 09:02:01.487996 - Coroutine completed successfully
+2025-03-28 09:02:01.490002 - Closing event loop
+2025-03-28 09:02:01.491003 - Event loop closed
+2025-03-28 09:02:01.492351 - Search completed successfully
+2025-03-28 09:02:01.512424 - Starting search function
+2025-03-28 09:02:01.514557 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False
+2025-03-28 09:02:01.516560 - Starting run_async_safely
+2025-03-28 09:02:01.519566 - Created new event loop
+2025-03-28 09:02:01.520563 - Coroutine completed successfully
+2025-03-28 09:02:01.522584 - Closing event loop
+2025-03-28 09:02:01.523584 - Event loop closed
+2025-03-28 09:02:01.524712 - Search completed successfully
+2025-03-28 09:02:01.544057 - Starting search function
+2025-03-28 09:02:14.447771 - Entering final_cleanup from atexit handler
+2025-03-28 09:02:14.449396 - Successfully ran cleanup from atexit handler
+2025-03-28 09:02:14.450402 - Exiting final_cleanup from atexit handler
+2025-03-28 09:07:19.749439 - Starting search function
+2025-03-28 09:07:19.759215 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:07:19.760211 - Starting run_async_safely
+2025-03-28 09:07:19.764624 - Created new event loop
+2025-03-28 09:07:21.340234 - Coroutine completed successfully
+2025-03-28 09:07:21.343805 - Closing event loop
+2025-03-28 09:07:21.345808 - Event loop closed
+2025-03-28 09:07:21.347317 - Search completed successfully
+2025-03-28 09:07:21.436033 - Starting search function
+2025-03-28 09:07:21.438172 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:07:21.439406 - Starting run_async_safely
+2025-03-28 09:07:21.442422 - Created new event loop
+2025-03-28 09:07:23.197949 - Coroutine completed successfully
+2025-03-28 09:07:23.207293 - Closing event loop
+2025-03-28 09:07:23.208352 - Event loop closed
+2025-03-28 09:07:23.210304 - Search completed successfully
+2025-03-28 09:07:23.250973 - Starting search function
+2025-03-28 09:07:23.251974 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:07:23.253992 - Starting run_async_safely
+2025-03-28 09:07:23.256029 - Created new event loop
+2025-03-28 09:07:25.089441 - Coroutine completed successfully
+2025-03-28 09:07:25.098560 - Closing event loop
+2025-03-28 09:07:25.101575 - Event loop closed
+2025-03-28 09:07:25.103515 - Search completed successfully
+2025-03-28 09:07:25.121296 - Starting search function
+2025-03-28 09:07:25.122303 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:07:25.124598 - Starting run_async_safely
+2025-03-28 09:07:25.127340 - Created new event loop
+2025-03-28 09:07:26.369032 - Coroutine completed successfully
+2025-03-28 09:07:26.371539 - Closing event loop
+2025-03-28 09:07:26.374065 - Event loop closed
+2025-03-28 09:07:26.375025 - Search completed successfully
+2025-03-28 09:07:26.422400 - Starting search function
+2025-03-28 09:07:26.424506 - No filter option enabled, setting min_score to None
+2025-03-28 09:07:26.446108 - Starting search function
+2025-03-28 09:07:26.447112 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:07:26.448313 - Starting run_async_safely
+2025-03-28 09:07:26.452739 - Created new event loop
+2025-03-28 09:07:28.697523 - Coroutine completed successfully
+2025-03-28 09:07:28.699443 - Closing event loop
+2025-03-28 09:07:28.700442 - Event loop closed
+2025-03-28 09:07:28.702999 - Search completed successfully
+2025-03-28 09:07:28.841116 - Starting search function
+2025-03-28 09:07:28.843118 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:07:28.846005 - Starting run_async_safely
+2025-03-28 09:07:28.850282 - Created new event loop
+2025-03-28 09:07:28.853402 - Coroutine completed successfully
+2025-03-28 09:07:28.854660 - Closing event loop
+2025-03-28 09:07:28.857344 - Event loop closed
+2025-03-28 09:07:28.858355 - Search completed successfully
+2025-03-28 09:07:28.891733 - Starting search function
+2025-03-28 09:07:28.893966 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:07:28.896198 - Starting run_async_safely
+2025-03-28 09:07:28.900623 - Created new event loop
+2025-03-28 09:07:30.358129 - Coroutine completed successfully
+2025-03-28 09:07:30.360132 - Closing event loop
+2025-03-28 09:07:30.362141 - Event loop closed
+2025-03-28 09:07:30.364454 - Search completed successfully
+2025-03-28 09:07:30.450380 - Starting search function
+2025-03-28 09:07:30.452382 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:07:30.454389 - Starting run_async_safely
+2025-03-28 09:07:30.458186 - Created new event loop
+2025-03-28 09:07:32.347127 - Coroutine completed successfully
+2025-03-28 09:07:32.349338 - Closing event loop
+2025-03-28 09:07:32.350649 - Event loop closed
+2025-03-28 09:07:32.351656 - Search completed successfully
+2025-03-28 09:07:32.411069 - Starting search function
+2025-03-28 09:07:36.724709 - Entering final_cleanup from atexit handler
+2025-03-28 09:07:36.727221 - Successfully ran cleanup from atexit handler
+2025-03-28 09:07:36.728714 - Exiting final_cleanup from atexit handler
+2025-03-28 09:09:02.415870 - Starting search function
+2025-03-28 09:09:02.416870 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:09:02.418376 - Starting run_async_safely
+2025-03-28 09:09:02.422049 - Created new event loop
+2025-03-28 09:09:04.497081 - Coroutine completed successfully
+2025-03-28 09:09:04.499207 - Closing event loop
+2025-03-28 09:09:04.500625 - Event loop closed
+2025-03-28 09:09:04.501645 - Search completed successfully
+2025-03-28 09:09:04.591284 - Starting search function
+2025-03-28 09:09:04.592280 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:09:04.594286 - Starting run_async_safely
+2025-03-28 09:09:04.597280 - Created new event loop
+2025-03-28 09:09:06.324704 - Coroutine completed successfully
+2025-03-28 09:09:06.326084 - Closing event loop
+2025-03-28 09:09:06.328092 - Event loop closed
+2025-03-28 09:09:06.330079 - Search completed successfully
+2025-03-28 09:09:06.384696 - Starting search function
+2025-03-28 09:09:06.385655 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:09:06.386662 - Starting run_async_safely
+2025-03-28 09:09:06.390177 - Created new event loop
+2025-03-28 09:09:08.284298 - Coroutine completed successfully
+2025-03-28 09:09:08.285298 - Closing event loop
+2025-03-28 09:09:08.288294 - Event loop closed
+2025-03-28 09:09:08.289299 - Search completed successfully
+2025-03-28 09:09:08.311076 - Starting search function
+2025-03-28 09:09:08.313674 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:09:08.315677 - Starting run_async_safely
+2025-03-28 09:09:08.318479 - Created new event loop
+2025-03-28 09:09:10.289710 - Coroutine completed successfully
+2025-03-28 09:09:10.298280 - Closing event loop
+2025-03-28 09:09:10.301286 - Event loop closed
+2025-03-28 09:09:10.302501 - Search completed successfully
+2025-03-28 09:09:10.329557 - Starting search function
+2025-03-28 09:09:10.330565 - No filter option enabled, setting min_score to None
+2025-03-28 09:09:10.345240 - Starting search function
+2025-03-28 09:09:10.347477 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:09:10.348483 - Starting run_async_safely
+2025-03-28 09:09:10.351556 - Created new event loop
+2025-03-28 09:09:12.391977 - Coroutine completed successfully
+2025-03-28 09:09:12.400987 - Closing event loop
+2025-03-28 09:09:12.402965 - Event loop closed
+2025-03-28 09:09:12.403968 - Search completed successfully
+2025-03-28 09:09:12.456680 - Starting search function
+2025-03-28 09:09:12.458190 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:09:12.460623 - Starting run_async_safely
+2025-03-28 09:09:12.463620 - Created new event loop
+2025-03-28 09:09:12.464947 - Coroutine completed successfully
+2025-03-28 09:09:12.467058 - Closing event loop
+2025-03-28 09:09:12.468573 - Event loop closed
+2025-03-28 09:09:12.469579 - Search completed successfully
+2025-03-28 09:09:12.486829 - Starting search function
+2025-03-28 09:09:12.489455 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:09:12.491467 - Starting run_async_safely
+2025-03-28 09:09:12.493469 - Created new event loop
+2025-03-28 09:09:14.282544 - Coroutine completed successfully
+2025-03-28 09:09:14.292573 - Closing event loop
+2025-03-28 09:09:14.293876 - Event loop closed
+2025-03-28 09:09:14.294882 - Search completed successfully
+2025-03-28 09:09:14.338472 - Starting search function
+2025-03-28 09:09:14.341173 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:09:14.342249 - Starting run_async_safely
+2025-03-28 09:09:14.345180 - Created new event loop
+2025-03-28 09:09:16.199980 - Coroutine completed successfully
+2025-03-28 09:09:16.208217 - Closing event loop
+2025-03-28 09:09:16.210224 - Event loop closed
+2025-03-28 09:09:16.211323 - Search completed successfully
+2025-03-28 09:09:16.240865 - Starting search function
+2025-03-28 09:09:20.488897 - Entering final_cleanup from atexit handler
+2025-03-28 09:09:20.497756 - Successfully ran cleanup from atexit handler
+2025-03-28 09:09:20.499272 - Exiting final_cleanup from atexit handler
+2025-03-28 09:10:30.461002 - Starting search function
+2025-03-28 09:10:30.470729 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:10:30.472685 - Starting run_async_safely
+2025-03-28 09:10:30.477169 - Created new event loop
+2025-03-28 09:10:32.139396 - Coroutine completed successfully
+2025-03-28 09:10:32.147509 - Closing event loop
+2025-03-28 09:10:32.149494 - Event loop closed
+2025-03-28 09:10:32.151636 - Search completed successfully
+2025-03-28 09:10:32.236467 - Starting search function
+2025-03-28 09:10:32.239140 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:10:32.240146 - Starting run_async_safely
+2025-03-28 09:10:32.242661 - Created new event loop
+2025-03-28 09:10:34.157652 - Coroutine completed successfully
+2025-03-28 09:10:34.166647 - Closing event loop
+2025-03-28 09:10:34.169151 - Event loop closed
+2025-03-28 09:10:34.170162 - Search completed successfully
+2025-03-28 09:10:34.218311 - Starting search function
+2025-03-28 09:10:34.220478 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:10:34.221485 - Starting run_async_safely
+2025-03-28 09:10:34.225483 - Created new event loop
+2025-03-28 09:10:35.679444 - Coroutine completed successfully
+2025-03-28 09:10:35.680815 - Closing event loop
+2025-03-28 09:10:35.683478 - Event loop closed
+2025-03-28 09:10:35.684483 - Search completed successfully
+2025-03-28 09:10:35.704965 - Starting search function
+2025-03-28 09:10:35.706870 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:10:35.707872 - Starting run_async_safely
+2025-03-28 09:10:35.711504 - Created new event loop
+2025-03-28 09:10:37.262669 - Coroutine completed successfully
+2025-03-28 09:10:37.271652 - Closing event loop
+2025-03-28 09:10:37.273054 - Event loop closed
+2025-03-28 09:10:37.274061 - Search completed successfully
+2025-03-28 09:10:37.307428 - Starting search function
+2025-03-28 09:10:37.309432 - No filter option enabled, setting min_score to None
+2025-03-28 09:10:37.331747 - Starting search function
+2025-03-28 09:10:37.333759 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:10:37.335762 - Starting run_async_safely
+2025-03-28 09:10:37.339403 - Created new event loop
+2025-03-28 09:10:39.182302 - Coroutine completed successfully
+2025-03-28 09:10:39.184714 - Closing event loop
+2025-03-28 09:10:39.185933 - Event loop closed
+2025-03-28 09:10:39.188228 - Search completed successfully
+2025-03-28 09:10:39.298491 - Starting search function
+2025-03-28 09:10:39.300506 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:10:39.301951 - Starting run_async_safely
+2025-03-28 09:10:39.305340 - Created new event loop
+2025-03-28 09:10:39.307340 - Coroutine completed successfully
+2025-03-28 09:10:39.309340 - Closing event loop
+2025-03-28 09:10:39.310803 - Event loop closed
+2025-03-28 09:10:39.312847 - Search completed successfully
+2025-03-28 09:10:39.345375 - Starting search function
+2025-03-28 09:10:39.347456 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:10:39.349473 - Starting run_async_safely
+2025-03-28 09:10:39.353059 - Created new event loop
+2025-03-28 09:10:41.005059 - Coroutine completed successfully
+2025-03-28 09:10:41.007058 - Closing event loop
+2025-03-28 09:10:41.008059 - Event loop closed
+2025-03-28 09:10:41.010987 - Search completed successfully
+2025-03-28 09:10:41.083901 - Starting search function
+2025-03-28 09:10:41.086080 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:10:41.088088 - Starting run_async_safely
+2025-03-28 09:10:41.090537 - Created new event loop
+2025-03-28 09:10:42.720262 - Coroutine completed successfully
+2025-03-28 09:10:42.721573 - Closing event loop
+2025-03-28 09:10:42.722581 - Event loop closed
+2025-03-28 09:10:42.725259 - Search completed successfully
+2025-03-28 09:10:42.773267 - Starting search function
+2025-03-28 09:10:46.941440 - Entering final_cleanup from atexit handler
+2025-03-28 09:10:46.949734 - Successfully ran cleanup from atexit handler
+2025-03-28 09:10:46.951739 - Exiting final_cleanup from atexit handler
+2025-03-28 09:12:56.937537 - Starting search function
+2025-03-28 09:12:56.938538 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:12:56.941102 - Starting run_async_safely
+2025-03-28 09:12:56.943251 - Created new event loop
+2025-03-28 09:12:59.028792 - Coroutine completed successfully
+2025-03-28 09:12:59.031238 - Closing event loop
+2025-03-28 09:12:59.032592 - Event loop closed
+2025-03-28 09:12:59.034118 - Search completed successfully
+2025-03-28 09:12:59.154672 - Starting search function
+2025-03-28 09:12:59.156786 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:12:59.157792 - Starting run_async_safely
+2025-03-28 09:12:59.160792 - Created new event loop
+2025-03-28 09:13:00.779870 - Coroutine completed successfully
+2025-03-28 09:13:00.788867 - Closing event loop
+2025-03-28 09:13:00.791485 - Event loop closed
+2025-03-28 09:13:00.792927 - Search completed successfully
+2025-03-28 09:13:00.875259 - Starting search function
+2025-03-28 09:13:00.877797 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:13:00.879796 - Starting run_async_safely
+2025-03-28 09:13:00.883029 - Created new event loop
+2025-03-28 09:13:02.643074 - Coroutine completed successfully
+2025-03-28 09:13:02.644032 - Closing event loop
+2025-03-28 09:13:02.646506 - Event loop closed
+2025-03-28 09:13:02.647989 - Search completed successfully
+2025-03-28 09:13:02.669077 - Starting search function
+2025-03-28 09:13:02.671154 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:13:02.672542 - Starting run_async_safely
+2025-03-28 09:13:02.675636 - Created new event loop
+2025-03-28 09:13:04.421959 - Coroutine completed successfully
+2025-03-28 09:13:04.430320 - Closing event loop
+2025-03-28 09:13:04.431934 - Event loop closed
+2025-03-28 09:13:04.434097 - Search completed successfully
+2025-03-28 09:13:04.464925 - Starting search function
+2025-03-28 09:13:04.467292 - No filter option enabled, setting min_score to None
+2025-03-28 09:13:04.485954 - Starting search function
+2025-03-28 09:13:04.487898 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:13:04.488860 - Starting run_async_safely
+2025-03-28 09:13:04.492166 - Created new event loop
+2025-03-28 09:13:06.275276 - Coroutine completed successfully
+2025-03-28 09:13:06.276273 - Closing event loop
+2025-03-28 09:13:06.280258 - Event loop closed
+2025-03-28 09:13:06.281259 - Search completed successfully
+2025-03-28 09:13:06.368664 - Starting search function
+2025-03-28 09:13:06.371174 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:13:06.372516 - Starting run_async_safely
+2025-03-28 09:13:06.374999 - Created new event loop
+2025-03-28 09:13:06.377561 - Coroutine completed successfully
+2025-03-28 09:13:06.379674 - Closing event loop
+2025-03-28 09:13:06.381181 - Event loop closed
+2025-03-28 09:13:06.383205 - Search completed successfully
+2025-03-28 09:13:06.403334 - Starting search function
+2025-03-28 09:13:06.404250 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:13:06.405765 - Starting run_async_safely
+2025-03-28 09:13:06.408877 - Created new event loop
+2025-03-28 09:13:08.227988 - Coroutine completed successfully
+2025-03-28 09:13:08.236121 - Closing event loop
+2025-03-28 09:13:08.237120 - Event loop closed
+2025-03-28 09:13:08.239632 - Search completed successfully
+2025-03-28 09:13:08.286492 - Starting search function
+2025-03-28 09:13:08.287500 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:13:08.289489 - Starting run_async_safely
+2025-03-28 09:13:08.293025 - Created new event loop
+2025-03-28 09:13:10.134454 - Coroutine completed successfully
+2025-03-28 09:13:10.135757 - Closing event loop
+2025-03-28 09:13:10.137802 - Event loop closed
+2025-03-28 09:13:10.138803 - Search completed successfully
+2025-03-28 09:13:10.199119 - Starting search function
+2025-03-28 09:13:15.134180 - Entering final_cleanup from atexit handler
+2025-03-28 09:13:15.142882 - Successfully ran cleanup from atexit handler
+2025-03-28 09:13:15.144882 - Exiting final_cleanup from atexit handler
+2025-03-28 09:15:22.511133 - Starting search function
+2025-03-28 09:15:22.520498 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:15:22.523219 - Starting run_async_safely
+2025-03-28 09:15:22.526221 - Created new event loop
+2025-03-28 09:15:24.002385 - Coroutine completed successfully
+2025-03-28 09:15:24.003934 - Closing event loop
+2025-03-28 09:15:24.005977 - Event loop closed
+2025-03-28 09:15:24.007933 - Search completed successfully
+2025-03-28 09:15:24.125516 - Starting search function
+2025-03-28 09:15:24.127602 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:15:24.129536 - Starting run_async_safely
+2025-03-28 09:15:24.132518 - Created new event loop
+2025-03-28 09:15:25.540005 - Coroutine completed successfully
+2025-03-28 09:15:25.549734 - Closing event loop
+2025-03-28 09:15:25.551273 - Event loop closed
+2025-03-28 09:15:25.552778 - Search completed successfully
+2025-03-28 09:15:25.603564 - Starting search function
+2025-03-28 09:15:25.605473 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:15:25.607483 - Starting run_async_safely
+2025-03-28 09:15:25.609520 - Created new event loop
+2025-03-28 09:15:27.171488 - Coroutine completed successfully
+2025-03-28 09:15:27.173908 - Closing event loop
+2025-03-28 09:15:27.175914 - Event loop closed
+2025-03-28 09:15:27.176915 - Search completed successfully
+2025-03-28 09:15:27.195948 - Starting search function
+2025-03-28 09:15:27.197948 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:15:27.198947 - Starting run_async_safely
+2025-03-28 09:15:27.201570 - Created new event loop
+2025-03-28 09:15:32.169762 - Coroutine completed successfully
+2025-03-28 09:15:32.177838 - Closing event loop
+2025-03-28 09:15:32.179843 - Event loop closed
+2025-03-28 09:15:32.180844 - Search completed successfully
+2025-03-28 09:15:32.224923 - Starting search function
+2025-03-28 09:15:32.225935 - No filter option enabled, setting min_score to None
+2025-03-28 09:15:32.248139 - Starting search function
+2025-03-28 09:15:32.250361 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:15:32.251801 - Starting run_async_safely
+2025-03-28 09:15:32.254812 - Created new event loop
+2025-03-28 09:15:33.745539 - Coroutine completed successfully
+2025-03-28 09:15:33.747521 - Closing event loop
+2025-03-28 09:15:33.749520 - Event loop closed
+2025-03-28 09:15:33.751605 - Search completed successfully
+2025-03-28 09:15:33.837858 - Starting search function
+2025-03-28 09:15:33.840379 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:15:33.841379 - Starting run_async_safely
+2025-03-28 09:15:33.844998 - Created new event loop
+2025-03-28 09:15:33.847026 - Coroutine completed successfully
+2025-03-28 09:15:33.848413 - Closing event loop
+2025-03-28 09:15:33.849902 - Event loop closed
+2025-03-28 09:15:33.851056 - Search completed successfully
+2025-03-28 09:15:33.877704 - Starting search function
+2025-03-28 09:15:33.879687 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:15:33.881683 - Starting run_async_safely
+2025-03-28 09:15:33.884917 - Created new event loop
+2025-03-28 09:15:35.455917 - Coroutine completed successfully
+2025-03-28 09:15:35.458448 - Closing event loop
+2025-03-28 09:15:35.459911 - Event loop closed
+2025-03-28 09:15:35.461093 - Search completed successfully
+2025-03-28 09:15:35.526821 - Starting search function
+2025-03-28 09:15:35.527933 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:15:35.530353 - Starting run_async_safely
+2025-03-28 09:15:35.533633 - Created new event loop
+2025-03-28 09:15:37.098680 - Coroutine completed successfully
+2025-03-28 09:15:37.099628 - Closing event loop
+2025-03-28 09:15:37.102615 - Event loop closed
+2025-03-28 09:15:37.104144 - Search completed successfully
+2025-03-28 09:15:37.144118 - Starting search function
+2025-03-28 09:15:41.869658 - Entering final_cleanup from atexit handler
+2025-03-28 09:15:41.871670 - Successfully ran cleanup from atexit handler
+2025-03-28 09:15:41.873175 - Exiting final_cleanup from atexit handler
+2025-03-28 09:19:49.575504 - Entering final_cleanup from atexit handler
+2025-03-28 09:19:49.576953 - Successfully ran cleanup from atexit handler
+2025-03-28 09:19:49.578240 - Exiting final_cleanup from atexit handler
+2025-03-28 09:22:08.139350 - Entering final_cleanup from atexit handler
+2025-03-28 09:22:08.148437 - Successfully ran cleanup from atexit handler
+2025-03-28 09:22:08.149436 - Exiting final_cleanup from atexit handler
+2025-03-28 09:24:36.131780 - Entering final_cleanup from atexit handler
+2025-03-28 09:24:36.166858 - Successfully ran cleanup from atexit handler
+2025-03-28 09:24:36.204966 - Exiting final_cleanup from atexit handler
+2025-03-28 09:25:48.359877 - Entering final_cleanup from atexit handler
+2025-03-28 09:25:48.361885 - Successfully ran cleanup from atexit handler
+2025-03-28 09:25:48.363884 - Exiting final_cleanup from atexit handler
+2025-03-28 09:27:18.627984 - Starting search function
+2025-03-28 09:27:18.634073 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:27:18.636061 - Starting run_async_safely
+2025-03-28 09:27:18.675708 - Created new event loop
+2025-03-28 09:27:20.554358 - Coroutine completed successfully
+2025-03-28 09:27:20.556380 - Closing event loop
+2025-03-28 09:27:20.558722 - Event loop closed
+2025-03-28 09:27:20.559732 - Search completed successfully
+2025-03-28 09:27:20.666309 - Starting search function
+2025-03-28 09:27:20.668308 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:27:20.669309 - Starting run_async_safely
+2025-03-28 09:27:20.672948 - Created new event loop
+2025-03-28 09:27:23.027945 - Coroutine completed successfully
+2025-03-28 09:27:23.030684 - Closing event loop
+2025-03-28 09:27:23.031689 - Event loop closed
+2025-03-28 09:27:23.033696 - Search completed successfully
+2025-03-28 09:27:23.081693 - Starting search function
+2025-03-28 09:27:23.083693 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:27:23.084688 - Starting run_async_safely
+2025-03-28 09:27:23.087690 - Created new event loop
+2025-03-28 09:27:25.023607 - Coroutine completed successfully
+2025-03-28 09:27:25.067140 - Closing event loop
+2025-03-28 09:27:25.105400 - Event loop closed
+2025-03-28 09:27:25.111066 - Search completed successfully
+2025-03-28 09:27:25.168427 - Starting search function
+2025-03-28 09:27:25.187010 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:27:25.217315 - Starting run_async_safely
+2025-03-28 09:27:25.259848 - Created new event loop
+2025-03-28 09:27:27.443416 - Coroutine completed successfully
+2025-03-28 09:27:27.445374 - Closing event loop
+2025-03-28 09:27:27.446883 - Event loop closed
+2025-03-28 09:27:27.448890 - Search completed successfully
+2025-03-28 09:27:27.485356 - Starting search function
+2025-03-28 09:27:27.486348 - No filter option enabled, setting min_score to None
+2025-03-28 09:27:27.510841 - Starting search function
+2025-03-28 09:27:27.512849 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:27:27.513851 - Starting run_async_safely
+2025-03-28 09:27:27.516849 - Created new event loop
+2025-03-28 09:27:29.109830 - Coroutine completed successfully
+2025-03-28 09:27:29.112064 - Closing event loop
+2025-03-28 09:27:29.113062 - Event loop closed
+2025-03-28 09:27:29.115064 - Search completed successfully
+2025-03-28 09:27:29.181181 - Starting search function
+2025-03-28 09:27:29.183194 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:27:29.184196 - Starting run_async_safely
+2025-03-28 09:27:29.187194 - Created new event loop
+2025-03-28 09:27:29.189203 - Coroutine completed successfully
+2025-03-28 09:27:29.190709 - Closing event loop
+2025-03-28 09:27:29.192722 - Event loop closed
+2025-03-28 09:27:29.194721 - Search completed successfully
+2025-03-28 09:27:29.214877 - Starting search function
+2025-03-28 09:27:29.216877 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:27:29.234840 - Starting run_async_safely
+2025-03-28 09:27:29.237843 - Created new event loop
+2025-03-28 09:27:30.939297 - Coroutine completed successfully
+2025-03-28 09:27:30.964827 - Closing event loop
+2025-03-28 09:27:30.966819 - Event loop closed
+2025-03-28 09:27:31.002040 - Search completed successfully
+2025-03-28 09:27:31.088571 - Starting search function
+2025-03-28 09:27:31.103109 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:27:31.139303 - Starting run_async_safely
+2025-03-28 09:27:31.142821 - Created new event loop
+2025-03-28 09:27:34.288988 - Coroutine completed successfully
+2025-03-28 09:27:34.290989 - Closing event loop
+2025-03-28 09:27:34.292155 - Event loop closed
+2025-03-28 09:27:34.294154 - Search completed successfully
+2025-03-28 09:27:34.332169 - Starting search function
+2025-03-28 09:27:39.487364 - Entering final_cleanup from atexit handler
+2025-03-28 09:27:39.488378 - Successfully ran cleanup from atexit handler
+2025-03-28 09:27:39.489376 - Exiting final_cleanup from atexit handler
+2025-03-28 09:29:21.232105 - Starting search function
+2025-03-28 09:29:21.234465 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:29:21.262243 - Starting run_async_safely
+2025-03-28 09:29:21.265738 - Created new event loop
+2025-03-28 09:29:23.396355 - Coroutine completed successfully
+2025-03-28 09:29:23.398355 - Closing event loop
+2025-03-28 09:29:23.399356 - Event loop closed
+2025-03-28 09:29:23.401358 - Search completed successfully
+2025-03-28 09:29:23.503682 - Starting search function
+2025-03-28 09:29:23.504679 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:29:23.506826 - Starting run_async_safely
+2025-03-28 09:29:23.508836 - Created new event loop
+2025-03-28 09:29:25.115535 - Coroutine completed successfully
+2025-03-28 09:29:25.146423 - Closing event loop
+2025-03-28 09:29:25.182132 - Event loop closed
+2025-03-28 09:29:25.213052 - Search completed successfully
+2025-03-28 09:29:25.291096 - Starting search function
+2025-03-28 09:29:25.315181 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:29:25.344224 - Starting run_async_safely
+2025-03-28 09:29:25.347229 - Created new event loop
+2025-03-28 09:29:27.251200 - Coroutine completed successfully
+2025-03-28 09:29:27.253331 - Closing event loop
+2025-03-28 09:29:27.256330 - Event loop closed
+2025-03-28 09:29:27.257339 - Search completed successfully
+2025-03-28 09:29:27.325075 - Starting search function
+2025-03-28 09:29:27.327075 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:29:27.328582 - Starting run_async_safely
+2025-03-28 09:29:27.332104 - Created new event loop
+2025-03-28 09:29:29.530881 - Coroutine completed successfully
+2025-03-28 09:29:29.532389 - Closing event loop
+2025-03-28 09:29:29.533883 - Event loop closed
+2025-03-28 09:29:29.536258 - Search completed successfully
+2025-03-28 09:29:29.607810 - Starting search function
+2025-03-28 09:29:29.608803 - No filter option enabled, setting min_score to None
+2025-03-28 09:29:29.672236 - Starting search function
+2025-03-28 09:29:29.709023 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:29:29.711110 - Starting run_async_safely
+2025-03-28 09:29:29.714505 - Created new event loop
+2025-03-28 09:29:31.524614 - Coroutine completed successfully
+2025-03-28 09:29:31.526612 - Closing event loop
+2025-03-28 09:29:31.529057 - Event loop closed
+2025-03-28 09:29:31.531219 - Search completed successfully
+2025-03-28 09:29:31.723750 - Starting search function
+2025-03-28 09:29:31.798048 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:29:31.841030 - Starting run_async_safely
+2025-03-28 09:29:31.871590 - Created new event loop
+2025-03-28 09:29:31.892447 - Coroutine completed successfully
+2025-03-28 09:29:31.894971 - Closing event loop
+2025-03-28 09:29:31.896973 - Event loop closed
+2025-03-28 09:29:31.898972 - Search completed successfully
+2025-03-28 09:29:31.952304 - Starting search function
+2025-03-28 09:29:31.955131 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:29:31.956140 - Starting run_async_safely
+2025-03-28 09:29:31.959658 - Created new event loop
+2025-03-28 09:29:34.042649 - Coroutine completed successfully
+2025-03-28 09:29:34.045574 - Closing event loop
+2025-03-28 09:29:34.047957 - Event loop closed
+2025-03-28 09:29:34.049261 - Search completed successfully
+2025-03-28 09:29:34.136670 - Starting search function
+2025-03-28 09:29:34.139076 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:29:34.141715 - Starting run_async_safely
+2025-03-28 09:29:34.145545 - Created new event loop
+2025-03-28 09:29:36.708285 - Coroutine completed successfully
+2025-03-28 09:29:36.727583 - Closing event loop
+2025-03-28 09:29:36.764764 - Event loop closed
+2025-03-28 09:29:36.766051 - Search completed successfully
+2025-03-28 09:29:36.808975 - Starting search function
+2025-03-28 09:29:49.819426 - Entering final_cleanup from atexit handler
+2025-03-28 09:29:49.925997 - Successfully ran cleanup from atexit handler
+2025-03-28 09:29:50.034005 - Exiting final_cleanup from atexit handler
+2025-03-28 09:31:38.498168 - Starting search function
+2025-03-28 09:31:38.500128 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:31:38.501684 - Starting run_async_safely
+2025-03-28 09:31:38.505448 - Created new event loop
+2025-03-28 09:31:41.131184 - Coroutine completed successfully
+2025-03-28 09:31:41.173778 - Closing event loop
+2025-03-28 09:31:41.206831 - Event loop closed
+2025-03-28 09:31:41.244968 - Search completed successfully
+2025-03-28 09:31:41.566282 - Starting search function
+2025-03-28 09:31:41.568748 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:31:41.570186 - Starting run_async_safely
+2025-03-28 09:31:41.573981 - Created new event loop
+2025-03-28 09:31:43.604663 - Coroutine completed successfully
+2025-03-28 09:31:43.611170 - Closing event loop
+2025-03-28 09:31:43.643893 - Event loop closed
+2025-03-28 09:31:43.680559 - Search completed successfully
+2025-03-28 09:31:43.741350 - Starting search function
+2025-03-28 09:31:43.751688 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:31:43.752904 - Starting run_async_safely
+2025-03-28 09:31:43.757107 - Created new event loop
+2025-03-28 09:31:45.283547 - Coroutine completed successfully
+2025-03-28 09:31:45.339174 - Closing event loop
+2025-03-28 09:31:45.342278 - Event loop closed
+2025-03-28 09:31:45.378241 - Search completed successfully
+2025-03-28 09:31:45.430764 - Starting search function
+2025-03-28 09:31:45.450111 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:31:45.452115 - Starting run_async_safely
+2025-03-28 09:31:45.522395 - Created new event loop
+2025-03-28 09:31:47.256187 - Coroutine completed successfully
+2025-03-28 09:31:47.257190 - Closing event loop
+2025-03-28 09:31:47.260475 - Event loop closed
+2025-03-28 09:31:47.261609 - Search completed successfully
+2025-03-28 09:31:47.303918 - Starting search function
+2025-03-28 09:31:47.305179 - No filter option enabled, setting min_score to None
+2025-03-28 09:31:47.329396 - Starting search function
+2025-03-28 09:31:47.331270 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:31:47.333471 - Starting run_async_safely
+2025-03-28 09:31:47.337060 - Created new event loop
+2025-03-28 09:31:49.555027 - Coroutine completed successfully
+2025-03-28 09:31:49.556025 - Closing event loop
+2025-03-28 09:31:49.559117 - Event loop closed
+2025-03-28 09:31:49.560127 - Search completed successfully
+2025-03-28 09:31:49.669283 - Starting search function
+2025-03-28 09:31:49.671277 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:31:49.672296 - Starting run_async_safely
+2025-03-28 09:31:49.677089 - Created new event loop
+2025-03-28 09:31:49.679087 - Coroutine completed successfully
+2025-03-28 09:31:49.680088 - Closing event loop
+2025-03-28 09:31:49.681593 - Event loop closed
+2025-03-28 09:31:49.684122 - Search completed successfully
+2025-03-28 09:31:49.708067 - Starting search function
+2025-03-28 09:31:49.710069 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:31:49.712085 - Starting run_async_safely
+2025-03-28 09:31:49.715016 - Created new event loop
+2025-03-28 09:31:51.684188 - Coroutine completed successfully
+2025-03-28 09:31:51.756787 - Closing event loop
+2025-03-28 09:31:51.793822 - Event loop closed
+2025-03-28 09:31:51.836161 - Search completed successfully
+2025-03-28 09:31:51.935001 - Starting search function
+2025-03-28 09:31:51.982869 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:31:52.032072 - Starting run_async_safely
+2025-03-28 09:31:52.036193 - Created new event loop
+2025-03-28 09:31:53.498936 - Coroutine completed successfully
+2025-03-28 09:31:53.689027 - Closing event loop
+2025-03-28 09:31:53.802301 - Event loop closed
+2025-03-28 09:31:53.868638 - Search completed successfully
+2025-03-28 09:31:54.091412 - Starting search function
+2025-03-28 09:32:04.905137 - Entering final_cleanup from atexit handler
+2025-03-28 09:32:05.032577 - Successfully ran cleanup from atexit handler
+2025-03-28 09:32:05.212873 - Exiting final_cleanup from atexit handler
+2025-03-28 09:34:03.753737 - Starting search function
+2025-03-28 09:34:03.782623 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:34:03.818476 - Starting run_async_safely
+2025-03-28 09:34:03.823475 - Created new event loop
+2025-03-28 09:34:05.780845 - Coroutine completed successfully
+2025-03-28 09:34:05.781843 - Closing event loop
+2025-03-28 09:34:05.817521 - Event loop closed
+2025-03-28 09:34:05.821313 - Search completed successfully
+2025-03-28 09:34:06.040521 - Starting search function
+2025-03-28 09:34:06.052754 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:34:06.089347 - Starting run_async_safely
+2025-03-28 09:34:06.122035 - Created new event loop
+2025-03-28 09:34:08.498419 - Coroutine completed successfully
+2025-03-28 09:34:08.513727 - Closing event loop
+2025-03-28 09:34:08.515727 - Event loop closed
+2025-03-28 09:34:08.550370 - Search completed successfully
+2025-03-28 09:34:08.628920 - Starting search function
+2025-03-28 09:34:08.672860 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:34:08.708901 - Starting run_async_safely
+2025-03-28 09:34:08.712909 - Created new event loop
+2025-03-28 09:34:11.549802 - Coroutine completed successfully
+2025-03-28 09:34:11.572055 - Closing event loop
+2025-03-28 09:34:11.605630 - Event loop closed
+2025-03-28 09:34:11.606758 - Search completed successfully
+2025-03-28 09:34:11.661594 - Starting search function
+2025-03-28 09:34:11.682914 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:34:11.720938 - Starting run_async_safely
+2025-03-28 09:34:11.753768 - Created new event loop
+2025-03-28 09:34:13.606128 - Coroutine completed successfully
+2025-03-28 09:34:13.611134 - Closing event loop
+2025-03-28 09:34:13.614469 - Event loop closed
+2025-03-28 09:34:13.649891 - Search completed successfully
+2025-03-28 09:34:13.699246 - Starting search function
+2025-03-28 09:34:13.719733 - No filter option enabled, setting min_score to None
+2025-03-28 09:34:13.766788 - Starting search function
+2025-03-28 09:34:13.790683 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:34:13.792050 - Starting run_async_safely
+2025-03-28 09:34:13.825726 - Created new event loop
+2025-03-28 09:34:16.803981 - Coroutine completed successfully
+2025-03-28 09:34:16.865550 - Closing event loop
+2025-03-28 09:34:16.868559 - Event loop closed
+2025-03-28 09:34:16.905783 - Search completed successfully
+2025-03-28 09:34:16.962353 - Starting search function
+2025-03-28 09:34:16.982002 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:34:17.014683 - Starting run_async_safely
+2025-03-28 09:34:17.018748 - Created new event loop
+2025-03-28 09:34:17.058833 - Coroutine completed successfully
+2025-03-28 09:34:17.090590 - Closing event loop
+2025-03-28 09:34:17.132782 - Event loop closed
+2025-03-28 09:34:17.133782 - Search completed successfully
+2025-03-28 09:34:17.160884 - Starting search function
+2025-03-28 09:34:17.172412 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:34:17.175412 - Starting run_async_safely
+2025-03-28 09:34:17.216677 - Created new event loop
+2025-03-28 09:34:19.129633 - Coroutine completed successfully
+2025-03-28 09:34:19.164576 - Closing event loop
+2025-03-28 09:34:19.267132 - Event loop closed
+2025-03-28 09:34:19.269140 - Search completed successfully
+2025-03-28 09:34:19.354077 - Starting search function
+2025-03-28 09:34:19.357594 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:34:19.379492 - Starting run_async_safely
+2025-03-28 09:34:19.383496 - Created new event loop
+2025-03-28 09:34:21.426696 - Coroutine completed successfully
+2025-03-28 09:34:21.451708 - Closing event loop
+2025-03-28 09:34:21.486814 - Event loop closed
+2025-03-28 09:34:21.488338 - Search completed successfully
+2025-03-28 09:34:21.560771 - Starting search function
+2025-03-28 09:34:33.196651 - Entering final_cleanup from atexit handler
+2025-03-28 09:34:33.221007 - Successfully ran cleanup from atexit handler
+2025-03-28 09:34:33.223007 - Exiting final_cleanup from atexit handler
+2025-03-28 09:37:18.626299 - Starting search function
+2025-03-28 09:37:18.629002 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:37:18.631013 - Starting run_async_safely
+2025-03-28 09:37:18.634014 - Created new event loop
+2025-03-28 09:37:20.715987 - Coroutine completed successfully
+2025-03-28 09:37:20.717902 - Closing event loop
+2025-03-28 09:37:20.719414 - Event loop closed
+2025-03-28 09:37:20.720310 - Search completed successfully
+2025-03-28 09:37:20.794969 - Starting search function
+2025-03-28 09:37:20.796755 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:37:20.799139 - Starting run_async_safely
+2025-03-28 09:37:20.802108 - Created new event loop
+2025-03-28 09:37:22.323941 - Coroutine completed successfully
+2025-03-28 09:37:22.331959 - Closing event loop
+2025-03-28 09:37:22.334061 - Event loop closed
+2025-03-28 09:37:22.335959 - Search completed successfully
+2025-03-28 09:37:22.368105 - Starting search function
+2025-03-28 09:37:22.369479 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:37:22.371543 - Starting run_async_safely
+2025-03-28 09:37:22.373541 - Created new event loop
+2025-03-28 09:37:24.217711 - Coroutine completed successfully
+2025-03-28 09:37:24.226382 - Closing event loop
+2025-03-28 09:37:24.228990 - Event loop closed
+2025-03-28 09:37:24.231028 - Search completed successfully
+2025-03-28 09:37:24.246501 - Starting search function
+2025-03-28 09:37:24.249019 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:37:24.250024 - Starting run_async_safely
+2025-03-28 09:37:24.253024 - Created new event loop
+2025-03-28 09:37:26.190226 - Coroutine completed successfully
+2025-03-28 09:37:26.198716 - Closing event loop
+2025-03-28 09:37:26.199721 - Event loop closed
+2025-03-28 09:37:26.201983 - Search completed successfully
+2025-03-28 09:37:26.232090 - Starting search function
+2025-03-28 09:37:26.233604 - No filter option enabled, setting min_score to None
+2025-03-28 09:37:26.246184 - Starting search function
+2025-03-28 09:37:26.248817 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:37:26.249817 - Starting run_async_safely
+2025-03-28 09:37:26.252823 - Created new event loop
+2025-03-28 09:37:30.212035 - Coroutine completed successfully
+2025-03-28 09:37:30.220453 - Closing event loop
+2025-03-28 09:37:30.222450 - Event loop closed
+2025-03-28 09:37:30.224452 - Search completed successfully
+2025-03-28 09:37:30.276982 - Starting search function
+2025-03-28 09:37:30.277983 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:37:30.280273 - Starting run_async_safely
+2025-03-28 09:37:30.283307 - Created new event loop
+2025-03-28 09:37:30.284273 - Coroutine completed successfully
+2025-03-28 09:37:30.286301 - Closing event loop
+2025-03-28 09:37:30.287805 - Event loop closed
+2025-03-28 09:37:30.288812 - Search completed successfully
+2025-03-28 09:37:30.312787 - Starting search function
+2025-03-28 09:37:30.314893 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:37:30.316448 - Starting run_async_safely
+2025-03-28 09:37:30.319961 - Created new event loop
+2025-03-28 09:37:32.541126 - Coroutine completed successfully
+2025-03-28 09:37:32.550086 - Closing event loop
+2025-03-28 09:37:32.552100 - Event loop closed
+2025-03-28 09:37:32.553088 - Search completed successfully
+2025-03-28 09:37:32.590987 - Starting search function
+2025-03-28 09:37:32.592961 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:37:32.593954 - Starting run_async_safely
+2025-03-28 09:37:32.598133 - Created new event loop
+2025-03-28 09:37:34.140919 - Coroutine completed successfully
+2025-03-28 09:37:34.142238 - Closing event loop
+2025-03-28 09:37:34.143269 - Event loop closed
+2025-03-28 09:37:34.144623 - Search completed successfully
+2025-03-28 09:37:34.182809 - Starting search function
+2025-03-28 09:38:03.128241 - Entering final_cleanup from atexit handler
+2025-03-28 09:38:03.136750 - Successfully ran cleanup from atexit handler
+2025-03-28 09:38:03.138254 - Exiting final_cleanup from atexit handler
+2025-03-28 09:39:19.514246 - Starting search function
+2025-03-28 09:39:19.516244 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:39:19.518311 - Starting run_async_safely
+2025-03-28 09:39:19.520325 - Created new event loop
+2025-03-28 09:39:21.634155 - Coroutine completed successfully
+2025-03-28 09:39:21.642516 - Closing event loop
+2025-03-28 09:39:21.645344 - Event loop closed
+2025-03-28 09:39:21.646618 - Search completed successfully
+2025-03-28 09:39:21.740343 - Starting search function
+2025-03-28 09:39:21.742350 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:39:21.744353 - Starting run_async_safely
+2025-03-28 09:39:21.745349 - Created new event loop
+2025-03-28 09:39:23.297906 - Coroutine completed successfully
+2025-03-28 09:39:23.307128 - Closing event loop
+2025-03-28 09:39:23.309649 - Event loop closed
+2025-03-28 09:39:23.309649 - Search completed successfully
+2025-03-28 09:39:23.352500 - Starting search function
+2025-03-28 09:39:23.355750 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.8 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:39:23.357303 - Starting run_async_safely
+2025-03-28 09:39:23.360200 - Created new event loop
+2025-03-28 09:39:24.827879 - Coroutine completed successfully
+2025-03-28 09:39:24.836537 - Closing event loop
+2025-03-28 09:39:24.838517 - Event loop closed
+2025-03-28 09:39:24.840027 - Search completed successfully
+2025-03-28 09:39:24.864630 - Starting search function
+2025-03-28 09:39:24.865628 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=5 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:39:24.867629 - Starting run_async_safely
+2025-03-28 09:39:24.870139 - Created new event loop
+2025-03-28 09:39:26.518969 - Coroutine completed successfully
+2025-03-28 09:39:26.519976 - Closing event loop
+2025-03-28 09:39:26.521031 - Event loop closed
+2025-03-28 09:39:26.523552 - Search completed successfully
+2025-03-28 09:39:26.571140 - Starting search function
+2025-03-28 09:39:26.573298 - No filter option enabled, setting min_score to None
+2025-03-28 09:39:26.599075 - Starting search function
+2025-03-28 09:39:26.600082 - Executing search with query: query='test document' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='invalid' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:39:26.602081 - Starting run_async_safely
+2025-03-28 09:39:26.603543 - Created new event loop
+2025-03-28 09:39:28.403334 - Coroutine completed successfully
+2025-03-28 09:39:28.412786 - Closing event loop
+2025-03-28 09:39:28.414789 - Event loop closed
+2025-03-28 09:39:28.416294 - Search completed successfully
+2025-03-28 09:39:28.473891 - Starting search function
+2025-03-28 09:39:28.475892 - Executing search with query: query='' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:39:28.476891 - Starting run_async_safely
+2025-03-28 09:39:28.479481 - Created new event loop
+2025-03-28 09:39:28.481496 - Coroutine completed successfully
+2025-03-28 09:39:28.482986 - Closing event loop
+2025-03-28 09:39:28.484993 - Event loop closed
+2025-03-28 09:39:28.485993 - Search completed successfully
+2025-03-28 09:39:28.502147 - Starting search function
+2025-03-28 09:39:28.504253 - Executing search with query: query='test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:39:28.505154 - Starting run_async_safely
+2025-03-28 09:39:28.508770 - Created new event loop
+2025-03-28 09:39:30.519030 - Coroutine completed successfully
+2025-03-28 09:39:30.521371 - Closing event loop
+2025-03-28 09:39:30.523813 - Event loop closed
+2025-03-28 09:39:30.526362 - Search completed successfully
+2025-03-28 09:39:30.674392 - Starting search function
+2025-03-28 09:39:30.679034 - Executing search with query: query='test!@#$%^&*()' author=None year=None month=None day=None keywords=[] title=None min_score=0.3 top_k=10 search_type='dense' no_filter=False use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 09:39:30.681045 - Starting run_async_safely
+2025-03-28 09:39:30.684522 - Created new event loop
+2025-03-28 09:39:32.300188 - Coroutine completed successfully
+2025-03-28 09:39:32.301187 - Closing event loop
+2025-03-28 09:39:32.304362 - Event loop closed
+2025-03-28 09:39:32.306375 - Search completed successfully
+2025-03-28 09:39:32.398281 - Starting search function
+2025-03-28 09:39:54.733618 - Entering final_cleanup from atexit handler
+2025-03-28 09:39:54.741440 - Successfully ran cleanup from atexit handler
+2025-03-28 09:39:54.742440 - Exiting final_cleanup from atexit handler

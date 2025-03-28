@@ -23,10 +23,16 @@ class ArchiveAgent:
     Agent for searching and querying the DPRG archive.
     """
     
-    def __init__(self):
-        """Initialize the archive agent."""
-        self.search_tool = SearchTool()
-        self.chat_tool = ChatTool()
+    def __init__(self, search_tool: Optional[SearchTool] = None, chat_tool: Optional[ChatTool] = None):
+        """
+        Initialize the archive agent.
+        
+        Args:
+            search_tool: Optional SearchTool instance
+            chat_tool: Optional ChatTool instance
+        """
+        self.search_tool = search_tool or SearchTool()
+        self.chat_tool = chat_tool or ChatTool()
         logger.info("Archive agent initialized")
     
     async def search(self, query: Union[str, SearchQuery]) -> Union[SearchResponse, SearchError]:

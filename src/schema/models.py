@@ -62,34 +62,35 @@ class ArchiveDocument(BaseModel):
 
 
 class SearchQuery(BaseModel):
-    """A search query for the DPRG archive."""
-    query: str = Field(..., description="The search query text")
-    top_k: int = Field(10, description="Number of results to return")
-    author: Optional[str] = Field(None, description="Filter by author")
-    year: Optional[int] = Field(None, description="Filter by year")
-    month: Optional[int] = Field(None, description="Filter by month")
-    day: Optional[int] = Field(None, description="Filter by day")
-    keywords: Optional[List[str]] = Field(None, description="Filter by keywords")
-    title: Optional[str] = Field(None, description="Filter by title (partial match)")
-    min_score: Optional[float] = Field(None, description="Minimum score threshold")
-    use_dense: Optional[bool] = Field(True, description="Use dense vector search")
-    use_sparse: Optional[bool] = Field(False, description="Use sparse vector search")
-    use_hybrid: Optional[bool] = Field(False, description="Use hybrid search approach")
+    """Search query model."""
+    query: str
+    author: Optional[str] = None
+    year: Optional[int] = None
+    month: Optional[int] = None
+    day: Optional[int] = None
+    keywords: Optional[List[str]] = None
+    title: Optional[str] = None
+    min_score: float = 0.7
+    top_k: int = 10
+    search_type: str = "dense"
+    no_filter: bool = False
+    use_dense: bool = True
+    use_sparse: bool = False
+    use_hybrid: bool = False
 
 
 class SearchResponse(BaseModel):
-    """Response model for search queries."""
+    """Search response model."""
     results: List[ArchiveDocument]
-    total: int = Field(..., description="Total number of results")
-    query: str = Field(..., description="The original query")
-    search_type: str = Field(..., description="The type of search performed")
-    elapsed_time: float = Field(..., description="Time taken to perform the search in seconds")
+    total: int
+    query: str
+    search_type: str
+    elapsed_time: float
 
 
 class SearchError(BaseModel):
-    """Error response for search queries."""
+    """Search error model."""
     error: str
-    details: Optional[Dict[str, Any]] = None
 
 
 # Chat completion models
@@ -119,4 +120,73 @@ class ChatCompletionResponse(BaseModel):
 class ChatCompletionError(BaseModel):
     """Error response for chat completions."""
     error: str
-    details: Optional[Dict[str, Any]] = None 
+    details: Optional[Dict[str, Any]] = None
+
+
+class Metadata(BaseModel):
+    """Document metadata model."""
+    author: str
+    year: int
+    month: int
+    day: int
+    keywords: List[str]
+    title: str
+    has_url: bool = False
+
+
+class Document(BaseModel):
+    """Document model."""
+    id: str
+    text_excerpt: str
+    metadata: Metadata
+    score: float
+
+
+class Message(BaseModel):
+    """Chat message model."""
+    role: str
+    content: str
+
+
+class ChatRequest(BaseModel):
+    """Chat request model."""
+    messages: List[Message]
+    model: str = "gpt-4"
+    max_tokens: int = 1024
+    temperature: float = 0.7
+    search_top_k: int = 5
+    use_search_type: str = "dense"
+
+
+class ChatResponse(BaseModel):
+    """Chat response model."""
+    message: Message
+    referenced_documents: List[Document]
+    elapsed_time: float
+
+
+class ChatError(BaseModel):
+    """Chat error model."""
+    error: str
+
+
+class SearchResult(BaseModel):
+    """A search result."""
+    id: str = Field(..., description="The document ID")
+    score: float = Field(..., description="The similarity score")
+    content: str = Field(..., description="The document content")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Document metadata")
+
+
+class MetadataFilter(BaseModel):
+    """A metadata filter."""
+    author: Optional[str] = Field(default=None, description="Filter by author")
+    title: Optional[str] = Field(default=None, description="Filter by title")
+    keywords: Optional[List[str]] = Field(default=None, description="Filter by keywords")
+    start_date: Optional[datetime] = Field(default=None, description="Filter by start date")
+    end_date: Optional[datetime] = Field(default=None, description="Filter by end date")
+
+
+class ErrorResponse(BaseModel):
+    """An error response."""
+    error: str = Field(..., description="The error message") 

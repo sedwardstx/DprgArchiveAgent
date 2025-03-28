@@ -1,129 +1,95 @@
+﻿"""
+Test fixtures for the DPRG Archive Agent.
 """
-Test configuration and fixtures.
-"""
-import pytest
 import asyncio
-from typing import List, Dict, Any
-from pinecone import Pinecone
+import pytest
+from typing import AsyncGenerator, Generator
+from unittest.mock import AsyncMock, MagicMock, patch
 
-from src.config import (
-    PINECONE_API_KEY,
-    DENSE_INDEX_NAME,
-    SPARSE_INDEX_NAME,
-    DENSE_INDEX_URL,
-    SPARSE_INDEX_URL,
-    PINECONE_NAMESPACE
-)
-from src.utils.embeddings import get_embedding, generate_sparse_vector
-
-# Sample test documents with various metadata
-TEST_DOCUMENTS = [
-    {
-        "id": "1",
-        "text": "First test document",
-        "metadata": {
-            "author": "test@example.com",
-            "year": 2023,
-            "month": 1,
-            "day": 15,
-            "keywords": ["test", "document"],
-            "title": "Test Document 1"
-        }
-    },
-    {
-        "id": "2",
-        "text": "Second test document",
-        "metadata": {
-            "author": "another@example.com",
-            "year": 2023,
-            "month": 2,
-            "day": 20,
-            "keywords": ["test", "document", "second"],
-            "title": "Test Document 2"
-        }
-    },
-    {
-        "id": "3",
-        "text": "Third test document",
-        "metadata": {
-            "author": "test@example.com",
-            "year": 2024,
-            "month": 1,
-            "day": 1,
-            "keywords": ["test", "document", "third"],
-            "title": "Test Document 3"
-        }
-    }
-]
+from src.agent.archive_agent import ArchiveAgent
+from src.tools.search_tool import SearchTool
+from src.tools.chat_tool import ChatTool
+from src.utils.vector_store import DenseVectorClient, SparseVectorClient, HybridSearchClient
 
 @pytest.fixture(scope="session")
-def event_loop():
-    """Create an event loop for the test session."""
-    policy = asyncio.get_event_loop_policy()
-    loop = policy.new_event_loop()
+def event_loop_policy():
+    """Create an event loop policy for the test session."""
+    return asyncio.WindowsProactorEventLoopPolicy()
+
+@pytest.fixture(scope="function")
+def event_loop(event_loop_policy):
+    """Create an event loop for each test function."""
+    asyncio.set_event_loop_policy(event_loop_policy)
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     yield loop
     loop.close()
 
-@pytest.fixture(scope="session")
-def pinecone_client():
-    """Create a Pinecone client for the test session."""
-    return Pinecone(api_key=PINECONE_API_KEY)
+@pytest.fixture
+async def chat_tool():
+    """Create a ChatTool instance for testing."""
+    mock_client = AsyncMock()
+    mock_client.chat.completions.create = AsyncMock()
+    return ChatTool(mock_client)
 
-@pytest.fixture(scope="session")
-def dense_index(pinecone_client):
-    """Get the dense index for testing."""
-    return pinecone_client.Index(DENSE_INDEX_NAME, host=DENSE_INDEX_URL)
+@pytest.fixture
+async def dense_vector_client():
+    """Create a mock dense vector client."""
+    mock_client = AsyncMock()
+    mock_client.search = AsyncMock()
+    return mock_client
 
-@pytest.fixture(scope="session")
-def sparse_index(pinecone_client):
-    """Get the sparse index for testing."""
-    return pinecone_client.Index(SPARSE_INDEX_NAME, host=SPARSE_INDEX_URL)
+@pytest.fixture
+async def sparse_vector_client():
+    """Create a mock sparse vector client."""
+    mock_client = AsyncMock()
+    mock_client.search = AsyncMock()
+    return mock_client
 
-@pytest.fixture(scope="session")
-async def load_test_documents(dense_index, sparse_index):
-    """Load test documents into both indices."""
-    # Generate vectors for each document
-    dense_vectors = []
-    sparse_vectors = []
+@pytest.fixture
+async def hybrid_search_client():
+    """Create a mock HybridSearchClient for testing."""
+    mock_client = AsyncMock()
+    mock_client.search = AsyncMock()
+    return mock_client
+
+@pytest.fixture
+async def search_tool(dense_vector_client, sparse_vector_client):
+    """Create a SearchTool instance for testing."""
+    dense_client = await dense_vector_client
+    sparse_client = await sparse_vector_client
+    return SearchTool(dense_client, sparse_client)
+
+@pytest.fixture
+async def archive_agent(search_tool, chat_tool):
+    """Create an ArchiveAgent instance for testing."""
+    return ArchiveAgent(search_tool=search_tool, chat_tool=chat_tool)
+
+@pytest.fixture
+async def load_test_documents(dense_vector_client, sparse_vector_client):
+    """Load test documents for search."""
+    from src.schema.models import ArchiveDocument, ArchiveMetadata
     
-    for doc in TEST_DOCUMENTS:
-        # Generate dense vector
-        dense_vector = await get_embedding(doc['text'])
-        
-        # Generate sparse vector
-        indices, values = await generate_sparse_vector(doc['text'])
-        
-        # Create dense vector record
-        dense_vectors.append({
-            'id': doc['id'],
-            'values': dense_vector,
-            'metadata': doc['metadata']
-        })
-        
-        # Create sparse vector record
-        sparse_vectors.append({
-            'id': doc['id'],
-            'sparse_values': {
-                'indices': indices,
-                'values': values
-            },
-            'metadata': doc['metadata']
-        })
+    test_docs = [
+        ArchiveDocument(
+            id=f"doc{i}",
+            text_excerpt=f"Test document {i} about robotics",
+            metadata=ArchiveMetadata(
+                author="test_author",
+                year=2023,
+                month=1,
+                day=1,
+                keywords=["test", "robotics"],
+                title=f"Test Document {i}"
+            ),
+            score=0.9 - (i * 0.1)
+        ) for i in range(10)
+    ]
     
-    # Upsert to indices
-    try:
-        dense_index.upsert(vectors=dense_vectors, namespace=PINECONE_NAMESPACE)
-        sparse_index.upsert(vectors=sparse_vectors, namespace=PINECONE_NAMESPACE)
-    except Exception as e:
-        print(f"Error loading test documents: {str(e)}")
-        raise
-    
-    yield
-    
-    # Clean up test documents
-    try:
-        dense_index.delete(ids=[doc['id'] for doc in TEST_DOCUMENTS], namespace=PINECONE_NAMESPACE)
-        sparse_index.delete(ids=[doc['id'] for doc in TEST_DOCUMENTS], namespace=PINECONE_NAMESPACE)
-    except Exception as e:
-        print(f"Error cleaning up test documents: {str(e)}")
-        raise 
+    dense_client = await dense_vector_client
+    sparse_client = await sparse_vector_client
+
+    dense_client.search.return_value = test_docs
+    sparse_client.search.return_value = []
+
+    return test_docs

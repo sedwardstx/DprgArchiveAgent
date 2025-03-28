@@ -16,12 +16,19 @@ logger = logging.getLogger(__name__)
 class SearchTool:
     """Tool for searching the DPRG archive."""
     
-    def __init__(self):
-        """Initialize the search tool."""
+    def __init__(self, dense_client: Optional[DenseVectorClient] = None, sparse_client: Optional[SparseVectorClient] = None, hybrid_client: Optional[HybridSearchClient] = None):
+        """
+        Initialize the search tool.
+        
+        Args:
+            dense_client: Optional DenseVectorClient instance
+            sparse_client: Optional SparseVectorClient instance
+            hybrid_client: Optional HybridSearchClient instance
+        """
         # Initialize vector clients
-        self.dense_client = DenseVectorClient()
-        self.sparse_client = SparseVectorClient()
-        self.hybrid_client = HybridSearchClient()
+        self.dense_client = dense_client or DenseVectorClient()
+        self.sparse_client = sparse_client or SparseVectorClient()
+        self.hybrid_client = hybrid_client or HybridSearchClient()
         logger.info("Search tool initialized")
     
     async def search(self, query: SearchQuery) -> Union[SearchResponse, SearchError]:

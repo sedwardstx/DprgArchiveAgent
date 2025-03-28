@@ -10,11 +10,13 @@ from openai.types.chat import ChatCompletion
 
 from ..config import OPENAI_API_KEY, EMBEDDING_MODEL, CHAT_MODEL, CHAT_MAX_TOKENS, CHAT_TEMPERATURE
 
+__all__ = ['openai_client', 'get_embedding', 'get_chat_completion']
+
 # Set up logger
 logger = logging.getLogger(__name__)
 
 # Initialize the OpenAI client
-client = OpenAI(api_key=OPENAI_API_KEY)
+openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 async def get_embedding(text: str) -> List[float]:
@@ -28,7 +30,7 @@ async def get_embedding(text: str) -> List[float]:
         Embedding vector as a list of floats
     """
     try:
-        embedding_response = client.embeddings.create(
+        embedding_response = openai_client.embeddings.create(
             model=EMBEDDING_MODEL,
             input=text
         )
@@ -66,7 +68,7 @@ async def get_chat_completion(
         
         logger.info(f"Getting chat completion with model={model_name}, max_tokens={tokens}, temperature={temp}")
         
-        response = client.chat.completions.create(
+        response = openai_client.chat.completions.create(
             model=model_name,
             messages=messages,
             max_tokens=tokens,
