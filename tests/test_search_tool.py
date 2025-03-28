@@ -398,3 +398,240 @@ async def test_hybrid_search_with_min_score():
     assert response.search_type == "hybrid"
     # We can't reliably assert the total since it depends on the implementation
     # of from_pinecone_match and how the results are combined 
+
+@pytest.mark.asyncio
+async def test_search_tool_year_validation():
+    """Test validation of year parameter."""
+    # Create search tool
+    search_tool = SearchTool(MagicMock(), MagicMock())
+    
+    # Test with invalid year
+    query = SearchQuery(query="test query", year=2200)
+    response = await search_tool.search(query)
+    
+    assert isinstance(response, SearchError)
+    assert "Year must be between" in response.error
+
+@pytest.mark.asyncio
+async def test_search_tool_month_validation():
+    """Test validation of month parameter."""
+    # Create search tool
+    search_tool = SearchTool(MagicMock(), MagicMock())
+    
+    # Test with invalid month
+    query = SearchQuery(query="test query", month=13)
+    response = await search_tool.search(query)
+    
+    assert isinstance(response, SearchError)
+    assert "Month must be between" in response.error
+
+@pytest.mark.asyncio
+async def test_search_tool_day_validation():
+    """Test validation of day parameter."""
+    # Create search tool
+    search_tool = SearchTool(MagicMock(), MagicMock())
+    
+    # Test with invalid day
+    query = SearchQuery(query="test query", day=32)
+    response = await search_tool.search(query)
+    
+    assert isinstance(response, SearchError)
+    assert "Day must be between" in response.error
+
+@pytest.mark.asyncio
+async def test_sparse_search_error_handling():
+    """Test error handling in sparse search method."""
+    # Mock vector clients
+    mock_dense = MagicMock(spec=DenseVectorClient)
+    mock_sparse = MagicMock(spec=SparseVectorClient)
+    
+    # Configure the sparse mock to raise an exception
+    mock_sparse.search = AsyncMock(side_effect=Exception("Sparse search error"))
+    
+    # Create search tool with mocked clients
+    search_tool = SearchTool(dense_client=mock_dense, sparse_client=mock_sparse)
+    
+    # Test with sparse search type
+    query = SearchQuery(query="test query", search_type="sparse")
+    response = await search_tool.search(query)
+    
+    # The response should be a SearchResponse with empty results
+    assert isinstance(response, SearchResponse)
+    assert response.total == 0
+    assert len(response.results) == 0
+
+@pytest.mark.asyncio
+async def test_search_custom_filters():
+    """Test search with custom filters."""
+    # Mock vector clients
+    mock_dense = MagicMock(spec=DenseVectorClient)
+    mock_dense.search = AsyncMock(return_value=[])
+    
+    # Create search tool with mocked clients
+    search_tool = SearchTool(dense_client=mock_dense, sparse_client=None)
+    
+    # Test with custom metadata fields
+    query = SearchQuery(
+        query="test query", 
+        search_type="dense",
+        author="test_author",
+        year=2023,
+        month=6,
+        day=15,
+        keywords=["test", "filters"],
+        title="Test Title"
+    )
+    
+    await search_tool.search(query)
+    
+    # Verify that the search method was called with the correct filters
+    mock_dense.search.assert_called_once()
+    call_kwargs = mock_dense.search.call_args[1]
+    
+    assert "filter" in call_kwargs
+    filter_arg = call_kwargs["filter"]
+    
+    # Check that metadata filters were passed correctly
+    assert filter_arg.get("author") == "test_author"
+    assert filter_arg.get("year") == 2023
+    assert filter_arg.get("month") == 6
+    assert filter_arg.get("day") == 15
+    assert "keywords" in filter_arg
+    assert "title" in filter_arg
+
+@pytest.mark.asyncio
+async def test_hybrid_search_error_handling():
+    """Test error handling in hybrid search."""
+    # Mock vector clients
+    mock_dense = MagicMock(spec=DenseVectorClient)
+    mock_sparse = MagicMock(spec=SparseVectorClient)
+    
+    # Configure the mock to raise exception in hybrid search
+    mock_dense.search = AsyncMock(side_effect=Exception("Dense error in hybrid"))
+    
+    # Create search tool with mocked clients
+    search_tool = SearchTool(dense_client=mock_dense, sparse_client=mock_sparse)
+    
+    # Test hybrid search
+    query = SearchQuery(query="test query", search_type="hybrid")
+    response = await search_tool.search(query)
+    
+    # Even with an error, we should get a response object
+    assert isinstance(response, SearchResponse)
+    assert response.total == 0 
+
+@pytest.mark.asyncio
+async def test_filter_by_metadata():
+    """Test the filter_by_metadata method."""
+    # Mock vector clients
+    mock_dense = MagicMock(spec=DenseVectorClient)
+    mock_sparse = MagicMock(spec=SparseVectorClient)
+    
+    # Create search tool with mocked clients
+    search_tool = SearchTool(dense_client=mock_dense, sparse_client=mock_sparse)
+    
+    # Create test documents
+    test_docs = [
+        ArchiveDocument(
+            id="doc1",
+            text_excerpt="Test document 1",
+            metadata=ArchiveMetadata(
+                author="author1@example.com",
+                year=2023,
+                month=1,
+                day=15,
+                keywords=["test", "document"],
+                title="Test Document 1"
+            ),
+            score=0.9
+        ),
+        ArchiveDocument(
+            id="doc2",
+            text_excerpt="Test document 2",
+            metadata=ArchiveMetadata(
+                author="author2@example.com",
+                year=2023,
+                month=2,
+                day=20,
+                keywords=["test", "example"],
+                title="Test Document 2"
+            ),
+            score=0.8
+        ),
+        ArchiveDocument(
+            id="doc3",
+            text_excerpt="Test document 3",
+            metadata=ArchiveMetadata(
+                author="author3@example.com",
+                year=2022,
+                month=12,
+                day=10,
+                keywords=["sample", "document"],
+                title="Sample Document"
+            ),
+            score=0.7
+        )
+    ]
+    
+    # Test with author filter
+    filtered_docs = await search_tool.filter_by_metadata(
+        test_docs,
+        author="author1@example.com"
+    )
+    assert len(filtered_docs) == 1
+    assert filtered_docs[0].id == "doc1"
+    
+    # Test with year filter
+    filtered_docs = await search_tool.filter_by_metadata(
+        test_docs,
+        year=2023
+    )
+    assert len(filtered_docs) == 2
+    assert filtered_docs[0].id == "doc1"
+    assert filtered_docs[1].id == "doc2"
+    
+    # Test with month filter
+    filtered_docs = await search_tool.filter_by_metadata(
+        test_docs,
+        month=1
+    )
+    assert len(filtered_docs) == 1
+    assert filtered_docs[0].id == "doc1"
+    
+    # Test with day filter
+    filtered_docs = await search_tool.filter_by_metadata(
+        test_docs,
+        day=10
+    )
+    assert len(filtered_docs) == 1
+    assert filtered_docs[0].id == "doc3"
+    
+    # Test with keywords filter
+    filtered_docs = await search_tool.filter_by_metadata(
+        test_docs,
+        keywords=["test"]
+    )
+    assert len(filtered_docs) == 2
+    
+    # Test with title filter
+    filtered_docs = await search_tool.filter_by_metadata(
+        test_docs,
+        title="Sample Document"
+    )
+    assert len(filtered_docs) == 1
+    assert filtered_docs[0].id == "doc3"
+    
+    # Test with multiple filters
+    filtered_docs = await search_tool.filter_by_metadata(
+        test_docs,
+        year=2023,
+        keywords=["test"]
+    )
+    assert len(filtered_docs) == 2
+    
+    # Test with no matches
+    filtered_docs = await search_tool.filter_by_metadata(
+        test_docs,
+        author="nonexistent@example.com"
+    )
+    assert len(filtered_docs) == 0 
