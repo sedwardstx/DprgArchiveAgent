@@ -40,7 +40,7 @@ STOPWORDS = {
 
 def tokenize_text(text: str) -> List[str]:
     """
-    Basic tokenization function for text.
+    Tokenization function for text that preserves technical terms.
     
     Args:
         text: The text to tokenize
@@ -48,17 +48,11 @@ def tokenize_text(text: str) -> List[str]:
     Returns:
         List of tokens
     """
-    # Convert to lowercase
-    text = text.lower()
-    
-    # Replace non-alphanumeric with spaces
-    text = re.sub(r'[^a-z0-9\s]', ' ', text)
-    
-    # Split on whitespace
+    # Split on whitespace while preserving case
     tokens = text.split()
     
-    # Remove stopwords and very short tokens
-    tokens = [t for t in tokens if t not in STOPWORDS and len(t) > 2]
+    # Remove stopwords but keep technical terms
+    tokens = [t for t in tokens if t not in STOPWORDS]
     
     return tokens
 
@@ -92,7 +86,7 @@ def compute_idf(corpus_tokens: List[List[str]]) -> Dict[str, float]:
 
 async def generate_sparse_vector(text: str) -> Tuple[List[int], List[float]]:
     """
-    Generate a sparse vector for text using a simplified BM25-like approach.
+    Generate a sparse vector for text using a consistent hashing approach.
     
     Args:
         text: The text to convert to a sparse vector
@@ -100,30 +94,29 @@ async def generate_sparse_vector(text: str) -> Tuple[List[int], List[float]]:
     Returns:
         A tuple of (indices, values) representing the sparse vector
     """
-    # Step 1: Tokenize the text
+    # Step 1: Tokenize the text while preserving case
     tokens = tokenize_text(text)
     
     # Step 2: Count term frequencies
     term_freq = Counter(tokens)
     
-    # Step 3: Compute TF-IDF-like weights
-    # In a real BM25 implementation, we would compute proper IDF values from a corpus
-    # Here we use a simplified approach that just uses the term frequency with diminishing returns
-    
-    # Sort by tokens to ensure consistent ordering
-    sorted_items = sorted(term_freq.items())
-    
-    # Get indices and values
+    # Step 3: Generate consistent indices and values
     indices = []
     values = []
     
-    for token, count in sorted_items:
-        # Compute hash of token to get index
-        # Using hash % 1000 to limit the dimensionality of the sparse vector
-        index = abs(hash(token) % 1000)
+    for token, count in term_freq.items():
+        # Use a consistent hashing approach
+        # Convert token to bytes and use first 4 bytes as index
+        token_bytes = token.encode('utf-8')
+        if len(token_bytes) >= 4:
+            # Use first 4 bytes to generate index
+            index = int.from_bytes(token_bytes[:4], byteorder='big') % 1000
+        else:
+            # For short tokens, pad with zeros
+            padded_bytes = token_bytes + b'\x00' * (4 - len(token_bytes))
+            index = int.from_bytes(padded_bytes, byteorder='big') % 1000
         
-        # Calculate the value using a simplified formula
-        # Higher frequency means higher value, but with diminishing returns
+        # Calculate value using term frequency
         value = 1.0 + math.log(count)
         
         indices.append(index)
