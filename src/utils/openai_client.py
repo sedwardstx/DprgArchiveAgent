@@ -68,12 +68,15 @@ async def get_chat_completion(
         
         logger.info(f"Getting chat completion with model={model_name}, max_tokens={tokens}, temperature={temp}")
         
-        response = openai_client.chat.completions.create(
+        # Run the synchronous call in a separate thread to avoid blocking
+        from asyncio import get_event_loop
+        loop = get_event_loop()
+        response = await loop.run_in_executor(None, lambda: openai_client.chat.completions.create(
             model=model_name,
             messages=messages,
             max_tokens=tokens,
             temperature=temp
-        )
+        ))
         
         elapsed = time.time() - start_time
         logger.info(f"Chat completion completed in {elapsed:.2f}s")

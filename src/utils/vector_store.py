@@ -105,7 +105,50 @@ class DenseVectorClient(BaseVectorClient):
                 results.matches = [r for r in results.matches if r['score'] >= min_score]
                 logger.info(f"Filtered to {len(results.matches)} matches with score >= {min_score}")
             
-            return results.matches
+            # Convert results to include text_excerpt at both root level and in metadata
+            converted_results = []
+            for match in results.matches:
+                # Handle both dictionary and object formats
+                if isinstance(match, dict):
+                    match_id = match.get('id', '')
+                    match_score = match.get('score')
+                    match_metadata = match.get('metadata', {})
+                else:
+                    match_id = getattr(match, 'id', '')
+                    match_score = getattr(match, 'score')
+                    match_metadata = getattr(match, 'metadata', {})
+                
+                # Extract text_excerpt from metadata if present
+                if isinstance(match_metadata, dict):
+                    metadata = match_metadata
+                else:
+                    metadata = {
+                        "author": getattr(match_metadata, "author", None),
+                        "date": getattr(match_metadata, "date", None),
+                        "day": getattr(match_metadata, "day", None),
+                        "month": getattr(match_metadata, "month", None),
+                        "year": getattr(match_metadata, "year", None),
+                        "has_url": getattr(match_metadata, "has_url", None),
+                        "keywords": getattr(match_metadata, "keywords", None),
+                        "title": getattr(match_metadata, "title", None),
+                        "text_excerpt": getattr(match_metadata, "text_excerpt", "")
+                    }
+                
+                text_excerpt = metadata.get('text_excerpt', '')
+                
+                # Create new result with text_excerpt at both levels
+                result = {
+                    'id': match_id,
+                    'score': match_score,
+                    'text_excerpt': text_excerpt,
+                    'metadata': {
+                        **metadata,
+                        'text_excerpt': text_excerpt
+                    }
+                }
+                converted_results.append(result)
+            
+            return converted_results
         except Exception as e:
             logger.error(f"Error in dense search: {str(e)}")
             return []
@@ -171,7 +214,50 @@ class SparseVectorClient(BaseVectorClient):
                 results.matches = [r for r in results.matches if r['score'] >= min_score]
                 logger.info(f"Filtered to {len(results.matches)} matches with score >= {min_score}")
             
-            return results.matches
+            # Convert results to include text_excerpt at both root level and in metadata
+            converted_results = []
+            for match in results.matches:
+                # Handle both dictionary and object formats
+                if isinstance(match, dict):
+                    match_id = match.get('id', '')
+                    match_score = match.get('score')
+                    match_metadata = match.get('metadata', {})
+                else:
+                    match_id = getattr(match, 'id', '')
+                    match_score = getattr(match, 'score')
+                    match_metadata = getattr(match, 'metadata', {})
+                
+                # Extract text_excerpt from metadata if present
+                if isinstance(match_metadata, dict):
+                    metadata = match_metadata
+                else:
+                    metadata = {
+                        "author": getattr(match_metadata, "author", None),
+                        "date": getattr(match_metadata, "date", None),
+                        "day": getattr(match_metadata, "day", None),
+                        "month": getattr(match_metadata, "month", None),
+                        "year": getattr(match_metadata, "year", None),
+                        "has_url": getattr(match_metadata, "has_url", None),
+                        "keywords": getattr(match_metadata, "keywords", None),
+                        "title": getattr(match_metadata, "title", None),
+                        "text_excerpt": getattr(match_metadata, "text_excerpt", "")
+                    }
+                
+                text_excerpt = metadata.get('text_excerpt', '')
+                
+                # Create new result with text_excerpt at both levels
+                result = {
+                    'id': match_id,
+                    'score': match_score,
+                    'text_excerpt': text_excerpt,
+                    'metadata': {
+                        **metadata,
+                        'text_excerpt': text_excerpt
+                    }
+                }
+                converted_results.append(result)
+            
+            return converted_results
         except Exception as e:
             logger.error(f"Error in sparse search: {str(e)}")
             return []

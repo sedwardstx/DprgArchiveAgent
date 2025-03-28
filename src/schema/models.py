@@ -16,6 +16,7 @@ class ArchiveMetadata(BaseModel):
     has_url: Optional[bool] = None
     keywords: Optional[List[str]] = None
     title: Optional[str] = None
+    text_excerpt: Optional[str] = None
 
 
 class ArchiveDocument(BaseModel):
@@ -34,13 +35,15 @@ class ArchiveDocument(BaseModel):
             metadata = match.metadata
             match_id = match.id
             score = match.score
-            text_excerpt = getattr(match, "text_excerpt", "")
+            # Try to get text_excerpt from both root and metadata
+            text_excerpt = getattr(match, "text_excerpt", "") or getattr(metadata, "text_excerpt", "")
         else:
             # Dictionary response or older format
             metadata = match.get("metadata", {})
             match_id = match.get("id", "")
             score = match.get("score")
-            text_excerpt = match.get("text_excerpt", "")
+            # Try to get text_excerpt from both root and metadata
+            text_excerpt = match.get("text_excerpt", "") or metadata.get("text_excerpt", "")
         
         # Handle metadata that might be a dictionary or an object
         if isinstance(metadata, dict):
@@ -54,7 +57,8 @@ class ArchiveDocument(BaseModel):
                 "year": getattr(metadata, "year", None),
                 "has_url": getattr(metadata, "has_url", None),
                 "keywords": getattr(metadata, "keywords", None),
-                "title": getattr(metadata, "title", None)
+                "title": getattr(metadata, "title", None),
+                "text_excerpt": text_excerpt  # Include text_excerpt in metadata
             }
         
         # Create metadata object
@@ -67,6 +71,7 @@ class ArchiveDocument(BaseModel):
             has_url=metadata_dict.get("has_url"),
             keywords=metadata_dict.get("keywords"),
             title=metadata_dict.get("title"),
+            text_excerpt=text_excerpt  # Include text_excerpt in metadata
         )
         
         # Create and return document

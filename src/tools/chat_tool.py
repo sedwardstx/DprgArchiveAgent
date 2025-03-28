@@ -2,10 +2,12 @@
 Chat tool for the DPRG Archive Agent.
 """
 import logging
+import time
 from typing import List, Dict, Any, Optional
+import asyncio
 
 from src.schema.models import ChatRequest, ChatResponse, Message, Document
-from src.utils.openai_client import openai_client
+from src.utils.openai_client import get_chat_completion
 from src.config import get_settings
 
 # Set up logger
@@ -40,27 +42,27 @@ class ChatTool:
             ChatResponse containing the assistant's message
         """
         try:
+            start_time = time.time()
+            
             # Convert messages to OpenAI format
             messages = [
                 {"role": msg.role, "content": msg.content}
                 for msg in request.messages
             ]
             
-            # Get chat completion
-            response = openai_client.chat.completions.create(
-                model=self.settings.CHAT_MODEL,
+            # Get chat completion using the synchronous client
+            response = await get_chat_completion(
                 messages=messages,
+                model=self.settings.CHAT_MODEL,
                 max_tokens=max_tokens or self.settings.CHAT_MAX_TOKENS,
                 temperature=temperature or self.settings.CHAT_TEMPERATURE
             )
             
-            # Handle both sync and async responses
-            if hasattr(response, 'choices'):
-                assistant_message = response.choices[0].message.content
-            else:
-                # For async responses, await the result
-                response = await response
-                assistant_message = response.choices[0].message.content
+            # Extract assistant's message
+            assistant_message = response.choices[0].message.content
+            
+            # Calculate elapsed time
+            elapsed_time = time.time() - start_time
             
             # Return chat response
             return ChatResponse(
@@ -69,7 +71,7 @@ class ChatTool:
                     content=assistant_message
                 ),
                 referenced_documents=[],  # Empty list since we're not implementing document references yet
-                elapsed_time=0.0  # TODO: Implement timing
+                elapsed_time=elapsed_time
             )
             
         except Exception as e:

@@ -134,6 +134,19 @@ def display_results(results, query: str, search_type: str):
         )
         return
     
+    # Print search parameters
+    console.print(
+        f"Search parameters:",
+        style="bold",
+    )
+    console.print(f"  Query: {query}")
+    console.print(f"  Search type: {search_type}")
+    console.print(f"  Total results: {results.total}")
+    if hasattr(results, 'min_score'):
+        console.print(f"  min_score: {results.min_score}")
+    if hasattr(results, 'top_k'):
+        console.print(f"  top_k: {results.top_k}")
+    
     # Create table
     table = Table(
         title=f"Search Results for: '{query}' (using {search_type} search)",

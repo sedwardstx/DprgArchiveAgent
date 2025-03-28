@@ -33,114 +33,128 @@ class SearchTool:
     
     async def search(self, query: SearchQuery) -> Union[SearchResponse, SearchError]:
         """
-        Search the DPRG archive using the specified query parameters.
+        Search for documents matching the query.
+        """
+        try:
+            # Validate query
+            if not query.query:
+                return SearchError(error="Query cannot be empty")
+            if len(query.query) > 1000:
+                return SearchError(error="Query is too long (max 1000 characters)")
+            
+            # Validate dates
+            if query.year and (query.year < 1900 or query.year > 2100):
+                return SearchError(error="Year must be between 1900 and 2100")
+            if query.month and (query.month < 1 or query.month > 12):
+                return SearchError(error="Month must be between 1 and 12")
+            if query.day and (query.day < 1 or query.day > 31):
+                return SearchError(error="Day must be between 1 and 31")
+
+            # Validate search type
+            if query.search_type and query.search_type not in ["dense", "sparse", "hybrid"]:
+                return SearchError(error="Invalid search type. Must be one of: dense, sparse, hybrid")
+
+            # Build filters from query fields
+            filters = {}
+            if query.author:
+                filters["author"] = query.author
+            if query.year:
+                filters["year"] = query.year
+            if query.month:
+                filters["month"] = query.month
+            if query.day:
+                filters["day"] = query.day
+            if query.keywords:
+                filters["keywords"] = query.keywords
+            if query.title:
+                filters["title"] = query.title
+
+            # Log actual query and filters for debugging
+            logger.debug(f"Executing search with query: {query.query}")
+            if filters:
+                logger.debug(f"Using filters: {filters}")
+
+            # Execute search based on type
+            search_type = query.search_type or "dense"
+            if search_type == "dense":
+                results = await self.dense_search(query.query, filters=filters, top_k=query.top_k, min_score=query.min_score)
+            elif search_type == "sparse":
+                results = await self.sparse_search(query.query, filters=filters, top_k=query.top_k, min_score=query.min_score)
+            else:  # hybrid
+                results = await self.hybrid_search(query.query, filters=filters, top_k=query.top_k, min_score=query.min_score)
+
+            # Convert results to ArchiveDocument objects
+            docs = []
+            for result in results:
+                try:
+                    doc = ArchiveDocument.from_pinecone_match(result)
+                    docs.append(doc)
+                except Exception as e:
+                    logger.error(f"Error converting result to ArchiveDocument: {e}")
+                    continue
+
+            # Return response
+            response = SearchResponse(
+                results=docs,
+                total=len(docs),
+                query=query.query,
+                search_type=search_type,
+                elapsed_time=0.0  # TODO: Implement timing
+            )
+            return response
+
+        except Exception as e:
+            logger.error(f"Error executing search: {e}")
+            return SearchError(error=str(e))
+
+    async def dense_search(self, query: str, filters: Optional[Dict[str, Any]] = None, top_k: int = 10, min_score: float = 0.7) -> List[Dict[str, Any]]:
+        """Execute a dense vector search."""
+        try:
+            return await self.dense_client.search(query, top_k=top_k, filter=filters, min_score=min_score)
+        except Exception as e:
+            logger.error(f"Error in dense search: {e}")
+            return []
+
+    async def sparse_search(self, query: str, filters: Optional[Dict[str, Any]] = None, top_k: int = 10, min_score: float = 0.7) -> List[Dict[str, Any]]:
+        """Execute a sparse vector search."""
+        try:
+            return await self.sparse_client.search(query, top_k=top_k, filter=filters, min_score=min_score)
+        except Exception as e:
+            logger.error(f"Error in sparse search: {e}")
+            return []
+
+    async def hybrid_search(self, query: str, filters: Optional[Dict[str, Any]] = None, top_k: int = 10, min_score: float = 0.7) -> List[Dict[str, Any]]:
+        """Execute a hybrid search combining dense and sparse results."""
+        try:
+            dense_results = await self.dense_search(query, filters=filters, top_k=top_k, min_score=min_score)
+            sparse_results = await self.sparse_search(query, filters=filters, top_k=top_k, min_score=min_score)
+            
+            # Combine and deduplicate results
+            seen_ids = set()
+            combined_results = []
+            for result in dense_results + sparse_results:
+                result_id = result.get('id')
+                if result_id not in seen_ids:
+                    seen_ids.add(result_id)
+                    combined_results.append(result)
+            
+            # Sort by score and take top_k
+            combined_results.sort(key=lambda x: x.get('score', 0), reverse=True)
+            return combined_results[:top_k]
+        except Exception as e:
+            logger.error(f"Error in hybrid search: {e}")
+            return []
+    
+    def _build_filter(self, query: SearchQuery) -> Optional[Dict[str, Any]]:
+        """
+        Build a filter dictionary for the search query.
         
         Args:
             query: The search query parameters
             
         Returns:
-            SearchResponse with results or SearchError if an error occurred
+            Optional filter dictionary
         """
-        start_time = time.time()
-        
-        try:
-            # Log the actual query for debugging
-            logger.info(f"Search query: '{query.query}', Search type: {query.use_dense=}, {query.use_sparse=}, {query.use_hybrid=}")
-            if query.title:
-                logger.info(f"Searching with title filter: '{query.title}'")
-                
-            # More filter logging
-            if query.author or query.year or query.month or query.day or query.keywords:
-                logger.info("Additional filters: " + 
-                           (f"author='{query.author}' " if query.author else "") +
-                           (f"year={query.year} " if query.year else "") +
-                           (f"month={query.month} " if query.month else "") +
-                           (f"day={query.day} " if query.day else "") +
-                           (f"keywords={query.keywords} " if query.keywords else ""))
-            
-            # Determine search type and execute search
-            if query.use_hybrid:
-                search_type = "hybrid"
-                results = await self.hybrid_client.search(
-                    query.query,
-                    top_k=query.top_k,
-                    filter=self._build_filter(query),
-                    min_score=query.min_score
-                )
-            elif query.use_sparse:
-                search_type = "sparse"
-                results = await self.sparse_client.search(
-                    query.query,
-                    top_k=query.top_k,
-                    filter=self._build_filter(query),
-                    min_score=query.min_score
-                )
-            else:
-                search_type = "dense"
-                results = await self.dense_client.search(
-                    query.query,
-                    top_k=query.top_k,
-                    filter=self._build_filter(query),
-                    min_score=query.min_score
-                )
-            
-            # Convert results to ArchiveDocument objects
-            documents = []
-            for result in results:
-                # Handle any type of result by converting to dict first if needed
-                if hasattr(result, '__dict__'):
-                    result_dict = {
-                        'id': getattr(result, 'id', ''),
-                        'metadata': {
-                            'author': getattr(result.metadata, 'author', None),
-                            'date': getattr(result.metadata, 'date', None),
-                            'day': getattr(result.metadata, 'day', None),
-                            'month': getattr(result.metadata, 'month', None),
-                            'year': getattr(result.metadata, 'year', None),
-                            'has_url': getattr(result.metadata, 'has_url', None),
-                            'keywords': getattr(result.metadata, 'keywords', None),
-                            'title': getattr(result.metadata, 'title', None)
-                        },
-                        'score': getattr(result, 'score', None)
-                    }
-                    # Add text_excerpt at the top level
-                    text_excerpt = getattr(result, 'text_excerpt', '')
-                    if text_excerpt is None:
-                        text_excerpt = ''  # Ensure text_excerpt is never None
-                    result_dict['text_excerpt'] = text_excerpt
-                    documents.append(ArchiveDocument.from_pinecone_match(result_dict))
-                elif isinstance(result, dict):
-                    documents.append(ArchiveDocument.from_pinecone_match(result))
-                elif isinstance(result, ArchiveDocument):
-                    documents.append(result)
-            
-            # Filter by metadata if needed
-            if any([query.author, query.year, query.month, query.day, query.keywords, query.title]):
-                documents = await self.filter_by_metadata(
-                    documents,
-                    author=query.author,
-                    year=query.year,
-                    month=query.month,
-                    day=query.day,
-                    keywords=query.keywords,
-                    title=query.title
-                )
-            
-            # Create and return response
-            return SearchResponse(
-                results=documents,
-                total=len(documents),
-                query=query.query,
-                search_type=search_type,
-                elapsed_time=time.time() - start_time
-            )
-            
-        except Exception as e:
-            logger.error(f"Error during search: {str(e)}")
-            return SearchError(error=f"Search failed: {str(e)}")
-    
-    def _build_filter(self, query: SearchQuery) -> Optional[Dict[str, Any]]:
-        """Build a filter dictionary from query parameters."""
         filter_dict = {}
         
         if query.author:
