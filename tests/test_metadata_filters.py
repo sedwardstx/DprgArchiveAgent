@@ -33,9 +33,10 @@ async def test_author_filter_dense(dense_client, load_test_documents):
             filter={"author": query.author}
         )
         
-        # Should only return documents by test@example.com
-        assert len(results) > 0
-        assert all(r['metadata']['author'] == "test@example.com" for r in results)
+        # Should return at least one document by test@example.com
+        assert len(results) > 0, "No results found for author filter"
+        assert any(r['metadata']['author'] == "test@example.com" for r in results), "No documents found with specified author"
+        assert all(r['metadata']['author'] == "test@example.com" for r in results), "Found documents with incorrect author"
 
 @pytest.mark.asyncio
 async def test_author_filter_sparse(sparse_client, load_test_documents):
