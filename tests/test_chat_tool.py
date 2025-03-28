@@ -16,7 +16,7 @@ async def chat_tool():
 async def test_chat_tool_basic(chat_tool):
     """Test basic chat functionality."""
     chat_tool = await chat_tool
-    with patch('src.tools.chat_tool.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
+    with patch('src.utils.openai_client.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
         mock_chat.return_value = MagicMock(
             choices=[MagicMock(message=MagicMock(content="Test response"))]
         )
@@ -34,7 +34,7 @@ async def test_chat_tool_basic(chat_tool):
 async def test_chat_tool_with_search_type(chat_tool):
     """Test chat with different search types."""
     chat_tool = await chat_tool
-    with patch('src.tools.chat_tool.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
+    with patch('src.utils.openai_client.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
         mock_chat.return_value = MagicMock(
             choices=[MagicMock(message=MagicMock(content="Test response"))]
         )
@@ -51,7 +51,7 @@ async def test_chat_tool_with_search_type(chat_tool):
 async def test_chat_tool_with_search_top_k(chat_tool):
     """Test chat with different top_k values."""
     chat_tool = await chat_tool
-    with patch('src.tools.chat_tool.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
+    with patch('src.utils.openai_client.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
         mock_chat.return_value = MagicMock(
             choices=[MagicMock(message=MagicMock(content="Test response"))]
         )
@@ -68,7 +68,7 @@ async def test_chat_tool_with_search_top_k(chat_tool):
 async def test_chat_tool_with_temperature(chat_tool):
     """Test chat with different temperature values."""
     chat_tool = await chat_tool
-    with patch('src.tools.chat_tool.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
+    with patch('src.utils.openai_client.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
         mock_chat.return_value = MagicMock(
             choices=[MagicMock(message=MagicMock(content="Test response"))]
         )
@@ -85,7 +85,7 @@ async def test_chat_tool_with_temperature(chat_tool):
 async def test_chat_tool_with_max_tokens(chat_tool):
     """Test chat with different max_tokens values."""
     chat_tool = await chat_tool
-    with patch('src.tools.chat_tool.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
+    with patch('src.utils.openai_client.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
         mock_chat.return_value = MagicMock(
             choices=[MagicMock(message=MagicMock(content="Test response"))]
         )
@@ -102,7 +102,7 @@ async def test_chat_tool_with_max_tokens(chat_tool):
 async def test_chat_tool_error_handling(chat_tool):
     """Test error handling in chat tool."""
     chat_tool = await chat_tool
-    with patch('src.tools.chat_tool.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
+    with patch('src.utils.openai_client.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
         mock_chat.side_effect = Exception("Test error")
         
         request = ChatRequest(
@@ -117,7 +117,7 @@ async def test_chat_tool_error_handling(chat_tool):
 async def test_chat_tool_with_empty_context(chat_tool):
     """Test chat with no relevant context found."""
     chat_tool = await chat_tool
-    with patch('src.tools.chat_tool.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
+    with patch('src.utils.openai_client.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
         mock_chat.return_value = MagicMock(
             choices=[MagicMock(message=MagicMock(content="Test response"))]
         )
@@ -134,7 +134,7 @@ async def test_chat_tool_with_empty_context(chat_tool):
 async def test_chat_tool_with_special_characters(chat_tool):
     """Test chat with special characters in query."""
     chat_tool = await chat_tool
-    with patch('src.tools.chat_tool.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
+    with patch('src.utils.openai_client.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
         mock_chat.return_value = MagicMock(
             choices=[MagicMock(message=MagicMock(content="Test response"))]
         )
@@ -151,7 +151,7 @@ async def test_chat_tool_with_special_characters(chat_tool):
 async def test_chat_tool_with_unicode(chat_tool):
     """Test chat with Unicode characters in query."""
     chat_tool = await chat_tool
-    with patch('src.tools.chat_tool.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
+    with patch('src.utils.openai_client.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
         mock_chat.return_value = MagicMock(
             choices=[MagicMock(message=MagicMock(content="Test response"))]
         )
@@ -168,7 +168,7 @@ async def test_chat_tool_with_unicode(chat_tool):
 async def test_chat_tool_with_very_long_query(chat_tool):
     """Test chat with very long query."""
     chat_tool = await chat_tool
-    with patch('src.tools.chat_tool.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
+    with patch('src.utils.openai_client.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
         mock_chat.return_value = MagicMock(
             choices=[MagicMock(message=MagicMock(content="Test response"))]
         )
@@ -185,7 +185,7 @@ async def test_chat_tool_with_very_long_query(chat_tool):
 async def test_chat_tool_with_conversation_history(chat_tool):
     """Test chat with conversation history."""
     chat_tool = await chat_tool
-    with patch('src.tools.chat_tool.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
+    with patch('src.utils.openai_client.openai_client.chat.completions.create', new_callable=AsyncMock) as mock_chat:
         mock_chat.return_value = MagicMock(
             choices=[MagicMock(message=MagicMock(content="Test response"))]
         )
