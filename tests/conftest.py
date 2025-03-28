@@ -56,17 +56,17 @@ async def hybrid_search_client():
 @pytest.fixture
 async def search_tool(dense_vector_client, sparse_vector_client):
     """Create a SearchTool instance for testing."""
-    dense_client = await dense_vector_client
-    sparse_client = await sparse_vector_client
-    return SearchTool(dense_client, sparse_client)
+    return SearchTool(dense_vector_client, sparse_vector_client)
 
 @pytest.fixture
 async def archive_agent(search_tool, chat_tool):
     """Create an ArchiveAgent instance for testing."""
-    return ArchiveAgent(search_tool=search_tool, chat_tool=chat_tool)
+    tool = await search_tool
+    chat = await chat_tool
+    return ArchiveAgent(search_tool=tool, chat_tool=chat)
 
 @pytest.fixture
-async def load_test_documents(dense_vector_client, sparse_vector_client):
+def load_test_documents():
     """Load test documents for search."""
     from src.schema.models import ArchiveDocument, ArchiveMetadata
     
@@ -86,10 +86,4 @@ async def load_test_documents(dense_vector_client, sparse_vector_client):
         ) for i in range(10)
     ]
     
-    dense_client = await dense_vector_client
-    sparse_client = await sparse_vector_client
-
-    dense_client.search.return_value = test_docs
-    sparse_client.search.return_value = []
-
     return test_docs

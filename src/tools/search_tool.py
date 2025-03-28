@@ -6,7 +6,7 @@ import logging
 from typing import Dict, List, Any, Optional, Tuple, Union
 
 from ..config import DEFAULT_TOP_K, MIN_SCORE_THRESHOLD
-from ..schema.models import SearchQuery, ArchiveDocument, SearchResponse, SearchError
+from ..schema.models import SearchQuery, ArchiveDocument, SearchResponse, SearchError, ArchiveMetadata
 from ..utils.vector_store import DenseVectorClient, SparseVectorClient, HybridSearchClient
 
 # Set up logger
@@ -85,15 +85,17 @@ class SearchTool:
                 )
             
             # Convert results to ArchiveDocument objects
-            documents = [
-                ArchiveDocument(
-                    id=result['id'],
-                    text_excerpt=result['metadata'].get('text_excerpt', ''),
-                    metadata=result['metadata'],
-                    score=result['score']
-                )
-                for result in results
-            ]
+            documents = []
+            for result in results:
+                # Handle Pinecone ScoredVector objects
+                if hasattr(result, 'id') and hasattr(result, 'metadata') and hasattr(result, 'score'):
+                    documents.append(ArchiveDocument.from_pinecone_match(result))
+                # Handle dictionary results (for backward compatibility)
+                elif isinstance(result, dict):
+                    documents.append(ArchiveDocument.from_pinecone_match(result))
+                # Handle ArchiveDocument objects directly
+                elif isinstance(result, ArchiveDocument):
+                    documents.append(result)
             
             # Filter by metadata if needed
             if any([query.author, query.year, query.month, query.day, query.keywords, query.title]):

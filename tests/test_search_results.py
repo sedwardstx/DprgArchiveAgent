@@ -3,7 +3,7 @@ Test cases for verifying search results with known queries.
 """
 import pytest
 from src.agent.archive_agent import archive_agent
-from src.schema.models import SearchError
+from src.schema.models import SearchError, ArchiveDocument, ArchiveMetadata
 
 @pytest.mark.asyncio
 async def test_pdxbot_search():
@@ -78,7 +78,17 @@ async def test_hybrid_search_pdxbot():
 @pytest.mark.asyncio
 async def test_sparse_search_pdxbot(load_test_documents):
     """Test sparse search with test data."""
-    docs = await load_test_documents
+    # No need to await load_test_documents since it's a list
+    docs = load_test_documents
+    
+    # Verify test documents contain expected content
+    assert len(docs) > 0
+    for doc in docs:
+        assert isinstance(doc, ArchiveDocument)
+        assert doc.text_excerpt is not None
+        assert doc.metadata is not None
+        assert isinstance(doc.metadata, ArchiveMetadata)
+    
     result = await archive_agent.search_sparse(
         query="test document",  # Using a query that matches our test data
         top_k=10,
