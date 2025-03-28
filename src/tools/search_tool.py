@@ -57,21 +57,24 @@ class SearchTool:
                 results = await self.hybrid_client.search(
                     query.query,
                     top_k=query.top_k,
-                    filter=self._build_filter(query)
+                    filter=self._build_filter(query),
+                    min_score=query.min_score
                 )
             elif query.use_sparse:
                 search_type = "sparse"
                 results = await self.sparse_client.search(
                     query.query,
                     top_k=query.top_k,
-                    filter=self._build_filter(query)
+                    filter=self._build_filter(query),
+                    min_score=query.min_score
                 )
             else:
                 search_type = "dense"
                 results = await self.dense_client.search(
                     query.query,
                     top_k=query.top_k,
-                    filter=self._build_filter(query)
+                    filter=self._build_filter(query),
+                    min_score=query.min_score
                 )
             
             # Convert results to ArchiveDocument objects

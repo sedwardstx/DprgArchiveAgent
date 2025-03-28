@@ -11,10 +11,14 @@ from ..config import (
     PINECONE_ENVIRONMENT,
     DENSE_INDEX_NAME,
     SPARSE_INDEX_NAME,
+    DENSE_INDEX_URL,
+    SPARSE_INDEX_URL,
     DENSE_WEIGHT,
     SPARSE_WEIGHT,
-    MIN_SCORE_THRESHOLD
+    MIN_SCORE_THRESHOLD,
+    PINECONE_NAMESPACE
 )
+from .embeddings import get_embedding, generate_sparse_vector
 
 # Set up logger
 logger = logging.getLogger(__name__)
@@ -24,15 +28,24 @@ class BaseVectorClient(ABC):
     
     def __init__(self):
         """Initialize the vector client."""
+        logger.info(f"Initializing Pinecone client with API key: {PINECONE_API_KEY[:5]}...")
         self.pc = Pinecone(api_key=PINECONE_API_KEY)
         logger.info(f"Initialized {self.__class__.__name__}")
+        
+        # List available indices
+        try:
+            indices = self.pc.list_indexes()
+            logger.info(f"Available Pinecone indices: {[index.name for index in indices]}")
+        except Exception as e:
+            logger.error(f"Error listing Pinecone indices: {str(e)}")
 
     @abstractmethod
     async def search(
         self,
         query: str,
         top_k: int = 10,
-        filter: Optional[Dict[str, Any]] = None
+        filter: Optional[Dict[str, Any]] = None,
+        min_score: Optional[float] = MIN_SCORE_THRESHOLD
     ) -> List[Dict[str, Any]]:
         """Search the vector index."""
         pass
@@ -43,14 +56,20 @@ class DenseVectorClient(BaseVectorClient):
     def __init__(self):
         """Initialize the dense vector client."""
         super().__init__()
-        self.index = self.pc.Index(DENSE_INDEX_NAME)
-        logger.info(f"Initialized {self.__class__.__name__} with index {DENSE_INDEX_NAME}")
+        logger.info(f"Initializing dense index with name: {DENSE_INDEX_NAME} and URL: {DENSE_INDEX_URL}")
+        try:
+            self.index = self.pc.Index(DENSE_INDEX_NAME, host=DENSE_INDEX_URL)
+            logger.info(f"Successfully initialized {self.__class__.__name__} with index {DENSE_INDEX_NAME}")
+        except Exception as e:
+            logger.error(f"Error initializing dense index: {str(e)}")
+            raise
     
     async def search(
         self,
         query: str,
         top_k: int = 10,
-        filter: Optional[Dict[str, Any]] = None
+        filter: Optional[Dict[str, Any]] = None,
+        min_score: Optional[float] = MIN_SCORE_THRESHOLD
     ) -> List[Dict[str, Any]]:
         """
         Search the dense vector index.
@@ -59,17 +78,33 @@ class DenseVectorClient(BaseVectorClient):
             query: The search query
             top_k: Number of results to return
             filter: Optional filter dictionary
+            min_score: Minimum score threshold
             
         Returns:
             List of search results
         """
         try:
+            # Generate embedding for query
+            logger.info(f"Generating embedding for query: {query}")
+            vector = await get_embedding(query)
+            logger.info(f"Generated embedding with dimension: {len(vector)}")
+            
+            # Execute search
+            logger.info(f"Executing dense search with top_k={top_k}, filter={filter}")
             results = self.index.query(
-                vector=query,
+                vector=vector,
                 top_k=top_k,
                 filter=filter,
-                include_metadata=True
+                include_metadata=True,
+                namespace=PINECONE_NAMESPACE
             )
+            logger.info(f"Search returned {len(results.matches)} matches")
+            
+            # Filter by minimum score if specified
+            if min_score is not None:
+                results.matches = [r for r in results.matches if r['score'] >= min_score]
+                logger.info(f"Filtered to {len(results.matches)} matches with score >= {min_score}")
+            
             return results.matches
         except Exception as e:
             logger.error(f"Error in dense search: {str(e)}")
@@ -81,14 +116,20 @@ class SparseVectorClient(BaseVectorClient):
     def __init__(self):
         """Initialize the sparse vector client."""
         super().__init__()
-        self.index = self.pc.Index(SPARSE_INDEX_NAME)
-        logger.info(f"Initialized {self.__class__.__name__} with index {SPARSE_INDEX_NAME}")
+        logger.info(f"Initializing sparse index with name: {SPARSE_INDEX_NAME} and URL: {SPARSE_INDEX_URL}")
+        try:
+            self.index = self.pc.Index(SPARSE_INDEX_NAME, host=SPARSE_INDEX_URL)
+            logger.info(f"Successfully initialized {self.__class__.__name__} with index {SPARSE_INDEX_NAME}")
+        except Exception as e:
+            logger.error(f"Error initializing sparse index: {str(e)}")
+            raise
     
     async def search(
         self,
         query: str,
         top_k: int = 10,
-        filter: Optional[Dict[str, Any]] = None
+        filter: Optional[Dict[str, Any]] = None,
+        min_score: Optional[float] = MIN_SCORE_THRESHOLD
     ) -> List[Dict[str, Any]]:
         """
         Search the sparse vector index.
@@ -97,17 +138,39 @@ class SparseVectorClient(BaseVectorClient):
             query: The search query
             top_k: Number of results to return
             filter: Optional filter dictionary
+            min_score: Minimum score threshold
             
         Returns:
             List of search results
         """
         try:
+            # Generate sparse vector for query
+            logger.info(f"Generating sparse vector for query: {query}")
+            indices, values = await generate_sparse_vector(query)
+            logger.info(f"Generated sparse vector with {len(indices)} non-zero elements")
+            
+            # Create sparse vector dictionary in Pinecone's expected format
+            sparse_vector = {
+                "indices": indices,
+                "values": values
+            }
+            
+            # Execute search
+            logger.info(f"Executing sparse search with top_k={top_k}, filter={filter}")
             results = self.index.query(
-                vector=query,
+                sparse_vector=sparse_vector,
                 top_k=top_k,
                 filter=filter,
-                include_metadata=True
+                include_metadata=True,
+                namespace=PINECONE_NAMESPACE
             )
+            logger.info(f"Search returned {len(results.matches)} matches")
+            
+            # Filter by minimum score if specified
+            if min_score is not None:
+                results.matches = [r for r in results.matches if r['score'] >= min_score]
+                logger.info(f"Filtered to {len(results.matches)} matches with score >= {min_score}")
+            
             return results.matches
         except Exception as e:
             logger.error(f"Error in sparse search: {str(e)}")
@@ -127,7 +190,8 @@ class HybridSearchClient(BaseVectorClient):
         self,
         query: str,
         top_k: int = 10,
-        filter: Optional[Dict[str, Any]] = None
+        filter: Optional[Dict[str, Any]] = None,
+        min_score: Optional[float] = MIN_SCORE_THRESHOLD
     ) -> List[Dict[str, Any]]:
         """
         Perform hybrid search combining dense and sparse results.
@@ -136,14 +200,15 @@ class HybridSearchClient(BaseVectorClient):
             query: The search query
             top_k: Number of results to return
             filter: Optional filter dictionary
+            min_score: Minimum score threshold
             
         Returns:
             List of search results
         """
         try:
             # Execute both searches in parallel
-            dense_results = await self.dense_client.search(query, top_k, filter)
-            sparse_results = await self.sparse_client.search(query, top_k, filter)
+            dense_results = await self.dense_client.search(query, top_k, filter, min_score=None)
+            sparse_results = await self.sparse_client.search(query, top_k, filter, min_score=None)
             
             # Combine results
             combined_results = {}
@@ -168,8 +233,10 @@ class HybridSearchClient(BaseVectorClient):
             results = list(combined_results.values())
             results.sort(key=lambda x: x['score'], reverse=True)
             
-            # Filter by minimum score
-            results = [r for r in results if r['score'] >= MIN_SCORE_THRESHOLD]
+            # Filter by minimum score if specified
+            if min_score is not None:
+                results = [r for r in results if r['score'] >= min_score]
+                logger.info(f"Filtered to {len(results)} matches with score >= {min_score}")
             
             # Return top k results
             return results[:top_k]

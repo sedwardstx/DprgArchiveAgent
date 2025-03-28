@@ -24,7 +24,6 @@ from rich import box
 from .config import validate_config, DEFAULT_TOP_K
 from .agent.archive_agent import archive_agent
 from .schema.models import SearchError, SearchQuery, ChatMessage, ChatCompletionRequest
-from .utils.vector_store import cleanup_clients
 
 # Set up logger
 logging.basicConfig(
@@ -44,20 +43,16 @@ def log_debug(message):
         f.flush()  # Force write to disk
         os.fsync(f.fileno())  # Ensure it's written to the filesystem
 
-# Modify the cleanup function to log its activity
 @atexit.register
 def final_cleanup():
     """Final cleanup before exit."""
     log_debug("Entering final_cleanup from atexit handler")
     try:
-        cleanup_clients()
-        log_debug("Successfully ran cleanup_clients from atexit handler")
+        # Any cleanup needed before exit
+        log_debug("Successfully ran cleanup from atexit handler")
     except Exception as e:
         log_debug(f"Error in final_cleanup: {str(e)}")
     log_debug("Exiting final_cleanup from atexit handler")
-    
-# Remove the previous atexit registration to avoid double calls
-atexit.unregister(cleanup_clients)
 
 # Create Typer app
 app = typer.Typer(
@@ -203,111 +198,43 @@ def search(
         # Validate environment
         log_debug("Starting search function")
         if not validate_environment():
-            log_debug("Environment validation failed")
-            sys.exit(1)
-        
-        # Handle no_filter option
+            return
+
+        # Set min_score to None if no_filter is True
         if no_filter:
-            min_score = 0.0
-        
-        # Show search parameters
-        log_debug("Displaying search parameters")
-        console.print(
-            Panel(
-                f"Query: [bold]{query}[/bold]\n"
-                f"Search Type: [cyan]{search_type}[/cyan]\n"
-                f"Min Score: [cyan]{min_score if min_score else 'None'}[/cyan]\n"
-                f"Filters: "
-                f"{f'Author=[blue]{author}[/blue]' if author else ''} "
-                f"{f'Year=[blue]{year}[/blue]' if year else ''} "
-                f"{f'Month=[blue]{month}[/blue]' if month else ''} "
-                f"{f'Day=[blue]{day}[/blue]' if day else ''} "
-                f"{f'Keywords=[blue]{keywords}[/blue]' if keywords else ''}",
-                title="Search Parameters",
-                expand=False,
-            )
+            min_score = None
+            log_debug("No filter option enabled, setting min_score to None")
+
+        # Build search query
+        search_query = SearchQuery(
+            query=query,
+            top_k=top_k,
+            author=author,
+            year=year,
+            month=month,
+            day=day,
+            keywords=keywords,
+            min_score=min_score,
+            search_type=search_type
         )
-        
+
         # Execute search
-        log_debug("Starting search execution")
-        with console.status(f"Searching for '{query}'...", spinner="dots"):
-            try:
-                log_debug(f"Running search with type: {search_type}")
-                if search_type == "hybrid":
-                    result = run_async_safely(
-                        archive_agent.search_hybrid(
-                            query=query,
-                            top_k=top_k,
-                            author=author,
-                            year=year,
-                            month=month,
-                            day=day,
-                            keywords=keywords,
-                            min_score=min_score,
-                        )
-                    )
-                elif search_type == "sparse":
-                    result = run_async_safely(
-                        archive_agent.search_sparse(
-                            query=query,
-                            top_k=top_k,
-                            author=author,
-                            year=year,
-                            month=month,
-                            day=day,
-                            keywords=keywords,
-                            min_score=min_score,
-                        )
-                    )
-                else:  # dense
-                    result = run_async_safely(
-                        archive_agent.search_dense(
-                            query=query,
-                            top_k=top_k,
-                            author=author,
-                            year=year,
-                            month=month,
-                            day=day,
-                            keywords=keywords,
-                            min_score=min_score,
-                        )
-                    )
-                    
-                # Check for error
-                if isinstance(result, SearchError):
-                    log_debug(f"Search returned error: {result.error}")
-                    console.print(f"Error: {result.error}", style="bold red")
-                    sys.exit(1)
-                    
-                # Display results
-                log_debug("Displaying search results")
-                display_results(result, query, search_type)
-                    
-                # Explicitly attempt cleanup
-                log_debug("Running cleanup_clients from search function")
-                cleanup_clients()
-                log_debug("Cleanup completed")
-                    
-            except Exception as e:
-                log_debug(f"Exception during search execution: {str(e)}")
-                log_debug(traceback.format_exc())
-                console.print(f"Error: {str(e)}", style="bold red")
-                sys.exit(1)
-        
-        log_debug("Search completed successfully, returning 0")
-        # Add a clean exit to prevent segmentation fault
-        return 0
-    
-    except KeyboardInterrupt:
-        log_debug("Search interrupted by user")
-        console.print("\nSearch cancelled by user", style="yellow")
-        return 1
+        log_debug(f"Executing search with query: {search_query}")
+        results = run_async_safely(archive_agent.search(search_query))
+        log_debug("Search completed successfully")
+
+        # Display results
+        display_results(results, query, search_type)
+
+    except SearchError as e:
+        console.print(f"[bold red]Search Error:[/bold red] {str(e)}")
+        log_debug(f"SearchError: {str(e)}")
+        sys.exit(1)
     except Exception as e:
-        log_debug(f"Unexpected error in search: {str(e)}")
+        console.print(f"[bold red]Error:[/bold red] {str(e)}")
+        log_debug(f"Unexpected error: {str(e)}")
         log_debug(traceback.format_exc())
-        console.print(f"Unexpected error: {str(e)}", style="bold red")
-        logger.exception("Unexpected error during search")
-        return 1
+        sys.exit(1)
 
 
 @app.command("metadata")
@@ -379,9 +306,6 @@ def search_metadata(
                     
                 # Display results
                 display_results(result, "Metadata Search", "metadata")
-                    
-                # Explicitly attempt cleanup
-                cleanup_clients()
                     
             except Exception as e:
                 console.print(f"Error: {str(e)}", style="bold red")

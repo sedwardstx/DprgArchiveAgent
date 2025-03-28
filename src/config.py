@@ -13,9 +13,13 @@ PINECONE_API_KEY = os.getenv("PINECONE_API_KEY", "")
 PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT", "")
 PINECONE_NAMESPACE = os.getenv("PINECONE_NAMESPACE", "dprg-archive")
 
-# Vector index names
-DENSE_INDEX_NAME = os.getenv("DENSE_INDEX_NAME", "dprg-list-archive-dense")
-SPARSE_INDEX_NAME = os.getenv("SPARSE_INDEX_NAME", "dprg-list-archive-sparse")
+# Vector index URLs
+DENSE_INDEX_URL = os.getenv("DENSE_INDEX_URL", "https://dprg-list-archive-dense-4p4f7lg.svc.aped-4627-b74a.pinecone.io")
+SPARSE_INDEX_URL = os.getenv("SPARSE_INDEX_URL", "https://dprg-list-archive-sparse-4p4f7lg.svc.aped-4627-b74a.pinecone.io")
+
+# Vector index names (from available indices)
+DENSE_INDEX_NAME = "dprg-list-archive-dense"
+SPARSE_INDEX_NAME = "dprg-list-archive-sparse"
 
 # OpenAI settings
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")

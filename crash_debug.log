@@ -1,0 +1,283 @@
+2025-03-28 07:12:27.928904 - Starting CLI with platform: Windows 10
+2025-03-28 07:12:27.938716 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:12:27.940233 - Windows platform: True, MINGW detected: False
+2025-03-28 07:12:27.943243 - Calling app()
+2025-03-28 07:12:27.949884 - Starting search function
+2025-03-28 07:12:27.952362 - Displaying search parameters
+2025-03-28 07:12:27.956463 - Starting search execution
+2025-03-28 07:12:27.961933 - Running search with type: sparse
+2025-03-28 07:12:27.963934 - Starting run_async_safely
+2025-03-28 07:12:27.966932 - Created new event loop
+2025-03-28 07:12:28.521021 - Coroutine completed successfully
+2025-03-28 07:12:28.523022 - Closing event loop
+2025-03-28 07:12:28.525023 - Event loop closed
+2025-03-28 07:12:28.526020 - Displaying search results
+2025-03-28 07:12:28.530639 - Search completed successfully, returning 0
+2025-03-28 07:12:28.531640 - Entering final_cleanup from atexit handler
+2025-03-28 07:12:28.532642 - Successfully ran cleanup from atexit handler
+2025-03-28 07:12:28.534640 - Exiting final_cleanup from atexit handler
+2025-03-28 07:13:08.776959 - Starting CLI with platform: Windows 10
+2025-03-28 07:13:08.785993 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:13:08.786992 - Windows platform: True, MINGW detected: False
+2025-03-28 07:13:08.787993 - Calling app()
+2025-03-28 07:13:08.794423 - Starting search function
+2025-03-28 07:13:08.796440 - Displaying search parameters
+2025-03-28 07:13:08.800187 - Starting search execution
+2025-03-28 07:13:08.805196 - Running search with type: sparse
+2025-03-28 07:13:08.806196 - Starting run_async_safely
+2025-03-28 07:13:08.809727 - Created new event loop
+2025-03-28 07:13:09.095847 - Coroutine completed successfully
+2025-03-28 07:13:09.096846 - Closing event loop
+2025-03-28 07:13:09.099246 - Event loop closed
+2025-03-28 07:13:09.100254 - Displaying search results
+2025-03-28 07:13:09.104246 - Search completed successfully, returning 0
+2025-03-28 07:13:09.106906 - Entering final_cleanup from atexit handler
+2025-03-28 07:13:09.108156 - Successfully ran cleanup from atexit handler
+2025-03-28 07:13:09.109162 - Exiting final_cleanup from atexit handler
+2025-03-28 07:14:05.942013 - Starting CLI with platform: Windows 10
+2025-03-28 07:14:05.944024 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:14:05.945240 - Windows platform: True, MINGW detected: False
+2025-03-28 07:14:05.946247 - Calling app()
+2025-03-28 07:14:05.953430 - Starting search function
+2025-03-28 07:14:05.955386 - Displaying search parameters
+2025-03-28 07:14:05.958488 - Starting search execution
+2025-03-28 07:14:05.964651 - Running search with type: dense
+2025-03-28 07:14:05.965662 - Starting run_async_safely
+2025-03-28 07:14:05.969506 - Created new event loop
+2025-03-28 07:14:06.763919 - Coroutine completed successfully
+2025-03-28 07:14:06.773585 - Closing event loop
+2025-03-28 07:14:06.775590 - Event loop closed
+2025-03-28 07:14:06.777590 - Displaying search results
+2025-03-28 07:14:06.781103 - Search completed successfully, returning 0
+2025-03-28 07:14:06.782106 - Entering final_cleanup from atexit handler
+2025-03-28 07:14:06.783105 - Successfully ran cleanup from atexit handler
+2025-03-28 07:14:06.785102 - Exiting final_cleanup from atexit handler
+2025-03-28 07:19:35.357656 - Starting CLI with platform: Windows 10
+2025-03-28 07:19:35.366094 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:19:35.367140 - Windows platform: True, MINGW detected: False
+2025-03-28 07:19:35.369095 - Calling app()
+2025-03-28 07:19:35.375672 - Starting search function
+2025-03-28 07:19:35.377668 - Displaying search parameters
+2025-03-28 07:19:35.381677 - Starting search execution
+2025-03-28 07:19:35.385182 - Running search with type: dense
+2025-03-28 07:19:35.386280 - Starting run_async_safely
+2025-03-28 07:19:35.389797 - Created new event loop
+2025-03-28 07:19:36.259078 - Coroutine completed successfully
+2025-03-28 07:19:36.268308 - Closing event loop
+2025-03-28 07:19:36.269309 - Event loop closed
+2025-03-28 07:19:36.271800 - Displaying search results
+2025-03-28 07:19:36.275477 - Search completed successfully, returning 0
+2025-03-28 07:19:36.277473 - Entering final_cleanup from atexit handler
+2025-03-28 07:19:36.278462 - Successfully ran cleanup from atexit handler
+2025-03-28 07:19:36.278462 - Exiting final_cleanup from atexit handler
+2025-03-28 07:20:01.694692 - Starting CLI with platform: Windows 10
+2025-03-28 07:20:01.703614 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:20:01.705050 - Windows platform: True, MINGW detected: False
+2025-03-28 07:20:01.706060 - Calling app()
+2025-03-28 07:20:01.713815 - Starting search function
+2025-03-28 07:20:01.716329 - Displaying search parameters
+2025-03-28 07:20:01.721320 - Starting search execution
+2025-03-28 07:20:01.726146 - Running search with type: dense
+2025-03-28 07:20:01.728454 - Starting run_async_safely
+2025-03-28 07:20:01.731457 - Created new event loop
+2025-03-28 07:20:02.612379 - Coroutine completed successfully
+2025-03-28 07:20:02.621429 - Closing event loop
+2025-03-28 07:20:02.623968 - Event loop closed
+2025-03-28 07:20:02.624978 - Displaying search results
+2025-03-28 07:20:02.632054 - Search completed successfully, returning 0
+2025-03-28 07:20:02.634540 - Entering final_cleanup from atexit handler
+2025-03-28 07:20:02.636603 - Successfully ran cleanup from atexit handler
+2025-03-28 07:20:02.637610 - Exiting final_cleanup from atexit handler
+2025-03-28 07:34:14.901480 - Starting CLI with platform: Windows 10
+2025-03-28 07:34:14.909108 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:34:14.911115 - Windows platform: True, MINGW detected: False
+2025-03-28 07:34:14.912608 - Calling app()
+2025-03-28 07:34:14.917631 - Starting search function
+2025-03-28 07:34:14.919832 - Displaying search parameters
+2025-03-28 07:34:14.923335 - Starting search execution
+2025-03-28 07:34:14.929348 - Running search with type: dense
+2025-03-28 07:34:14.931382 - Starting run_async_safely
+2025-03-28 07:34:14.933497 - Created new event loop
+2025-03-28 07:34:15.872252 - Coroutine completed successfully
+2025-03-28 07:34:15.881656 - Closing event loop
+2025-03-28 07:34:15.882613 - Event loop closed
+2025-03-28 07:34:15.883610 - Displaying search results
+2025-03-28 07:34:15.887899 - Search completed successfully, returning 0
+2025-03-28 07:34:15.888897 - Entering final_cleanup from atexit handler
+2025-03-28 07:34:15.889899 - Successfully ran cleanup from atexit handler
+2025-03-28 07:34:15.890900 - Exiting final_cleanup from atexit handler
+2025-03-28 07:35:36.161199 - Starting CLI with platform: Windows 10
+2025-03-28 07:35:36.163195 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:35:36.164195 - Windows platform: True, MINGW detected: False
+2025-03-28 07:35:36.166293 - Calling app()
+2025-03-28 07:35:36.171292 - Starting search function
+2025-03-28 07:35:36.173296 - Displaying search parameters
+2025-03-28 07:35:36.175808 - Starting search execution
+2025-03-28 07:35:36.179320 - Running search with type: dense
+2025-03-28 07:35:36.180332 - Starting run_async_safely
+2025-03-28 07:35:36.183331 - Created new event loop
+2025-03-28 07:35:36.958780 - Coroutine completed successfully
+2025-03-28 07:35:36.967092 - Closing event loop
+2025-03-28 07:35:36.969084 - Event loop closed
+2025-03-28 07:35:36.970102 - Displaying search results
+2025-03-28 07:35:36.988211 - Search completed successfully, returning 0
+2025-03-28 07:35:36.989212 - Entering final_cleanup from atexit handler
+2025-03-28 07:35:36.991211 - Successfully ran cleanup from atexit handler
+2025-03-28 07:35:36.993209 - Exiting final_cleanup from atexit handler
+2025-03-28 07:35:56.592706 - Starting CLI with platform: Windows 10
+2025-03-28 07:35:56.594715 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:35:56.595724 - Windows platform: True, MINGW detected: False
+2025-03-28 07:35:56.597722 - Calling app()
+2025-03-28 07:35:56.614255 - Entering final_cleanup from atexit handler
+2025-03-28 07:35:56.615788 - Successfully ran cleanup from atexit handler
+2025-03-28 07:35:56.616794 - Exiting final_cleanup from atexit handler
+2025-03-28 07:36:17.162750 - Starting CLI with platform: Windows 10
+2025-03-28 07:36:17.164704 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:36:17.166241 - Windows platform: True, MINGW detected: False
+2025-03-28 07:36:17.167241 - Calling app()
+2025-03-28 07:36:17.172890 - Starting search function
+2025-03-28 07:36:17.175395 - Displaying search parameters
+2025-03-28 07:36:17.178411 - Starting search execution
+2025-03-28 07:36:17.182921 - Running search with type: hybrid
+2025-03-28 07:36:17.183922 - Starting run_async_safely
+2025-03-28 07:36:17.186256 - Created new event loop
+2025-03-28 07:36:18.343443 - Coroutine completed successfully
+2025-03-28 07:36:18.351826 - Closing event loop
+2025-03-28 07:36:18.353828 - Event loop closed
+2025-03-28 07:36:18.354829 - Displaying search results
+2025-03-28 07:36:18.363049 - Search completed successfully, returning 0
+2025-03-28 07:36:18.365054 - Entering final_cleanup from atexit handler
+2025-03-28 07:36:18.365568 - Successfully ran cleanup from atexit handler
+2025-03-28 07:36:18.367573 - Exiting final_cleanup from atexit handler
+2025-03-28 07:36:34.489914 - Starting CLI with platform: Windows 10
+2025-03-28 07:36:34.498647 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:36:34.500076 - Windows platform: True, MINGW detected: False
+2025-03-28 07:36:34.501083 - Calling app()
+2025-03-28 07:36:34.507739 - Starting search function
+2025-03-28 07:36:34.508739 - Displaying search parameters
+2025-03-28 07:36:34.513309 - Starting search execution
+2025-03-28 07:36:34.516802 - Running search with type: sparse
+2025-03-28 07:36:34.517807 - Starting run_async_safely
+2025-03-28 07:36:34.520803 - Created new event loop
+2025-03-28 07:36:34.912242 - Coroutine completed successfully
+2025-03-28 07:36:34.914243 - Closing event loop
+2025-03-28 07:36:34.915244 - Event loop closed
+2025-03-28 07:36:34.917422 - Displaying search results
+2025-03-28 07:36:34.925924 - Search completed successfully, returning 0
+2025-03-28 07:36:34.926927 - Entering final_cleanup from atexit handler
+2025-03-28 07:36:34.929046 - Successfully ran cleanup from atexit handler
+2025-03-28 07:36:34.930051 - Exiting final_cleanup from atexit handler
+2025-03-28 07:36:54.219293 - Starting CLI with platform: Windows 10
+2025-03-28 07:36:54.227944 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:36:54.228943 - Windows platform: True, MINGW detected: False
+2025-03-28 07:36:54.230944 - Calling app()
+2025-03-28 07:36:54.236541 - Starting search function
+2025-03-28 07:36:54.238545 - Displaying search parameters
+2025-03-28 07:36:54.241546 - Starting search execution
+2025-03-28 07:36:54.246064 - Running search with type: hybrid
+2025-03-28 07:36:54.248064 - Starting run_async_safely
+2025-03-28 07:36:54.250064 - Created new event loop
+2025-03-28 07:36:55.525166 - Coroutine completed successfully
+2025-03-28 07:36:55.533288 - Closing event loop
+2025-03-28 07:36:55.535288 - Event loop closed
+2025-03-28 07:36:55.536381 - Displaying search results
+2025-03-28 07:36:55.540470 - Search completed successfully, returning 0
+2025-03-28 07:36:55.541476 - Entering final_cleanup from atexit handler
+2025-03-28 07:36:55.543794 - Successfully ran cleanup from atexit handler
+2025-03-28 07:36:55.543794 - Exiting final_cleanup from atexit handler
+2025-03-28 07:38:24.773338 - Starting CLI with platform: Windows 10
+2025-03-28 07:38:24.782029 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:38:24.784037 - Windows platform: True, MINGW detected: False
+2025-03-28 07:38:24.785050 - Calling app()
+2025-03-28 07:38:24.791567 - Starting search function
+2025-03-28 07:38:24.792567 - No filter option enabled, setting min_score to None
+2025-03-28 07:38:24.794565 - Executing search with query: query='Bornstein square' top_k=10 author=None year=None month=None day=None keywords=[] title=None min_score=None use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 07:38:24.795565 - Starting run_async_safely
+2025-03-28 07:38:24.798881 - Created new event loop
+2025-03-28 07:38:25.658502 - Coroutine completed successfully
+2025-03-28 07:38:25.667391 - Closing event loop
+2025-03-28 07:38:25.669399 - Event loop closed
+2025-03-28 07:38:25.669399 - Search completed successfully
+2025-03-28 07:38:25.673672 - Entering final_cleanup from atexit handler
+2025-03-28 07:38:25.674670 - Successfully ran cleanup from atexit handler
+2025-03-28 07:38:25.676180 - Exiting final_cleanup from atexit handler
+2025-03-28 07:39:10.103961 - Starting CLI with platform: Windows 10
+2025-03-28 07:39:10.104954 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:39:10.105948 - Windows platform: True, MINGW detected: False
+2025-03-28 07:39:10.107455 - Calling app()
+2025-03-28 07:39:10.114979 - Starting search function
+2025-03-28 07:39:10.115977 - No filter option enabled, setting min_score to None
+2025-03-28 07:39:10.117484 - Executing search with query: query='Bornstein square' top_k=10 author=None year=None month=None day=None keywords=[] title=None min_score=None use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 07:39:10.118490 - Starting run_async_safely
+2025-03-28 07:39:10.122005 - Created new event loop
+2025-03-28 07:39:11.666943 - Coroutine completed successfully
+2025-03-28 07:39:11.669083 - Closing event loop
+2025-03-28 07:39:11.671221 - Event loop closed
+2025-03-28 07:39:11.672702 - Search completed successfully
+2025-03-28 07:39:11.690299 - Entering final_cleanup from atexit handler
+2025-03-28 07:39:11.691360 - Successfully ran cleanup from atexit handler
+2025-03-28 07:39:11.693404 - Exiting final_cleanup from atexit handler
+2025-03-28 07:39:22.365492 - Starting CLI with platform: Windows 10
+2025-03-28 07:39:22.368013 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:39:22.369014 - Windows platform: True, MINGW detected: False
+2025-03-28 07:39:22.370022 - Calling app()
+2025-03-28 07:39:22.378541 - Starting search function
+2025-03-28 07:39:22.381062 - No filter option enabled, setting min_score to None
+2025-03-28 07:39:22.383077 - Executing search with query: query='Borenstein square' top_k=10 author=None year=None month=None day=None keywords=[] title=None min_score=None use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 07:39:22.384085 - Starting run_async_safely
+2025-03-28 07:39:22.387593 - Created new event loop
+2025-03-28 07:39:23.187664 - Coroutine completed successfully
+2025-03-28 07:39:23.189077 - Closing event loop
+2025-03-28 07:39:23.190558 - Event loop closed
+2025-03-28 07:39:23.191565 - Search completed successfully
+2025-03-28 07:39:23.212385 - Entering final_cleanup from atexit handler
+2025-03-28 07:39:23.213715 - Successfully ran cleanup from atexit handler
+2025-03-28 07:39:23.214991 - Exiting final_cleanup from atexit handler
+2025-03-28 07:39:35.958055 - Starting CLI with platform: Windows 10
+2025-03-28 07:39:35.959056 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:39:35.961121 - Windows platform: True, MINGW detected: False
+2025-03-28 07:39:35.962627 - Calling app()
+2025-03-28 07:39:35.968152 - Starting search function
+2025-03-28 07:39:35.970153 - No filter option enabled, setting min_score to None
+2025-03-28 07:39:35.972156 - Executing search with query: query='UMBMark' top_k=10 author=None year=None month=None day=None keywords=[] title=None min_score=None use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 07:39:35.973153 - Starting run_async_safely
+2025-03-28 07:39:35.975157 - Created new event loop
+2025-03-28 07:39:36.730423 - Coroutine completed successfully
+2025-03-28 07:39:36.740749 - Closing event loop
+2025-03-28 07:39:36.742763 - Event loop closed
+2025-03-28 07:39:36.743748 - Search completed successfully
+2025-03-28 07:39:36.762290 - Entering final_cleanup from atexit handler
+2025-03-28 07:39:36.764301 - Successfully ran cleanup from atexit handler
+2025-03-28 07:39:36.765295 - Exiting final_cleanup from atexit handler
+2025-03-28 07:39:45.988471 - Starting CLI with platform: Windows 10
+2025-03-28 07:39:45.997330 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:39:45.998337 - Windows platform: True, MINGW detected: False
+2025-03-28 07:39:45.999338 - Calling app()
+2025-03-28 07:39:46.012370 - Starting search function
+2025-03-28 07:39:46.014376 - No filter option enabled, setting min_score to None
+2025-03-28 07:39:46.015377 - Executing search with query: query='Borenstein UMBMark' top_k=10 author=None year=None month=None day=None keywords=[] title=None min_score=None use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 07:39:46.016378 - Starting run_async_safely
+2025-03-28 07:39:46.018893 - Created new event loop
+2025-03-28 07:39:46.933532 - Coroutine completed successfully
+2025-03-28 07:39:46.942570 - Closing event loop
+2025-03-28 07:39:46.944569 - Event loop closed
+2025-03-28 07:39:46.945570 - Search completed successfully
+2025-03-28 07:39:46.961607 - Entering final_cleanup from atexit handler
+2025-03-28 07:39:46.962607 - Successfully ran cleanup from atexit handler
+2025-03-28 07:39:46.963607 - Exiting final_cleanup from atexit handler
+2025-03-28 07:39:58.053458 - Starting CLI with platform: Windows 10
+2025-03-28 07:39:58.062062 - Python version: 3.11.0 (main, Oct 24 2022, 18:26:48) [MSC v.1933 64 bit (AMD64)]
+2025-03-28 07:39:58.064105 - Windows platform: True, MINGW detected: False
+2025-03-28 07:39:58.066069 - Calling app()
+2025-03-28 07:39:58.071671 - Starting search function
+2025-03-28 07:39:58.072583 - No filter option enabled, setting min_score to None
+2025-03-28 07:39:58.074586 - Executing search with query: query='odometry test' top_k=10 author=None year=None month=None day=None keywords=[] title=None min_score=None use_dense=True use_sparse=False use_hybrid=False
+2025-03-28 07:39:58.075588 - Starting run_async_safely
+2025-03-28 07:39:58.077420 - Created new event loop
+2025-03-28 07:39:59.267246 - Coroutine completed successfully
+2025-03-28 07:39:59.269680 - Closing event loop
+2025-03-28 07:39:59.271726 - Event loop closed
+2025-03-28 07:39:59.272726 - Search completed successfully
+2025-03-28 07:39:59.298980 - Entering final_cleanup from atexit handler
+2025-03-28 07:39:59.299988 - Successfully ran cleanup from atexit handler
+2025-03-28 07:39:59.300987 - Exiting final_cleanup from atexit handler
