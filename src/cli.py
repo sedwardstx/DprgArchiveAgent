@@ -409,6 +409,10 @@ def chat(
         500, "--max-tokens", "-m",
         help="Maximum tokens to generate in response"
     ),
+    min_score: float = typer.Option(
+        0.5, "--min-score", "-s",
+        help="Minimum relevance score for retrieved documents (0.0-1.0)"
+    ),
 ):
     """
     Start an interactive chat session with the DPRG Archive Agent.
@@ -440,18 +444,19 @@ def chat(
         console.print(f"\n[bold green]You[/bold green]: {query}")
         
         try:
-            # Create chat request
+            # Create chat request with specific search parameters
             request = ChatCompletionRequest(
                 messages=conversation,
                 search_top_k=top_k,
                 use_search_type=search_type,
                 temperature=temperature,
-                max_tokens=max_tokens
+                max_tokens=max_tokens,
+                min_score=min_score  # Pass the min_score parameter
             )
             
             # Indicate that we're thinking
             with console.status("[bold blue]Thinking...[/bold blue]", spinner="dots"):
-                # Get response from agent
+                # Get response from agent with all relevant parameters
                 response = run_async_safely(archive_agent.chat(request))
             
             # Display agent response

@@ -258,7 +258,58 @@ class ArchiveAgent:
                     max_tokens=max_tokens
                 )
             else:
+                # Use the request as provided but search with its parameters
                 request = query
+                
+                # Extract the user's query from the messages
+                user_query = ""
+                for msg in request.messages:
+                    if msg.role == "user":
+                        user_query = msg.content
+                        break
+                
+                if user_query:
+                    # Use min_score from the request or default to 0.5
+                    min_score_value = request.min_score if hasattr(request, 'min_score') and request.min_score is not None else 0.5
+                    
+                    # Create a search query with the request parameters
+                    search_query = SearchQuery(
+                        query=user_query,
+                        search_type=request.use_search_type or "hybrid",
+                        min_score=min_score_value,
+                        top_k=request.search_top_k or 10,
+                        filters={}
+                    )
+                    
+                    # Perform the search with the parameters from the request
+                    search_results = await self.search(search_query)
+                    
+                    if isinstance(search_results, SearchError):
+                        return ChatCompletionError(
+                            error=f"Search failed: {search_results.error}"
+                        )
+                    
+                    # Check if any documents were found
+                    if not search_results.results:
+                        logger.warning(f"No relevant documents found for query: {user_query}")
+                    
+                    # Build system prompt with context
+                    system_prompt = self._build_system_prompt(search_results.results)
+                    
+                    # Replace the system message if it exists, or add it if it doesn't
+                    has_system_message = False
+                    for i, msg in enumerate(request.messages):
+                        if msg.role == "system":
+                            request.messages[i] = ChatMessage(role="system", content=system_prompt)
+                            has_system_message = True
+                            break
+                    
+                    if not has_system_message:
+                        # Add the system message at the beginning
+                        request.messages.insert(0, ChatMessage(role="system", content=system_prompt))
+                else:
+                    # No user message found, use a default system prompt
+                    search_results = SearchResponse(query="", search_type="", results=[], total=0, elapsed_time=0)
             
             # Convert ChatCompletionRequest to ChatRequest for ChatTool
             chat_request = ChatRequest(
@@ -285,7 +336,7 @@ class ArchiveAgent:
                     role=chat_response.message.role,
                     content=chat_response.message.content
                 ),
-                referenced_documents=search_results.results if isinstance(query, str) else [],
+                referenced_documents=search_results.results if 'search_results' in locals() else [],
                 elapsed_time=chat_response.elapsed_time
             )
             

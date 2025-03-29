@@ -130,6 +130,7 @@ class ChatCompletionRequest(BaseModel):
     temperature: Optional[float] = Field(0.7, description="Sampling temperature")
     search_top_k: Optional[int] = Field(5, description="Number of archive documents to retrieve")
     use_search_type: Optional[str] = Field("dense", description="Search type to use: dense, sparse, or hybrid")
+    min_score: Optional[float] = Field(0.5, description="Minimum relevance score for documents (0.0-1.0)")
 
 
 class ChatCompletionResponse(BaseModel):
