@@ -162,21 +162,26 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
         try:
             # Format date if available
             date_str = ""
-            if result.metadata.get("year"):
+            if hasattr(result.metadata, "year") and result.metadata.year:
                 date_parts = []
-                date_parts.append(str(result.metadata["year"]))
-                if result.metadata.get("month"):
-                    date_parts.append(str(result.metadata["month"]).zfill(2))
-                if result.metadata.get("day"):
-                    date_parts.append(str(result.metadata["day"]).zfill(2))
+                date_parts.append(str(result.metadata.year))
+                if hasattr(result.metadata, "month") and result.metadata.month:
+                    date_parts.append(str(result.metadata.month).zfill(2))
+                if hasattr(result.metadata, "day") and result.metadata.day:
+                    date_parts.append(str(result.metadata.day).zfill(2))
                 date_str = "-".join(date_parts)
 
+            # Access metadata as object attributes, not dictionary keys
+            title = result.metadata.title or ""
+            author = result.metadata.author or ""
+            excerpt = result.text_excerpt
+            
             table.add_row(
                 f"{result.score:.3f}",
-                result.metadata.get("title", ""),
-                result.metadata.get("author", ""),
+                title,
+                author,
                 date_str,
-                result.text_excerpt[:100] + "..." if len(result.text_excerpt) > 100 else result.text_excerpt
+                excerpt[:100] + "..." if len(excerpt) > 100 else excerpt
             )
         except Exception as e:
             log_debug(f"Error formatting result: {str(e)}")

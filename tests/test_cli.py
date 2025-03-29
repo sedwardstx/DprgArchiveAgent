@@ -55,8 +55,24 @@ def test_search_command(mock_search_response, mock_archive_agent):
     with patch("src.cli.archive_agent", mock_archive_agent):
         result = runner.invoke(app, ["search", "test document"])
         assert result.exit_code == 0
-        assert "results" in result.stdout
-        assert "Total" in result.stdout
+        
+        # Check for table headers
+        assert "Score" in result.stdout
+        assert "Title" in result.stdout
+        assert "Author" in result.stdout
+        assert "Date" in result.stdout
+        assert "Excerpt" in result.stdout
+        
+        # Check for actual data from mock_search_response
+        assert "Test Document 1" in result.stdout  # Check for title
+        assert "test@example.com" in result.stdout  # Check for author
+        assert "0.9" in result.stdout  # Check for score
+        assert "Test document 1" in result.stdout  # Check for excerpt
+        
+        # Check for search parameters
+        assert "Query: test document" in result.stdout
+        assert "Search type: dense" in result.stdout
+        assert "Total: 1" in result.stdout
         assert "elapsed_time" in result.stdout
 
 def test_search_command_with_filters(mock_search_response, mock_archive_agent):
@@ -73,8 +89,22 @@ def test_search_command_with_filters(mock_search_response, mock_archive_agent):
             "--title", "Test Document 1"
         ])
         assert result.exit_code == 0
-        assert "results" in result.stdout
-        assert len(result.stdout.split("\n")) > 10  # Should have multiple results
+        
+        # Check for table headers
+        assert "Score" in result.stdout
+        assert "Title" in result.stdout
+        assert "Author" in result.stdout
+        assert "Date" in result.stdout
+        assert "Excerpt" in result.stdout
+        
+        # Check for actual data from mock_search_response
+        assert "Test Document 1" in result.stdout  # Check for title
+        assert "test@example.com" in result.stdout  # Check for author
+        assert "0.9" in result.stdout  # Check for score
+        assert "Test document 1" in result.stdout  # Check for excerpt
+        
+        # Check for search parameters
+        assert "Query: test document" in result.stdout
 
 def test_search_command_with_search_type(mock_search_response, mock_archive_agent):
     """Test the search command with different search types."""
@@ -86,6 +116,21 @@ def test_search_command_with_search_type(mock_search_response, mock_archive_agen
                 "--type", search_type
             ])
             assert result.exit_code == 0
+            
+            # Check for table headers
+            assert "Score" in result.stdout
+            assert "Title" in result.stdout
+            assert "Author" in result.stdout
+            assert "Date" in result.stdout
+            assert "Excerpt" in result.stdout
+            
+            # Check for actual data from mock_search_response
+            assert "Test Document 1" in result.stdout  # Check for title
+            assert "test@example.com" in result.stdout  # Check for author
+            assert "0.9" in result.stdout  # Check for score
+            assert "Test document 1" in result.stdout  # Check for excerpt
+            
+            # Check for search parameters
             assert f"Search type: {search_type}" in result.stdout
 
 def test_search_command_with_min_score(mock_search_response, mock_archive_agent):
@@ -97,7 +142,21 @@ def test_search_command_with_min_score(mock_search_response, mock_archive_agent)
             "--min-score", "0.8"
         ])
         assert result.exit_code == 0
-        assert "results" in result.stdout
+        
+        # Check for table headers
+        assert "Score" in result.stdout
+        assert "Title" in result.stdout
+        assert "Author" in result.stdout
+        assert "Date" in result.stdout
+        assert "Excerpt" in result.stdout
+        
+        # Check for actual data from mock_search_response
+        assert "Test Document 1" in result.stdout  # Check for title
+        assert "test@example.com" in result.stdout  # Check for author
+        assert "0.9" in result.stdout  # Check for score
+        assert "Test document 1" in result.stdout  # Check for excerpt
+        
+        # Check for search parameters
         assert "min_score: 0.8" in result.stdout
 
 def test_search_command_with_top_k(mock_search_response, mock_archive_agent):
@@ -109,7 +168,21 @@ def test_search_command_with_top_k(mock_search_response, mock_archive_agent):
             "--top-k", "5"
         ])
         assert result.exit_code == 0
-        assert "results" in result.stdout
+        
+        # Check for table headers
+        assert "Score" in result.stdout
+        assert "Title" in result.stdout
+        assert "Author" in result.stdout
+        assert "Date" in result.stdout
+        assert "Excerpt" in result.stdout
+        
+        # Check for actual data from mock_search_response
+        assert "Test Document 1" in result.stdout  # Check for title
+        assert "test@example.com" in result.stdout  # Check for author
+        assert "0.9" in result.stdout  # Check for score
+        assert "Test document 1" in result.stdout  # Check for excerpt
+        
+        # Check for search parameters
         assert "top_k: 5" in result.stdout
 
 def test_search_command_with_no_filter(mock_search_response, mock_archive_agent):
@@ -121,7 +194,21 @@ def test_search_command_with_no_filter(mock_search_response, mock_archive_agent)
             "--no-filter"
         ])
         assert result.exit_code == 0
-        assert "results" in result.stdout
+        
+        # Check for table headers
+        assert "Score" in result.stdout
+        assert "Title" in result.stdout
+        assert "Author" in result.stdout
+        assert "Date" in result.stdout
+        assert "Excerpt" in result.stdout
+        
+        # Check for actual data from mock_search_response
+        assert "Test Document 1" in result.stdout  # Check for title
+        assert "test@example.com" in result.stdout  # Check for author
+        assert "0.9" in result.stdout  # Check for score
+        assert "Test document 1" in result.stdout  # Check for excerpt
+        
+        # Check for search parameters
         assert "No filters applied" in result.stdout
 
 def test_search_command_error_handling():
@@ -469,4 +556,45 @@ def test_export_command_with_invalid_output_path():
         result = runner.invoke(app, ["export", "--query", "test query", "--output", "/invalid/path/to/file.json"])
         
         assert result.exit_code != 0
-        assert "error" in result.stdout.lower() 
+        assert "error" in result.stdout.lower()
+
+@pytest.fixture
+def mock_empty_search_response():
+    """Create a mock search response with no results."""
+    return SearchResponse(
+        results=[],
+        total=0,
+        query="test document",
+        search_type="dense",
+        elapsed_time=0.1
+    )
+
+@pytest.fixture
+def mock_empty_archive_agent(mock_empty_search_response):
+    """Create a mock archive agent that returns no results."""
+    mock = MagicMock()
+    async def mock_search(*args, **kwargs):
+        return mock_empty_search_response
+    mock.search = mock_search
+    return mock
+
+def test_search_command_with_no_results(mock_empty_search_response, mock_empty_archive_agent):
+    """Test the search command when no results are found."""
+    with patch("src.cli.archive_agent", mock_empty_archive_agent):
+        result = runner.invoke(app, ["search", "test document"])
+        assert result.exit_code == 0
+        
+        # Check that "No results found" message is displayed
+        assert "No results found" in result.stdout
+        
+        # Check that table headers are NOT present
+        assert "Title" not in result.stdout
+        assert "Author" not in result.stdout
+        assert "Date" not in result.stdout
+        assert "Excerpt" not in result.stdout
+        
+        # Check that search parameters are still present
+        assert "Query: test document" in result.stdout
+        assert "Search type: dense" in result.stdout
+        assert "Total: 0" in result.stdout
+        assert "elapsed_time" in result.stdout 
