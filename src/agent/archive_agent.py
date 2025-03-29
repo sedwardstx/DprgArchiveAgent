@@ -159,7 +159,7 @@ class ArchiveAgent:
         keywords: Optional[List[str]] = None,
         title: Optional[str] = None,
         top_k: int = 10,
-        min_score: Optional[float] = None,
+        min_score: Optional[float] = 0.0,
     ) -> Union[SearchResponse, SearchError]:
         """
         Search the DPRG archive by metadata only.
@@ -172,7 +172,7 @@ class ArchiveAgent:
             keywords: Filter by keywords
             title: Filter by title (partial match)
             top_k: Number of results to return
-            min_score: Minimum score threshold
+            min_score: Minimum score threshold (defaults to 0.0 for metadata searches)
             
         Returns:
             SearchResponse with results or SearchError if an error occurred

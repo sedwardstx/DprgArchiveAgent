@@ -202,7 +202,7 @@ def search(
     day: Optional[int] = typer.Option(None, "--day", "-d", help="Filter by day"),
     keywords: Optional[str] = typer.Option(None, "--keywords", "-kw", help="Comma-separated list of keywords"),
     title: Optional[str] = typer.Option(None, "--title", help="Filter by title"),
-    min_score: Optional[float] = typer.Option(0.3, "--min-score", "-s", help="Minimum score threshold"),
+    min_score: Optional[float] = typer.Option(0.3, "--min-score", "-s", help="Minimum semantic relevance score (0.0-1.0)"),
     search_type: str = typer.Option("dense", "--type", "-t", help="Search type: dense, sparse, or hybrid"),
     no_filter: bool = typer.Option(False, "--no-filter", help="Disable minimum score filtering"),
 ):
@@ -309,7 +309,7 @@ def search_metadata(
     keywords: Optional[List[str]] = typer.Option(None, "--keyword", "-kw", help="Filter by keyword (can be used multiple times)"),
     title: Optional[str] = typer.Option(None, "--title", "-t", help="Filter by title (partial match)"),
     top_k: int = typer.Option(10, "--top-k", "-k", help="Number of results to return"),
-    min_score: Optional[float] = typer.Option(0.3, "--min-score", "-s", help="Minimum score threshold"),
+    min_score: Optional[float] = typer.Option(0.0, "--min-score", "-s", help="Minimum score threshold (default 0.0 for metadata searches)"),
     no_filter: bool = typer.Option(False, "--no-filter", help="Disable minimum score filtering"),
 ):
     """
