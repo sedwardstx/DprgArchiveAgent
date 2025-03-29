@@ -223,13 +223,27 @@ class ArchiveAgent:
         try:
             # If query is a string, perform search and build context
             if isinstance(query, str):
-                # Search for relevant documents
-                search_results = await self.search(query)
+                # Search for relevant documents with a lower threshold for RAG
+                # Create a search query with a lower threshold specifically for chat
+                search_query = SearchQuery(
+                    query=query,
+                    search_type="hybrid",
+                    min_score=0.5,  # Lower threshold for chat context
+                    top_k=10,       # Retrieve more documents for better context
+                    filters={}       # No additional filters
+                )
+                
+                # Perform the search with the lower threshold
+                search_results = await self.search(search_query)
                 
                 if isinstance(search_results, SearchError):
                     return ChatCompletionError(
                         error=f"Search failed: {search_results.error}"
                     )
+                
+                # Check if any documents were found
+                if not search_results.results:
+                    logger.warning(f"No relevant documents found for query: {query}")
                 
                 # Build system prompt with context
                 system_prompt = self._build_system_prompt(search_results.results)
@@ -271,17 +285,7 @@ class ArchiveAgent:
                     role=chat_response.message.role,
                     content=chat_response.message.content
                 ),
-                referenced_documents=[
-                    ArchiveDocument(
-                        id=doc.id,
-                        text_excerpt=doc.text_excerpt,
-                        metadata=ArchiveMetadata(
-                            author=doc.metadata.get("author"),
-                            title=doc.metadata.get("title"),
-                            keywords=doc.metadata.get("keywords", [])
-                        )
-                    ) for doc in chat_response.referenced_documents
-                ],
+                referenced_documents=search_results.results if isinstance(query, str) else [],
                 elapsed_time=chat_response.elapsed_time
             )
             
@@ -301,9 +305,21 @@ class ArchiveAgent:
         Returns:
             System prompt with context
         """
+        if not documents:
+            # No documents found, provide a general instruction
+            return """You are a helpful assistant for the DPRG (Dallas Personal Robotics Group) archive.
+            
+            I could not find any specific information in the archive that matches your query.
+            If you're asking about a specific topic, I may not have access to that information.
+            
+            However, I can provide general information about DPRG, robotics concepts, or suggest related topics.
+            Please let me know if you'd like to ask about something else."""
+        
         # Format context into a string
         context_str = "\n\n".join([
-            f"Document {i+1}:\n{doc.text_excerpt}"
+            f"Document {i+1}:\nTitle: {doc.metadata.title if hasattr(doc.metadata, 'title') else 'Unknown'}\n" +
+            f"Author: {doc.metadata.author if hasattr(doc.metadata, 'author') else 'Unknown'}\n" +
+            f"Content: {doc.text_excerpt}"
             for i, doc in enumerate(documents)
         ])
         
@@ -313,8 +329,8 @@ class ArchiveAgent:
         
         {context_str}
         
-        If you cannot find relevant information in the context, say so.
-        Keep responses focused on the provided context."""
+        If you cannot find the specific information requested in the context, say so clearly, but try to provide the most relevant information from what's available.
+        Focus on information from the provided documents, and be specific about what document contains which information."""
 
 
 # Create singleton instance
