@@ -7,7 +7,8 @@ from typing import Dict, List, Any, Optional, Union
 
 from ..schema.models import (
     SearchQuery, SearchResponse, SearchError, ArchiveDocument,
-    ChatMessage, ChatCompletionRequest, ChatCompletionResponse, ChatCompletionError
+    ChatMessage, ChatCompletionRequest, ChatCompletionResponse, ChatCompletionError,
+    ChatRequest, Message
 )
 from ..tools.search_tool import SearchTool
 from ..tools.chat_tool import ChatTool
@@ -209,23 +210,26 @@ class ArchiveAgent:
         max_tokens: int = 500
     ) -> Union[ChatCompletionResponse, ChatCompletionError]:
         """
-        Chat with the archive agent.
+        Generate a chat response.
         
         Args:
-            query: Either a string query or a ChatCompletionRequest
-            temperature: Controls randomness in the response
-            max_tokens: Maximum length of the response
+            query: The query string or chat request
+            temperature: Sampling temperature for response generation
+            max_tokens: Maximum tokens to generate
             
         Returns:
-            ChatCompletionResponse with the response or ChatCompletionError if an error occurred
+            The chat response
         """
         try:
-            # Convert string query to ChatCompletionRequest if needed
+            # If query is a string, perform search and build context
             if isinstance(query, str):
-                # First, search for relevant documents
-                search_results = await self.search_tool.search(
-                    SearchQuery(query=query, top_k=5)
-                )
+                # Search for relevant documents
+                search_results = await self.search(query)
+                
+                if isinstance(search_results, SearchError):
+                    return ChatCompletionError(
+                        error=f"Search failed: {search_results.error}"
+                    )
                 
                 # Build system prompt with context
                 system_prompt = self._build_system_prompt(search_results.results)
@@ -242,8 +246,44 @@ class ArchiveAgent:
             else:
                 request = query
             
-            # Generate chat response
-            return await self.chat_tool.chat(request)
+            # Convert ChatCompletionRequest to ChatRequest for ChatTool
+            chat_request = ChatRequest(
+                messages=[Message(role=msg.role, content=msg.content) for msg in request.messages],
+                model=request.model or "gpt-4",
+                max_tokens=request.max_tokens or max_tokens,
+                temperature=request.temperature or temperature,
+                search_top_k=request.search_top_k or 5,
+                use_search_type=request.use_search_type or "dense"
+            )
+            
+            # Generate chat response using the process method
+            chat_response = await self.chat_tool.process(
+                request=chat_request,
+                temperature=chat_request.temperature,
+                max_tokens=chat_request.max_tokens,
+                search_type=chat_request.use_search_type,
+                search_top_k=chat_request.search_top_k
+            )
+            
+            # Convert ChatResponse to ChatCompletionResponse
+            return ChatCompletionResponse(
+                message=ChatMessage(
+                    role=chat_response.message.role,
+                    content=chat_response.message.content
+                ),
+                referenced_documents=[
+                    ArchiveDocument(
+                        id=doc.id,
+                        text_excerpt=doc.text_excerpt,
+                        metadata=ArchiveMetadata(
+                            author=doc.metadata.get("author"),
+                            title=doc.metadata.get("title"),
+                            keywords=doc.metadata.get("keywords", [])
+                        )
+                    ) for doc in chat_response.referenced_documents
+                ],
+                elapsed_time=chat_response.elapsed_time
+            )
             
         except Exception as e:
             logger.error(f"Error during chat: {str(e)}")

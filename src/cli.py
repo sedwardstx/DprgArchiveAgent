@@ -390,6 +390,9 @@ def search_metadata(
 @app.command()
 def chat(
     ctx: typer.Context,
+    query: Optional[str] = typer.Option(
+        None, "--query", "-q", help="Optional query to process directly (non-interactive mode)"
+    ),
     search_type: str = typer.Option(
         "dense", "--type", "-t", 
         help="Search type to use for retrieving context: dense, sparse, or hybrid"
@@ -401,6 +404,10 @@ def chat(
     temperature: float = typer.Option(
         0.7, "--temperature", 
         help="Temperature for response generation"
+    ),
+    max_tokens: int = typer.Option(
+        500, "--max-tokens", "-m",
+        help="Maximum tokens to generate in response"
     ),
 ):
     """
@@ -426,18 +433,11 @@ def chat(
         )
     ]
     
-    # Chat loop
-    while True:
-        # Get user input
-        user_input = Prompt.ask("\n[bold green]You[/bold green]")
-        
-        # Check for exit command
-        if user_input.lower() in ["exit", "quit", "bye", "goodbye"]:
-            console.print("[bold blue]Agent[/bold blue]: Goodbye! Thanks for chatting.")
-            break
-        
+    # One-shot mode if query is provided
+    if query:
         # Add user message to conversation
-        conversation.append(ChatMessage(role="user", content=user_input))
+        conversation.append(ChatMessage(role="user", content=query))
+        console.print(f"\n[bold green]You[/bold green]: {query}")
         
         try:
             # Create chat request
@@ -445,51 +445,95 @@ def chat(
                 messages=conversation,
                 search_top_k=top_k,
                 use_search_type=search_type,
-                temperature=temperature
+                temperature=temperature,
+                max_tokens=max_tokens
             )
             
             # Indicate that we're thinking
             with console.status("[bold blue]Thinking...[/bold blue]", spinner="dots"):
                 # Get response from agent
-                response = asyncio.run(archive_agent.chat(request))
-            
-            # Display referenced documents if any
-            if hasattr(response, "referenced_documents") and response.referenced_documents:
-                docs_table = Table(title="Referenced Documents", box=box.ROUNDED)
-                docs_table.add_column("Title", style="cyan")
-                docs_table.add_column("Author", style="green")
-                docs_table.add_column("Date", style="yellow")
-                
-                for doc in response.referenced_documents[:3]:  # Show top 3 docs
-                    # Format date if available
-                    date_str = ""
-                    if doc.metadata.year:
-                        date_str = f"{doc.metadata.year}"
-                        if doc.metadata.month:
-                            date_str += f"-{doc.metadata.month}"
-                            if doc.metadata.day:
-                                date_str += f"-{doc.metadata.day}"
-                    
-                    docs_table.add_row(
-                        doc.metadata.title or "Untitled",
-                        doc.metadata.author or "Unknown",
-                        date_str or "Unknown"
-                    )
-                
-                console.print(docs_table)
+                response = run_async_safely(archive_agent.chat(request))
             
             # Display agent response
             if hasattr(response, "message"):
                 console.print("\n[bold blue]Agent[/bold blue]:")
                 console.print(Markdown(response.message.content))
-                
-                # Add assistant message to conversation history
-                conversation.append(response.message)
+                return 0  # Success
             else:
                 console.print("[bold red]Error:[/bold red] Failed to get a response")
-        
+                return 1  # Error
         except Exception as e:
             console.print(f"[bold red]Error:[/bold red] {str(e)}")
+            return 1  # Error
+    # Interactive mode
+    else:
+        # Chat loop
+        while True:
+            # Get user input
+            user_input = Prompt.ask("\n[bold green]You[/bold green]")
+            
+            # Check for exit command
+            if user_input.lower() in ["exit", "quit", "bye", "goodbye"]:
+                console.print("[bold blue]Agent[/bold blue]: Goodbye! Thanks for chatting.")
+                break
+            
+            # Add user message to conversation
+            conversation.append(ChatMessage(role="user", content=user_input))
+            
+            try:
+                # Create chat request
+                request = ChatCompletionRequest(
+                    messages=conversation,
+                    search_top_k=top_k,
+                    use_search_type=search_type,
+                    temperature=temperature,
+                    max_tokens=max_tokens
+                )
+                
+                # Indicate that we're thinking
+                with console.status("[bold blue]Thinking...[/bold blue]", spinner="dots"):
+                    # Get response from agent
+                    response = run_async_safely(archive_agent.chat(request))
+                
+                # Display referenced documents if any
+                if hasattr(response, "referenced_documents") and response.referenced_documents:
+                    docs_table = Table(title="Referenced Documents", box=box.ROUNDED)
+                    docs_table.add_column("Title", style="cyan")
+                    docs_table.add_column("Author", style="green")
+                    docs_table.add_column("Date", style="yellow")
+                    
+                    for doc in response.referenced_documents[:3]:  # Show top 3 docs
+                        # Format date if available
+                        date_str = ""
+                        if doc.metadata.year:
+                            date_str = f"{doc.metadata.year}"
+                            if doc.metadata.month:
+                                date_str += f"-{doc.metadata.month}"
+                                if doc.metadata.day:
+                                    date_str += f"-{doc.metadata.day}"
+                        
+                        docs_table.add_row(
+                            doc.metadata.title or "Untitled",
+                            doc.metadata.author or "Unknown",
+                            date_str or "Unknown"
+                        )
+                    
+                    console.print(docs_table)
+                
+                # Display agent response
+                if hasattr(response, "message"):
+                    console.print("\n[bold blue]Agent[/bold blue]:")
+                    console.print(Markdown(response.message.content))
+                    
+                    # Add assistant message to conversation history
+                    conversation.append(response.message)
+                else:
+                    console.print("[bold red]Error:[/bold red] Failed to get a response")
+            
+            except Exception as e:
+                console.print(f"[bold red]Error:[/bold red] {str(e)}")
+        
+        return 0  # Success
 
 
 if __name__ == "__main__":
