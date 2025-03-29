@@ -50,7 +50,7 @@ class ChatTool:
                 for msg in request.messages
             ]
             
-            # Get chat completion using the synchronous client
+            # Get chat completion using the asynchronous client
             response = await get_chat_completion(
                 messages=messages,
                 model=self.settings.CHAT_MODEL,
