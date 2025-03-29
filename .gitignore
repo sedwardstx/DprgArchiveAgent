@@ -39,4 +39,4 @@ crash_debug.log
 pytestdebug.log
 search_tool_coverage.xml
 cli_coverage.xml
-t --cov=src --cov-report=term
+
