@@ -196,7 +196,7 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
 def search(
     query: str = typer.Argument(..., help="Search query text"),
     top_k: int = typer.Option(10, "--top-k", "-k", help="Number of results to return"),
-    author: Optional[str] = typer.Option(None, "--author", "-a", help="Filter by author"),
+    author: Optional[str] = typer.Option(None, "--author", "-a", help="Filter by author (email address preferred)"),
     year: Optional[int] = typer.Option(None, "--year", "-y", help="Filter by year"),
     month: Optional[int] = typer.Option(None, "--month", "-m", help="Filter by month"),
     day: Optional[int] = typer.Option(None, "--day", "-d", help="Filter by day"),
@@ -207,7 +207,19 @@ def search(
     no_filter: bool = typer.Option(False, "--no-filter", help="Disable minimum score filtering"),
 ):
     """
-    Search the DPRG archive.
+    Search the DPRG archive using semantic search.
+    
+    This command performs semantic search on the archive content, finding documents
+    that are conceptually related to your query. Results are ordered by relevance
+    score, with higher scores indicating better matches.
+    
+    The default min_score is 0.3 for semantic searches to filter out less relevant results.
+    If you're not getting enough results, try lowering this value with --min-score.
+    
+    Examples:
+      search "outdoor robot navigation"
+      search "UMBMark calibration" --type hybrid --min-score 0.2
+      search "GPS coordinates" --author "dpa@io.isem.smu.edu" --year 2008
     """
     try:
         # Validate environment
@@ -302,7 +314,7 @@ def search(
 
 @app.command("metadata")
 def search_metadata(
-    author: Optional[str] = typer.Option(None, "--author", "-a", help="Filter by author"),
+    author: Optional[str] = typer.Option(None, "--author", "-a", help="Filter by author (email address preferred)"),
     year: Optional[int] = typer.Option(None, "--year", "-y", help="Filter by year"),
     month: Optional[int] = typer.Option(None, "--month", "-m", help="Filter by month"),
     day: Optional[int] = typer.Option(None, "--day", "-d", help="Filter by day"),
@@ -313,7 +325,16 @@ def search_metadata(
     no_filter: bool = typer.Option(False, "--no-filter", help="Disable minimum score filtering"),
 ):
     """
-    Search the DPRG archive by metadata only.
+    Search the DPRG archive by metadata fields only.
+    
+    This command allows you to find documents based on metadata like author, date, and title,
+    without requiring a text query. Metadata searches use a default min_score of 0.0, meaning
+    all documents matching the metadata criteria will be returned regardless of their semantic 
+    relevance scores.
+    
+    Examples:
+      metadata --author "dpa@io.isem.smu.edu"
+      metadata --year 2008 --title "Outdoor Contest" --top-k 20
     """
     try:
         # Validate environment
@@ -416,7 +437,19 @@ def chat(
 ):
     """
     Start an interactive chat session with the DPRG Archive Agent.
-    The agent will answer questions using information from the archive.
+    
+    The chat feature uses Retrieval-Augmented Generation (RAG) to answer questions
+    based on the DPRG archive content. The system searches for relevant documents
+    that match your query and uses them as context for generating responses.
+    
+    The default min_score is 0.5 for chat context retrieval. If answers seem
+    uninformed or generic, try lowering this value to include more documents
+    as context (e.g., --min-score 0.4).
+    
+    Examples:
+      chat                                            # Start interactive chat
+      chat --query "What is UMBMark?"                 # One-shot query
+      chat --query "Outdoor Contest rules" --min-score 0.4 --top-k 10  # More context
     """
     console = Console()
     

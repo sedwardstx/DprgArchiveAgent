@@ -159,13 +159,18 @@ class ArchiveAgent:
         keywords: Optional[List[str]] = None,
         title: Optional[str] = None,
         top_k: int = 10,
-        min_score: Optional[float] = 0.0,
+        min_score: Optional[float] = 0.0,  # Use a default of 0.0 for metadata searches
     ) -> Union[SearchResponse, SearchError]:
         """
         Search the DPRG archive by metadata only.
         
+        This function allows searching documents based solely on their metadata attributes
+        without requiring a text query. Unlike semantic searches, metadata searches use
+        a default min_score of 0.0 to ensure that all documents matching the metadata
+        criteria are returned, regardless of their semantic relevance scores.
+        
         Args:
-            author: Filter by author
+            author: Filter by author (email address preferred)
             year: Filter by year
             month: Filter by month
             day: Filter by day

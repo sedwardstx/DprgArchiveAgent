@@ -1,41 +1,102 @@
-# DprgArchiveAgent
+# DPRG Archive Agent
 
-An AI agent for searching and querying the DPRG archive data stored in Pinecone vector indexes.
-
-## Overview
-
-DprgArchiveAgent provides a seamless interface to search through DPRG archives using both dense and sparse vector indexes. The system intelligently routes queries to the appropriate index based on the query type and content, providing optimal search results.
+A command-line tool to search and interact with the Dallas Personal Robotics Group (DPRG) archive.
 
 ## Features
 
-- Search DPRG archives with natural language queries
-- Multiple search types:
-  - Dense vector search (semantic similarity)
-  - Sparse vector search (keyword matching)
-  - Hybrid search (combines both approaches)
-- Rich metadata filtering:
-  - Author
-  - Date (year, month, day)
-  - Keywords
-  - Title
-- CLI interface for quick searches
-- REST API for integration with other applications
-- Comprehensive test suite
+- **Semantic Search**: Search the archive using dense vector, sparse vector, or hybrid search methods
+- **Metadata Search**: Find documents by author, date, title, and keywords
+- **Chat Interface**: Interact with the archive using natural language
 
 ## Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/sedwardstx/DprgArchiveAgent.git
+git clone <repository-url>
 cd DprgArchiveAgent
-
-# Create a virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 ```
+
+## Usage
+
+### Search Commands
+
+#### Semantic Search
+
+Search the archive using semantic meaning:
+
+```bash
+# Basic search
+python -m src.cli search "robotics competition"
+
+# Specify search type (dense, sparse, or hybrid)
+python -m src.cli search "UMBMark calibration" --type hybrid
+
+# Adjust result count
+python -m src.cli search "line following robot" --top-k 20
+
+# Filter by metadata
+python -m src.cli search "outdoor navigation" --author "dpa@io.isem.smu.edu" --year 2008
+```
+
+#### Metadata Search
+
+Search by metadata fields only (uses min_score=0.0 by default):
+
+```bash
+# Search by author
+python -m src.cli metadata --author "dpa@io.isem.smu.edu"
+
+# Search by year 
+python -m src.cli metadata --year 2008
+
+# Combined metadata filters
+python -m src.cli metadata --author "dpa@io.isem.smu.edu" --year 2008 --top-k 15
+
+# Search by title (partial match)
+python -m src.cli metadata --title "Outdoor Contest" --top-k 10
+```
+
+### Chat Interface
+
+Chat with the archive to get information based on document content:
+
+```bash
+# Interactive chat mode
+python -m src.cli chat
+
+# One-shot query
+python -m src.cli chat --query "Tell me about the UMBMark calibration technique"
+
+# Adjust search parameters for more results
+python -m src.cli chat --query "What were the Outdoor Contest Final Rules?" --min-score 0.4 --top-k 10
+```
+
+## Search Parameters
+
+- `--type, -t`: Search type (dense, sparse, hybrid)
+- `--top-k, -k`: Number of results to return
+- `--min-score, -s`: Minimum relevance score threshold
+  - For semantic searches: 0.3 by default (higher means more relevant results)
+  - For metadata searches: 0.0 by default (to return all matching documents)
+- `--author, -a`: Filter by author
+- `--year, -y`: Filter by year
+- `--month, -m`: Filter by month
+- `--day, -d`: Filter by day
+- `--title`: Filter by title
+- `--keywords, -kw`: Filter by keywords (comma-separated)
+- `--no-filter`: Disable minimum score filtering
+
+## Chat Parameters
+
+- `--query, -q`: One-shot query (non-interactive mode)
+- `--type, -t`: Search type for retrieving context
+- `--top-k, -k`: Number of documents to retrieve for context
+- `--min-score, -s`: Minimum relevance score threshold (0.5 by default)
+- `--temperature`: Temperature for response generation (0.7 by default)
+- `--max-tokens, -m`: Maximum tokens to generate in response (500 by default)
 
 ## Configuration
 
@@ -62,36 +123,6 @@ PINECONE_NAMESPACE=your_namespace
 MIN_SCORE_THRESHOLD=0.7  # Minimum score for search results
 DENSE_WEIGHT=0.5        # Weight for dense results in hybrid search
 SPARSE_WEIGHT=0.5       # Weight for sparse results in hybrid search
-```
-
-## Usage
-
-### CLI Interface
-
-```bash
-# Basic search
-python -m src.cli search "DPRG robotics competition"
-
-# Search with metadata filters
-python -m src.cli search "progress video" --author "eric@sssi.com" --year 2007
-
-# Specify search type
-python -m src.cli search "robotics" --type dense    # Semantic search
-python -m src.cli search "robotics" --type sparse   # Keyword search
-python -m src.cli search "robotics" --type hybrid   # Combined search
-
-# Get help
-python -m src.cli --help
-```
-
-### API Server
-
-```bash
-# Start the API server
-python -m src.api
-
-# The server will be available at http://localhost:8000
-# API documentation at http://localhost:8000/docs
 ```
 
 ## API Examples
