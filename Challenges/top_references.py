@@ -15,10 +15,25 @@ from collections import defaultdict
 TEST_MODE = True
 TARGET_YEARS = [2006, 2007] if TEST_MODE else list(range(1997, 2016))
 
-def run_search(query, search_type="hybrid", top_k=20, min_score=0.1):
-    """Run a search using the CLI tool and return the results."""
+def run_search(query, search_type="hybrid", top_k=20, min_score=0.1, year=None, month=None):
+    """Run a search using the CLI tool and return the results.
+    
+    Args:
+        query (str): The search query text
+        search_type (str): Type of search (dense, sparse, or hybrid)
+        top_k (int): Number of results to return
+        min_score (float): Minimum similarity score threshold
+        year (int): Optional year to filter results
+        month (int): Optional month to filter results (1-12)
+    """
     cmd = ["python", "-m", "src.cli", "search", query, 
            "--type", search_type, "--top-k", str(top_k), "--min-score", str(min_score)]
+    
+    # Add metadata filters if provided
+    if year is not None:
+        cmd.extend(["--year", str(year)])
+    if month is not None:
+        cmd.extend(["--month", str(month)])
     
     print(f"Running: {' '.join(cmd)}")
     result = subprocess.run(cmd, capture_output=True, text=True)
@@ -161,91 +176,87 @@ def get_election_references_for_year(year):
     
     # Create election-specific queries covering the full election period
     election_queries = [
-        # General election queries for the period (Dec-Feb)
-        f"DPRG officer election {year-1} December",
-        f"DPRG officer election {year} January",
-        f"DPRG officer election {year} February",
-        f"DPRG officers elected {year-1} December",
-        f"DPRG officers elected {year} January",
-        f"DPRG officers elected {year} February",
-        f"DPRG voting results {year-1} December",
-        f"DPRG voting results {year} January",
-        f"DPRG voting results {year} February",
+        # General election queries
+        "DPRG officer election",
+        "DPRG officers elected",
+        "DPRG voting results",
         
-        # Annual meeting queries (Dec-Feb)
-        f"DPRG annual meeting {year-1} December",
-        f"DPRG annual meeting {year} January",
-        f"DPRG annual meeting {year} February",
+        # Annual meeting queries
+        "DPRG annual meeting",
         
-        # Officer position queries (year-specific)
-        f"{year} DPRG president election",
-        f"{year} DPRG vice president election",
-        f"{year} DPRG secretary election",
-        f"{year} DPRG treasurer election",
+        # Officer position queries
+        "DPRG president election",
+        "DPRG vice president election",
+        "DPRG secretary election",
+        "DPRG treasurer election",
         
         # Proxy voting and nominations
-        f"{year} DPRG proxy vote",
-        f"{year} DPRG nominations",
-        f"{year} DPRG officer nominations",
+        "DPRG proxy vote",
+        "DPRG nominations",
+        "DPRG officer nominations",
         
         # Election announcements and results
-        f"{year} DPRG election announcement",
-        f"{year} DPRG election results",
-        f"{year} DPRG officer announcement",
+        "DPRG election announcement",
+        "DPRG election results",
+        "DPRG officer announcement",
     ]
     
     all_results = []
     
+    # Search for each query in each relevant month
     for query in election_queries:
-        print(f"  Query: {query}")
-        search_output = run_search(query, min_score=0.1)
+        # Search December of previous year
+        print(f"  Query: {query} (December {year-1})")
+        search_output = run_search(query, min_score=0.1, year=year-1, month=12)
         rows = extract_table_rows(search_output)
+        all_results.extend(rows)
         
-        for row in rows:
-            # Extract year and month from the date field for precise filtering
-            date_parts = row["date"].split("-")
-            if len(date_parts) >= 2:
-                row_year = int(date_parts[0])
-                row_month = int(date_parts[1])
-                
-                # Filter results to only include the election period (Dec-Feb)
-                # December results must be from previous year
-                # January/February results must be from target year
-                if row_month in [12, 1, 2]:
-                    if (row_month == 12 and row_year == year - 1) or (row_month in [1, 2] and row_year == year):
-                        # Calculate relevance boost based on content
-                        full_text = (row["title"] + " " + row["excerpt"]).lower()
-                        relevance_boost = 0
-                        
-                        # Boost score based on presence of key election terms
-                        election_terms = [
-                            "president", "vice president", "secretary", "treasurer",
-                            "elected", "election results", "officer", "voting results",
-                            "proxy vote", "nominate", "annual meeting", "executive committee"
-                        ]
-                        
-                        for term in election_terms:
-                            if term in full_text:
-                                relevance_boost += 0.05
-                        
-                        # Extra boost for specific officer position mentions with names
-                        specific_officer_patterns = [
-                            r"president:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
-                            r"vice president:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
-                            r"secretary:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
-                            r"treasurer:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)"
-                        ]
-                        
-                        for pattern in specific_officer_patterns:
-                            if re.search(pattern, full_text, re.IGNORECASE):
-                                relevance_boost += 0.1
-                        
-                        # Apply the relevance boost
-                        row["score"] += relevance_boost
-                        all_results.append(row)
-                        
+        # Search January of target year
+        print(f"  Query: {query} (January {year})")
+        search_output = run_search(query, min_score=0.1, year=year, month=1)
+        rows = extract_table_rows(search_output)
+        all_results.extend(rows)
+        
+        # Search February of target year
+        print(f"  Query: {query} (February {year})")
+        search_output = run_search(query, min_score=0.1, year=year, month=2)
+        rows = extract_table_rows(search_output)
+        all_results.extend(rows)
+        
         # Rate limiting to avoid overwhelming the server
         time.sleep(0.5)
+    
+    # Calculate relevance boost for each result
+    for row in all_results:
+        # Calculate relevance boost based on content
+        full_text = (row["title"] + " " + row["excerpt"]).lower()
+        relevance_boost = 0
+        
+        # Boost score based on presence of key election terms
+        election_terms = [
+            "president", "vice president", "secretary", "treasurer",
+            "elected", "election results", "officer", "voting results",
+            "proxy vote", "nominate", "annual meeting", "executive committee"
+        ]
+        
+        for term in election_terms:
+            if term in full_text:
+                relevance_boost += 0.05
+        
+        # Extra boost for specific officer position mentions with names
+        specific_officer_patterns = [
+            r"president:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
+            r"vice president:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
+            r"secretary:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
+            r"treasurer:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)"
+        ]
+        
+        for pattern in specific_officer_patterns:
+            if re.search(pattern, full_text, re.IGNORECASE):
+                relevance_boost += 0.1
+        
+        # Apply the relevance boost
+        row["score"] += relevance_boost
     
     # Remove duplicates while keeping the highest scoring version of each unique post
     unique_results = {}
