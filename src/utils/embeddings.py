@@ -100,9 +100,8 @@ async def generate_sparse_vector(text: str) -> Tuple[List[int], List[float]]:
     # Step 2: Count term frequencies
     term_freq = Counter(tokens)
     
-    # Step 3: Generate consistent indices and values
-    indices = []
-    values = []
+    # Step 3: Generate consistent indices and values, handling duplicates
+    index_to_value = {}
     
     for token, count in term_freq.items():
         # Use a consistent hashing approach
@@ -119,8 +118,16 @@ async def generate_sparse_vector(text: str) -> Tuple[List[int], List[float]]:
         # Calculate value using term frequency
         value = 1.0 + math.log(count)
         
-        indices.append(index)
-        values.append(value)
+        # If we already have this index, add the values together
+        if index in index_to_value:
+            index_to_value[index] += value
+        else:
+            index_to_value[index] = value
+    
+    # Convert dictionary to sorted lists of indices and values
+    sorted_items = sorted(index_to_value.items())
+    indices = [item[0] for item in sorted_items]
+    values = [item[1] for item in sorted_items]
     
     return indices, values
 

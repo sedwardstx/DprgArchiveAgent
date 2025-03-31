@@ -410,46 +410,28 @@ def search_metadata(
 # Add a chat command
 @app.command()
 def chat(
-    ctx: typer.Context,
-    query: Optional[str] = typer.Option(
-        None, "--query", "-q", help="Optional query to process directly (non-interactive mode)"
-    ),
-    search_type: str = typer.Option(
-        "dense", "--type", "-t", 
-        help="Search type to use for retrieving context: dense, sparse, or hybrid"
-    ),
-    top_k: int = typer.Option(
-        5, "--top-k", "-k", 
-        help="Number of documents to retrieve for context"
-    ),
-    temperature: float = typer.Option(
-        0.7, "--temperature", 
-        help="Temperature for response generation"
-    ),
-    max_tokens: int = typer.Option(
-        500, "--max-tokens", "-m",
-        help="Maximum tokens to generate in response"
-    ),
-    min_score: float = typer.Option(
-        0.5, "--min-score", "-s",
-        help="Minimum relevance score for retrieved documents (0.0-1.0)"
-    ),
+    query: Optional[str] = typer.Option(None, help="One-shot query instead of interactive chat"),
+    top_k: int = typer.Option(5, help="Number of results to retrieve for context"),
+    search_type: str = typer.Option("hybrid", help="Search type: dense, sparse, or hybrid"),
+    temperature: float = typer.Option(0.7, help="Temperature for chat completion"),
+    max_tokens: int = typer.Option(500, help="Maximum tokens for chat completion"),
+    min_score: float = typer.Option(0.3, help="Minimum score threshold for relevant documents")
 ):
     """
-    Start an interactive chat session with the DPRG Archive Agent.
+    Chat with the DPRG Archive Agent using Retrieval-Augmented Generation (RAG).
     
-    The chat feature uses Retrieval-Augmented Generation (RAG) to answer questions
-    based on the DPRG archive content. The system searches for relevant documents
-    that match your query and uses them as context for generating responses.
+    This command starts an interactive chat session or processes a one-shot query.
+    The system searches for relevant documents that match your query and uses them
+    as context to generate informative responses about the DPRG archive.
     
-    The default min_score is 0.5 for chat context retrieval. If answers seem
-    uninformed or generic, try lowering this value to include more documents
-    as context (e.g., --min-score 0.4).
+    By default, only documents with a relevance score above 0.3 are used for context.
+    If responses seem too generic, try lowering this threshold with --min-score 0.2
+    to include more documents as context.
     
     Examples:
-      chat                                            # Start interactive chat
-      chat --query "What is UMBMark?"                 # One-shot query
-      chat --query "Outdoor Contest rules" --min-score 0.4 --top-k 10  # More context
+        chat                                            # Start interactive chat
+        chat --query "What is UMBMark?"                 # One-shot query
+        chat --query "Outdoor Contest rules" --min-score 0.4 --top-k 10  # More context
     """
     console = Console()
     

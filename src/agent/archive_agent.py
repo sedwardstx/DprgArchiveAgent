@@ -233,7 +233,7 @@ class ArchiveAgent:
                 search_query = SearchQuery(
                     query=query,
                     search_type="hybrid",
-                    min_score=0.5,  # Lower threshold for chat context
+                    min_score=0.3,  # Lower threshold for chat context
                     top_k=10,       # Retrieve more documents for better context
                     filters={}       # No additional filters
                 )
@@ -274,8 +274,8 @@ class ArchiveAgent:
                         break
                 
                 if user_query:
-                    # Use min_score from the request or default to 0.5
-                    min_score_value = request.min_score if hasattr(request, 'min_score') and request.min_score is not None else 0.5
+                    # Use min_score from the request or default to 0.3
+                    min_score_value = request.min_score if hasattr(request, 'min_score') and request.min_score is not None else 0.3
                     
                     # Create a search query with the request parameters
                     search_query = SearchQuery(
