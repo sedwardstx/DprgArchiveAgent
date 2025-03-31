@@ -545,18 +545,20 @@ Add the chat interface to any page or post using the shortcode:
 ## Security Considerations
 
 1. Always use HTTPS for API communications
-2. Implement rate limiting on the API endpoints
-3. Validate and sanitize all user input
-4. Use nonces for form submissions
-5. Implement proper error handling and logging
+2. Implement rate limiting on the API endpoints (see [Rate Limiting Implementation](security_and_performance_examples.md#1-rate-limiting-implementation))
+3. Validate and sanitize all user input (see [Input Validation and Sanitization](security_and_performance_examples.md#2-input-validation-and-sanitization))
+4. Use nonces for form submissions (see [Nonce Implementation](security_and_performance_examples.md#3-nonce-implementation))
+5. Implement proper error handling and logging (see [Error Handling and Logging](security_and_performance_examples.md#4-error-handling-and-logging))
+6. Configure security headers (see [Additional Security Headers](security_and_performance_examples.md#additional-security-headers))
 
 ## Performance Optimization
 
-1. Cache API responses when appropriate
-2. Implement lazy loading for search results
+1. Cache API responses when appropriate (see [Response Caching](security_and_performance_examples.md#1-response-caching))
+2. Implement lazy loading for search results (see [Lazy Loading Implementation](security_and_performance_examples.md#2-lazy-loading-implementation))
 3. Use pagination for large result sets
-4. Optimize database queries
-5. Minify and combine CSS/JS files
+4. Optimize database queries (see [Database Query Optimization](security_and_performance_examples.md#4-database-query-optimization))
+5. Minify and combine CSS/JS files (see [Asset Optimization](security_and_performance_examples.md#3-asset-optimization))
+6. Monitor performance metrics (see [Performance Monitoring](security_and_performance_examples.md#performance-monitoring))
 
 ## Maintenance
 
