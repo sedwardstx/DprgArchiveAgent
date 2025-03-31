@@ -170,7 +170,7 @@ def get_election_references_for_year(year):
         year (int): The target year to search for election references
         
     Returns:
-        list: Top 5 most relevant election references, sorted by score
+        list: Top 10 most relevant election references, sorted by score
     """
     print(f"\nSearching for officer election references in {year}...")
     
@@ -263,10 +263,10 @@ def get_election_references_for_year(year):
         if key not in unique_results or row['score'] > unique_results[key]['score']:
             unique_results[key] = row
     
-    # Sort by score and take top 5
+    # Sort by score and take top 10
     filtered_results = list(unique_results.values())
     filtered_results.sort(key=lambda x: x["score"], reverse=True)
-    return filtered_results[:5]
+    return filtered_results[:10]
 
 def main():
     """Main function."""
@@ -286,11 +286,11 @@ def main():
         # Save after each year in case of interruption
         save_year_references(year, top_references)
     
-    # Save top 5 references by year to CSV
+    # Save top 10 references by year to CSV
     save_all_references(top_references_by_year)
     
     # Print summary to console
-    print("\nTop 5 Officer Election References by Year:")
+    print("\nTop 10 Officer Election References by Year:")
     for year in sorted(top_references_by_year.keys()):
         references = top_references_by_year.get(year, [])
         if references:
