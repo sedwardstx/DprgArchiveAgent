@@ -125,7 +125,7 @@ def extract_table_rows(output_text):
                     "excerpt": excerpt
                 }
                 rows.append(row)
-                print(f"  Extracted: {title[:50]}... by {author} ({date})")
+                print(f"  Extracted: {title} by {author} ({date})")
             except Exception as e:
                 print(f"  Error parsing row: {str(e)}")
     
@@ -174,31 +174,28 @@ def get_election_references_for_year(year):
     """
     print(f"\nSearching for officer election references in {year}...")
     
-    # Create election-specific queries covering the full election period
+    # Simplified queries focusing on officer positions
     election_queries = [
-        # General election queries
-        "DPRG officer election",
-        "DPRG officers elected",
-        "DPRG voting results",
+        # Core officer position queries
+        "DPRG President",
+        "DPRG Vice President",
+        "DPRG Secretary",
+        "DPRG Treasurer",
+        "DPRG Librarian",
         
-        # Annual meeting queries
-        "DPRG annual meeting",
+        # Election-specific variations
+        "DPRG President election",
+        "DPRG Vice President election",
+        "DPRG Secretary election",
+        "DPRG Treasurer election",
+        "DPRG Librarian election",
         
-        # Officer position queries
-        "DPRG president election",
-        "DPRG vice president election",
-        "DPRG secretary election",
-        "DPRG treasurer election",
-        
-        # Proxy voting and nominations
-        "DPRG proxy vote",
-        "DPRG nominations",
-        "DPRG officer nominations",
-        
-        # Election announcements and results
-        "DPRG election announcement",
-        "DPRG election results",
-        "DPRG officer announcement",
+        # Results variations
+        "DPRG President elected",
+        "DPRG Vice President elected",
+        "DPRG Secretary elected",
+        "DPRG Treasurer elected",
+        "DPRG Librarian elected"
     ]
     
     all_results = []
@@ -234,7 +231,7 @@ def get_election_references_for_year(year):
         
         # Boost score based on presence of key election terms
         election_terms = [
-            "president", "vice president", "secretary", "treasurer",
+            "president", "vice president", "secretary", "treasurer", "librarian",
             "elected", "election results", "officer", "voting results",
             "proxy vote", "nominate", "annual meeting", "executive committee"
         ]
@@ -248,7 +245,8 @@ def get_election_references_for_year(year):
             r"president:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
             r"vice president:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
             r"secretary:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
-            r"treasurer:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)"
+            r"treasurer:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
+            r"librarian:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)"
         ]
         
         for pattern in specific_officer_patterns:
