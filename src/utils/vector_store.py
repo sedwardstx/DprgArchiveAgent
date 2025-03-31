@@ -5,7 +5,7 @@ import logging
 from typing import Dict, List, Any, Optional, Tuple, Union
 from abc import ABC, abstractmethod
 
-from pinecone import Pinecone, ServerlessSpec
+from pinecone import Pinecone
 from ..config import (
     PINECONE_API_KEY,
     PINECONE_ENVIRONMENT,

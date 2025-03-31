@@ -38,10 +38,11 @@ class Settings(BaseSettings):
     DENSE_WEIGHT: float = float(os.getenv("DENSE_WEIGHT", "0.7"))
     SPARSE_WEIGHT: float = float(os.getenv("SPARSE_WEIGHT", "0.3"))
     
-    class Config:
-        """Pydantic config."""
-        env_file = ".env"
-        case_sensitive = True
+    model_config = {
+        "env_file": ".env",
+        "case_sensitive": True,
+        "extra": "ignore"  # Allow extra fields for testing
+    }
 
 _settings: Optional[Settings] = None
 

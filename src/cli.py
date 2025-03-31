@@ -134,10 +134,6 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
     """
     Display search results in a formatted table.
     """
-    if not results.results:
-        console.print("No results found.")
-        return
-
     # Print search parameters
     console.print(f"\nQuery: {query}")
     console.print(f"Search type: {search_type}")
@@ -148,6 +144,10 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
         console.print(f"min_score: {min_score}")
     if top_k is not None:
         console.print(f"top_k: {top_k}")
+
+    if not results.results:
+        console.print("No results found.")
+        return
 
     # Create table for results
     table = Table(show_header=True, header_style="bold")
@@ -472,6 +472,11 @@ def chat(
     
     # One-shot mode if query is provided
     if query:
+        # Make sure the query is not empty
+        if query.strip() == "":
+            console.print("[bold red]Error:[/bold red] Query cannot be empty")
+            return 1  # Error
+            
         # Add user message to conversation
         conversation.append(ChatMessage(role="user", content=query))
         console.print(f"\n[bold green]You[/bold green]: {query}")
