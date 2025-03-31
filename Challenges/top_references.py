@@ -164,39 +164,43 @@ def get_election_references_for_year(year):
             # Extract year from the date field
             row_year = extract_year_from_date(row["date"])
             
-            # Only include results from election periods (Dec-Feb)
+            # Only include results from election periods (Dec-Feb) AND the correct year
             if is_election_period_date(row["date"]):
-                # Calculate relevance boost based on content
-                full_text = (row["title"] + " " + row["excerpt"]).lower()
-                relevance_boost = 0
-                
-                # Boost score based on presence of key terms
-                election_terms = [
-                    "president", "vice president", "secretary", "treasurer",
-                    "elected", "election results", "officer", "voting results",
-                    "proxy vote", "nominate", "annual meeting", "executive committee"
-                ]
-                
-                for term in election_terms:
-                    if term in full_text:
-                        relevance_boost += 0.05
-                
-                # Extra boost for specific officer position mentions
-                specific_officer_patterns = [
-                    r"president:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
-                    r"vice president:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
-                    r"secretary:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
-                    r"treasurer:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)"
-                ]
-                
-                for pattern in specific_officer_patterns:
-                    if re.search(pattern, full_text, re.IGNORECASE):
-                        relevance_boost += 0.1
-                
-                # Apply the relevance boost
-                row["score"] += relevance_boost
-                all_results.append(row)
-                
+                # For December results, they should be from the previous year
+                # For January/February results, they should be from the target year
+                month = int(row["date"].split("-")[1])
+                if (month == 12 and row_year == year - 1) or (month in [1, 2] and row_year == year):
+                    # Calculate relevance boost based on content
+                    full_text = (row["title"] + " " + row["excerpt"]).lower()
+                    relevance_boost = 0
+                    
+                    # Boost score based on presence of key terms
+                    election_terms = [
+                        "president", "vice president", "secretary", "treasurer",
+                        "elected", "election results", "officer", "voting results",
+                        "proxy vote", "nominate", "annual meeting", "executive committee"
+                    ]
+                    
+                    for term in election_terms:
+                        if term in full_text:
+                            relevance_boost += 0.05
+                    
+                    # Extra boost for specific officer position mentions
+                    specific_officer_patterns = [
+                        r"president:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
+                        r"vice president:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
+                        r"secretary:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
+                        r"treasurer:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)"
+                    ]
+                    
+                    for pattern in specific_officer_patterns:
+                        if re.search(pattern, full_text, re.IGNORECASE):
+                            relevance_boost += 0.1
+                    
+                    # Apply the relevance boost
+                    row["score"] += relevance_boost
+                    all_results.append(row)
+                    
         # Avoid hammering the server
         time.sleep(0.5)
     
