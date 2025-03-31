@@ -174,28 +174,28 @@ def get_election_references_for_year(year):
     """
     print(f"\nSearching for officer election references in {year}...")
     
-    # Simplified queries focusing on officer positions
+    # Simplified queries focusing on officer positions (without redundant DPRG prefix)
     election_queries = [
         # Core officer position queries
-        "DPRG President",
-        "DPRG Vice President",
-        "DPRG Secretary",
-        "DPRG Treasurer",
-        "DPRG Librarian",
+        "President",
+        "Vice President",
+        "Secretary",
+        "Treasurer",
+        "Librarian",
         
         # Election-specific variations
-        "DPRG President election",
-        "DPRG Vice President election",
-        "DPRG Secretary election",
-        "DPRG Treasurer election",
-        "DPRG Librarian election",
+        "President election",
+        "Vice President election",
+        "Secretary election",
+        "Treasurer election",
+        "Librarian election",
         
         # Results variations
-        "DPRG President elected",
-        "DPRG Vice President elected",
-        "DPRG Secretary elected",
-        "DPRG Treasurer elected",
-        "DPRG Librarian elected"
+        "President elected",
+        "Vice President elected",
+        "Secretary elected",
+        "Treasurer elected",
+        "Librarian elected"
     ]
     
     all_results = []
