@@ -268,6 +268,82 @@ def get_election_references_for_year(year):
     filtered_results.sort(key=lambda x: x["score"], reverse=True)
     return filtered_results[:10]
 
+def analyze_officer_positions(top_references_by_year):
+    """Analyze election results to determine officer positions by year.
+    
+    This function examines the top references for each year and attempts to determine
+    who held each officer position based on election results and announcements.
+    
+    Args:
+        top_references_by_year (dict): Dictionary of top references by year
+    """
+    # Officer positions to track
+    positions = ["President", "Vice President", "Secretary", "Treasurer", "Librarian"]
+    
+    # Create a summary file
+    with open("output/officer_positions_by_year.md", "w") as f:
+        f.write("# DPRG Officer Positions by Year\n\n")
+        
+        for year in sorted(top_references_by_year.keys()):
+            f.write(f"## {year}\n\n")
+            f.write("| Position | Name | Source | Date |\n")
+            f.write("|----------|------|---------|------|\n")
+            
+            # Get all references for this year
+            references = top_references_by_year.get(year, [])
+            
+            # Track found positions to avoid duplicates
+            found_positions = set()
+            
+            # First pass: Look for explicit election results
+            for ref in references:
+                full_text = (ref["title"] + " " + ref["excerpt"]).lower()
+                
+                # Look for patterns like "President: John Smith" or "John Smith elected President"
+                for position in positions:
+                    if position.lower() in full_text:
+                        # Try to find the name after the position
+                        name_patterns = [
+                            rf"{position.lower()}:?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)",
+                            rf"([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)\s+elected\s+{position.lower()}"
+                        ]
+                        
+                        for pattern in name_patterns:
+                            match = re.search(pattern, full_text, re.IGNORECASE)
+                            if match and position not in found_positions:
+                                name = match.group(1).strip()
+                                f.write(f"| {position} | {name} | {ref['title']} | {ref['date']} |\n")
+                                found_positions.add(position)
+                                break
+            
+            # Second pass: Look for announcements or mentions if we still have missing positions
+            for ref in references:
+                full_text = (ref["title"] + " " + ref["excerpt"]).lower()
+                
+                for position in positions:
+                    if position not in found_positions and position.lower() in full_text:
+                        # Try to find any name near the position mention
+                        name_pattern = r"([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)"
+                        matches = re.finditer(name_pattern, full_text)
+                        
+                        # Look for names that appear near the position mention
+                        for match in matches:
+                            name = match.group(1).strip()
+                            # Skip common words or partial names
+                            if len(name.split()) > 1 and not any(word in name.lower() for word in ["president", "vice", "secretary", "treasurer", "librarian"]):
+                                f.write(f"| {position} | {name} | {ref['title']} | {ref['date']} |\n")
+                                found_positions.add(position)
+                                break
+            
+            # Mark any unfound positions
+            for position in positions:
+                if position not in found_positions:
+                    f.write(f"| {position} | Unknown | - | - |\n")
+            
+            f.write("\n")
+    
+    print("\nOfficer positions summary saved to output/officer_positions_by_year.md")
+
 def main():
     """Main function."""
     print("Starting DPRG Officer Election References Search...")
@@ -289,6 +365,9 @@ def main():
     # Save top 10 references by year to CSV
     save_all_references(top_references_by_year)
     
+    # Analyze and save officer positions
+    analyze_officer_positions(top_references_by_year)
+    
     # Print summary to console
     print("\nTop 10 Officer Election References by Year:")
     for year in sorted(top_references_by_year.keys()):
@@ -301,6 +380,7 @@ def main():
             print(f"\n{year}: No election references found")
             
     print("\nResults saved to output/top_references_by_year.csv")
+    print("Officer positions summary saved to output/officer_positions_by_year.md")
 
 def save_year_references(year, references):
     """Save references for a specific year."""
