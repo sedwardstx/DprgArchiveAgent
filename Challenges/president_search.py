@@ -13,363 +13,278 @@ import time
 # Debug flag - set to True to see detailed output
 DEBUG = True
 
-# Define search queries to find information about presidents
-SEARCH_QUERIES = [
-    "election results",
-    "DPRG election",
-    "officer election results",
-    "Results of elections",
-    "president elected",
-    "executive council",
-    "executive officers", 
-    "new officers",
-    "annual meeting officers",
-    "DPRG Elections",
-    "voting procedure officers",
-]
+# Target years for our search (as requested by user)
+TARGET_YEARS = list(range(1997, 2016))  # 1997-2015
 
-# Terms that indicate a person might be a president
-PRESIDENT_INDICATORS = [
-    # Formal title matches
-    r"president:?\s+([A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+)",
-    r"president\s*[-:=]\s*([A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+)",
-    r"President[-:]?\s*([A-Z][a-zA-Z\.-]+)",  # Single name mentions
-    
-    # Contextual mentions
-    r"([A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+)\s+(?:is|as|was|became|elected)\s+(?:the\s+)?president",
-    r"([A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+),?\s+president",
-    r"new president[,\s]+([A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+)",
-    r"president[,\s]+([A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+)",
-    r"for president(?:\s*[-:])?\s*([A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+)",
-    
-    # Specific email formats
-    r"president.*?([A-Z][a-zA-Z\.-]+@[a-zA-Z0-9\.-]+\.[a-zA-Z]{2,})\s+\(([A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+)\)",
-    
-    # Name with title
-    r"([A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+)\s*[-–—]\s*President",
-]
-
-# Extract specific patterns for elections results
-ELECTION_RESULTS_INDICATORS = [
-    r"(?:DPRG|2\d{3}|new|election)\s+(?:officer|election)s?(?:\s+results)?:.*?president:?\s+([A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+)",
-    r"president\s*[-:=]\s*([A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+)",
-    r"president\s*[-:=]\s*([A-Z][a-zA-Z\.-]+)",  # Single name
-]
-
-def run_search(query, search_type="hybrid", top_k=150, min_score=0.2):
+def run_search(query, search_type="hybrid", top_k=150, min_score=0.1):
     """Run a search using the CLI tool and return the results."""
     cmd = ["python", "-m", "src.cli", "search", query, 
            "--type", search_type, "--top-k", str(top_k), "--min-score", str(min_score)]
     
     print(f"Running: {' '.join(cmd)}")
     result = subprocess.run(cmd, capture_output=True, text=True)
-    if DEBUG:
-        print(f"Command exit code: {result.returncode}")
     return result.stdout
 
-def extract_presidents(text, year=None):
-    """Extract president mentions from text."""
-    found_presidents = []
+def extract_table_rows(text):
+    """Extract table rows from the CLI output."""
+    # First, check if we have any results
+    if "No results found" in text:
+        return []
     
-    # Debug
-    if DEBUG:
-        print(f"Searching for presidents in text: {text[:100]}...")
+    # Find the part of the output containing the result table
+    table_section = re.search(r"Score.*?Title.*?Author.*?Date.*?Excerpt.*?Found \d+ results", text, re.DOTALL)
+    if not table_section:
+        if DEBUG:
+            print("Could not find table section in search results")
+        return []
     
-    # Try election results indicators first (more specific)
-    for pattern in ELECTION_RESULTS_INDICATORS:
-        matches = re.finditer(pattern, text, re.IGNORECASE | re.DOTALL)
-        for match in matches:
-            try:
-                president_name = match.group(1)
-                # Handle single name
-                if re.match(r"^[A-Z][a-zA-Z\.-]+$", president_name):
-                    # This is just a single name, might want to collect these separately
-                    if DEBUG:
-                        print(f"Found single name president: {president_name}")
-                    continue
-                
-                # Basic name verification (handle more formats)
-                if re.match(r"^[A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+$", president_name):
-                    found_presidents.append((president_name, year))
-                    if DEBUG:
-                        print(f"Found president from election pattern: {president_name} ({year})")
-            except Exception as e:
+    table_text = table_section.group(0)
+    
+    # Extract rows using line patterns
+    # Look for lines with the row format pattern in the CLI output
+    rows = []
+    
+    # Use regex to extract each row by looking for patterns of data between separators
+    row_pattern = r'│\s*([\d\.]+)\s*│\s*(.*?)\s*│\s*(.*?)\s*│\s*(.*?)\s*│\s*(.*?)\s*│'
+    matches = re.finditer(row_pattern, table_text, re.DOTALL)
+    
+    for match in matches:
+        # Skip header rows
+        if "Score" in match.group(1) and "Title" in match.group(2):
+            continue
+            
+        try:
+            score = match.group(1).strip()
+            title = match.group(2).strip()
+            author = match.group(3).strip()
+            date = match.group(4).strip()
+            excerpt = match.group(5).strip()
+            
+            # Only include rows with meaningful content
+            if score and title and not title.startswith("---"):
+                row = {
+                    "score": float(score),
+                    "title": title,
+                    "author": author,
+                    "date": date,
+                    "excerpt": excerpt
+                }
+                rows.append(row)
                 if DEBUG:
-                    print(f"Error extracting president: {str(e)}")
+                    print(f"Extracted row: {title} by {author} ({date})")
+        except Exception as e:
+            if DEBUG:
+                print(f"Error parsing row: {str(e)}")
     
-    # Then try the more general president indicators
-    for pattern in PRESIDENT_INDICATORS:
-        matches = re.finditer(pattern, text, re.IGNORECASE | re.DOTALL)
-        for match in matches:
-            try:
-                # Some patterns have multiple capture groups for different formats
-                if len(match.groups()) > 1 and match.group(2):
-                    president_name = match.group(2)  # Email format with name
-                else:
-                    president_name = match.group(1)
-                    
-                # Skip if it's just an email address
-                if "@" in president_name:
-                    continue
-                    
-                # Handle single name
-                if re.match(r"^[A-Z][a-zA-Z\.-]+$", president_name):
-                    # This is just a single name, might want to collect these separately
-                    if DEBUG:
-                        print(f"Found single name president: {president_name}")
-                    continue
-                    
-                # Basic name verification (handle more formats)
-                if re.match(r"^[A-Z][a-zA-Z\.-]+\s+[A-Z][a-zA-Z\.-]+$", president_name):
-                    found_presidents.append((president_name, year))
-                    if DEBUG:
-                        print(f"Found president from general pattern: {president_name} ({year})")
-            except Exception as e:
-                if DEBUG:
-                    print(f"Error extracting president: {str(e)}")
-    
-    return found_presidents
+    return rows
 
-def extract_year_from_metadata(text):
-    """Extract year from metadata in search results."""
-    # Try to find Date field in the format YYYY-MM-DD or just YYYY
-    year_match = re.search(r"Date:\s+(\d{4})(?:-\d{2}-\d{2})?", text)
-    if year_match:
-        return int(year_match.group(1))
-    
-    # Try alternative format with just the year
-    year_match = re.search(r"Date:\s+(\d{4})", text)
-    if year_match:
-        return int(year_match.group(1))
+def extract_year_from_date(date_str):
+    """Extract year from a date string."""
+    if not date_str:
+        return None
         
-    # Try to find year in email subjects or headers
-    year_match = re.search(r"(?:Subject|From).*?(?:election|results|officers).*?(?:for|in)\s+(\d{4})", text)
+    # Try to extract YYYY from YYYY-MM-DD format
+    year_match = re.search(r'(\d{4})(?:-\d{2}-\d{2})?', date_str)
     if year_match:
         return int(year_match.group(1))
-    
     return None
 
-def extract_document_info(section):
-    """Extract title, author, date, and text from a search result section."""
-    title_match = re.search(r"Title:\s+(.+)$", section, re.MULTILINE)
-    author_match = re.search(r"Author:\s+(.+)$", section, re.MULTILINE)
-    date_match = re.search(r"Date:\s+(.+)$", section, re.MULTILINE)
-    excerpt_match = re.search(r"Excerpt:\s+(.+)$", section, re.MULTILINE)
-    
-    title = title_match.group(1) if title_match else ""
-    author = author_match.group(1) if author_match else ""
-    date = date_match.group(1) if date_match else ""
-    excerpt = excerpt_match.group(1) if excerpt_match else section
-    
-    return {
-        "title": title.strip(),
-        "author": author.strip(),
-        "date": date.strip(),
-        "excerpt": excerpt.strip(),
-        "full_text": section
-    }
-
-def process_search_results(search_output):
-    """Process search results to extract president information."""
-    # First check if we have any search results
-    if "No results found" in search_output:
-        print("  - No search results returned")
-        return [], []
-        
-    # Print a snippet of the output for debugging
-    if DEBUG:
-        print(f"  - Search returned content (snippet): {search_output[:200]}...")
-    
-    # Look for table rows in the output
-    # Try to match the CLI table row structure
-    result_sections = []
-    
-    # First try to directly extract from the raw text
-    # This handles the case where the CLI tool might not follow a consistent format
-    year_pattern = r"\b(20\d\d|19\d\d)\b"
-    years = re.findall(year_pattern, search_output)
-    if DEBUG and years:
-        print(f"  - Found years in text: {years}")
-    
-    # Directly search for president mentions in the entire text
-    presidents_found = extract_presidents(search_output, None)
-    if DEBUG:
-        print(f"  - Direct text search found {len(presidents_found)} president mentions")
-    
-    # Also try to extract structured results
-    try:
-        # Try to split on table boundaries - handle complex CLI output
-        table_pattern = r"┃(.+?)┃(.+?)┃(.+?)┃(.+?)┃(.+?)┃"
-        rows = re.findall(table_pattern, search_output, re.DOTALL)
-        
-        if not rows:
-            # Fallback to simpler pipe separator
-            pipe_pattern = r"\|(.*?)\|(.*?)\|(.*?)\|(.*?)\|(.*?)\|"
-            rows = re.findall(pipe_pattern, search_output, re.DOTALL)
-        
-        if DEBUG:
-            print(f"  - Found {len(rows)} table rows")
-        
-        for row in rows:
-            # Skip header row with column names
-            if "Score" in row[0] and "Title" in row[1]:
-                continue
-            
-            # Extract data - handle CLI formatting with lots of whitespace
-            try:
-                score = row[0].strip()
-                title = row[1].strip()
-                author = row[2].strip()
-                date = row[3].strip()
-                excerpt = row[4].strip()
-                
-                # Skip very short/empty rows
-                if len(title) < 2 or len(author) < 2:
-                    continue
-                
-                # Construct a section with metadata
-                section = f"Title: {title}\nAuthor: {author}\nDate: {date}\nExcerpt: {excerpt}"
-                result_sections.append(section)
-                
-                # Try to extract year from date
-                year = None
-                if date:
-                    date_years = re.findall(year_pattern, date)
-                    if date_years:
-                        year = int(date_years[0])
-                
-                # Extract presidents from this section
-                section_presidents = extract_presidents(section, year)
-                presidents_found.extend(section_presidents)
-                
-                # Debug info
-                if DEBUG:
-                    print(f"  - Found result: {title} by {author} ({date})")
-                    if section_presidents:
-                        print(f"    - Found presidents: {section_presidents}")
-            except Exception as e:
-                if DEBUG:
-                    print(f"  - Error parsing row: {str(e)}")
-    except Exception as e:
-        if DEBUG:
-            print(f"  - Error parsing search results: {str(e)}")
-    
-    # Create document info
-    documents = []
-    for president, year in presidents_found:
-        # Create a placeholder document info
-        doc_info = {
-            "title": "Unknown",
-            "author": "Unknown",
-            "date": str(year) if year else "Unknown",
-            "excerpt": f"President mention: {president}",
-            "full_text": f"President: {president}, Year: {year}"
-        }
-        
-        documents.append({
-            "presidents": [(president, year)],
-            "info": doc_info
-        })
-    
-    return presidents_found, documents
-
-def run_president_search():
-    """Run searches for president information and process results."""
-    all_presidents = []
-    all_documents = []
-    
-    # Add some specific targeted searches that might help
-    target_searches = [
-        # Direct name searches - add known president names
-        "Ron Grant president",
-        "David Anderson president",
-        "Mike Dodson president",
-        "Jim Brown president",
-        # Specific elections
-        "2006 DPRG election results",
-        "2007 DPRG election results",
-        "2010 DPRG election results",
-        "2015 DPRG election results",
+def extract_presidents_from_text(text):
+    """Extract president mentions from text."""
+    # Patterns for president mentions
+    president_patterns = [
+        # Direct president title followed by name
+        r'[Pp]resident\s*(?:[-:])?\s*([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)',
+        # Name followed by president title
+        r'([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)(?:\s*[-,]\s*)[Pp]resident',
+        # "X is/as/was president" format
+        r'([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)\s+(?:is|as|was|became|elected)\s+(?:the\s+)?[Pp]resident',
+        # "elected X as president" format
+        r'elected\s+([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)\s+as\s+[Pp]resident',
+        # "new president X" format
+        r'new\s+[Pp]resident\s+([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)',
+        # Election results format
+        r'(?:[Ee]lection|[Oo]fficer)s?\s+(?:[Rr]esults?|[Aa]nnouncement)s?:.*?[Pp]resident:?\s+([A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+)',
     ]
     
-    # Try the target searches first
-    for query in target_searches:
-        search_output = run_search(query)
-        presidents, documents = process_search_results(search_output)
-        all_presidents.extend(presidents)
-        all_documents.extend(documents)
-        print(f"Found {len(presidents)} president mentions in query: {query}")
-        # Avoid rate limiting
-        time.sleep(1)
+    names = []
+    for pattern in president_patterns:
+        matches = re.finditer(pattern, text, re.IGNORECASE | re.DOTALL)
+        for match in matches:
+            name = match.group(1).strip()
+            # Validate it's a real name (First Last)
+            if re.match(r'^[A-Z][a-zA-Z\.-]+(?:\s+[A-Z][a-zA-Z\.-]+)+$', name):
+                if DEBUG:
+                    print(f"Found president name: {name} in text")
+                names.append(name)
     
-    # Then do the generic searches
-    for query in SEARCH_QUERIES:
-        search_output = run_search(query)
-        presidents, documents = process_search_results(search_output)
-        all_presidents.extend(presidents)
-        all_documents.extend(documents)
-        print(f"Found {len(presidents)} president mentions in query: {query}")
-        # Avoid rate limiting
-        time.sleep(1)
+    return list(set(names))  # Remove duplicates
+
+def search_for_presidents_by_year(year):
+    """Search for presidents for a specific year."""
+    print(f"\nSearching for presidents in {year}...")
     
-    # Deduplicate and organize by year
-    presidents_by_year = defaultdict(set)
-    for president, year in all_presidents:
-        if year:
-            presidents_by_year[year].add(president)
-        else:
-            # If year is unknown, add to "Unknown" category
-            presidents_by_year["Unknown"].add(president)
+    # Create year-specific queries
+    year_queries = [
+        f"{year} DPRG election results",
+        f"{year} DPRG officers",
+        f"{year} DPRG president",
+        f"{year} election DPRG",
+        f"DPRG election {year}"
+    ]
     
-    # Count mentions for confidence
-    president_mentions = defaultdict(int)
-    for president, _ in all_presidents:
-        president_mentions[president] += 1
+    search_results = []
+    president_mentions = []
     
-    # Create directory for output if it doesn't exist
+    for query in year_queries:
+        search_output = run_search(query, min_score=0.1)
+        rows = extract_table_rows(search_output)
+        
+        for row in rows:
+            # Extract year from the date field
+            row_year = extract_year_from_date(row["date"])
+            
+            # Only include results from the target year or if year can't be determined
+            if row_year == year or (row_year is None and year in row["title"] + row["excerpt"]):
+                search_results.append(row)
+                
+                # Look for president mentions
+                presidents = extract_presidents_from_text(row["title"] + " " + row["excerpt"])
+                for president in presidents:
+                    president_mentions.append({
+                        "president": president,
+                        "year": year,
+                        "reference": row
+                    })
+    
+    # Sort results by score
+    search_results.sort(key=lambda x: x["score"], reverse=True)
+    
+    return {
+        "top_references": search_results[:5],  # Top 5 references
+        "president_mentions": president_mentions
+    }
+
+def collect_all_mentions():
+    """Collect all president mentions across years."""
+    all_mentions = []
+    top_references_by_year = {}
+    
+    for year in TARGET_YEARS:
+        results = search_for_presidents_by_year(year)
+        all_mentions.extend(results["president_mentions"])
+        top_references_by_year[year] = results["top_references"]
+        time.sleep(1)  # Avoid rate limiting
+    
+    # Also search for general officer mentions without year
+    general_queries = [
+        "DPRG president history",
+        "DPRG officers elected",
+        "DPRG executive council",
+        "DPRG annual meeting officers",
+        "DPRG election announcement",
+        "new DPRG president"
+    ]
+    
+    for query in general_queries:
+        search_output = run_search(query, min_score=0.1)
+        rows = extract_table_rows(search_output)
+        
+        for row in rows:
+            # Extract year from the date field
+            row_year = extract_year_from_date(row["date"])
+            
+            # Look for president mentions
+            presidents = extract_presidents_from_text(row["title"] + " " + row["excerpt"])
+            for president in presidents:
+                all_mentions.append({
+                    "president": president,
+                    "year": row_year,  # Could be None
+                    "reference": row
+                })
+        
+        time.sleep(1)  # Avoid rate limiting
+    
+    return all_mentions, top_references_by_year
+
+def save_results(all_mentions, top_references_by_year):
+    """Save results to CSV files."""
+    # Create output directory if it doesn't exist
     os.makedirs("output", exist_ok=True)
     
-    # Output the results
-    output_file = os.path.join("output", "dprg_presidents.csv")
-    with open(output_file, "w", newline="") as f:
+    # 1. Save all president mentions with references
+    with open("output/dprg_presidents.csv", "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["Year", "President", "Mentions"])
+        writer.writerow(["President", "Year", "Title", "Author", "Date", "Score", "Excerpt"])
         
-        # Sort years with Unknown at the end
+        for mention in all_mentions:
+            writer.writerow([
+                mention["president"],
+                mention["year"] if mention["year"] else "Unknown",
+                mention["reference"]["title"],
+                mention["reference"]["author"],
+                mention["reference"]["date"],
+                mention["reference"]["score"],
+                mention["reference"]["excerpt"]
+            ])
+    
+    # 2. Save top 5 references by year
+    with open("output/top_references_by_year.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Year", "Rank", "Title", "Author", "Date", "Score", "Excerpt"])
+        
+        for year in TARGET_YEARS:
+            references = top_references_by_year.get(year, [])
+            for i, ref in enumerate(references):
+                writer.writerow([
+                    year,
+                    i+1,
+                    ref["title"],
+                    ref["author"],
+                    ref["date"],
+                    ref["score"],
+                    ref["excerpt"]
+                ])
+    
+    # 3. Create a summary of presidents by year
+    presidents_by_year = defaultdict(set)
+    for mention in all_mentions:
+        year = mention["year"] if mention["year"] else "Unknown"
+        presidents_by_year[year].add(mention["president"])
+    
+    with open("output/presidents_summary.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Year", "Presidents"])
+        
+        # Sort years to have Unknown at the end
         years = sorted([y for y in presidents_by_year.keys() if y != "Unknown"])
         if "Unknown" in presidents_by_year:
             years.append("Unknown")
             
         for year in years:
-            for president in sorted(presidents_by_year[year]):
-                writer.writerow([year, president, president_mentions[president]])
+            writer.writerow([year, ", ".join(sorted(presidents_by_year[year]))])
     
-    # Also save detailed information
-    details_file = os.path.join("output", "dprg_president_details.csv")
-    with open(details_file, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(["President", "Year", "Title", "Date", "Author", "Excerpt"])
-        
-        for doc in all_documents:
-            for president, year in doc["presidents"]:
-                writer.writerow([
-                    president,
-                    year if year else "Unknown",
-                    doc["info"]["title"],
-                    doc["info"]["date"],
-                    doc["info"]["author"],
-                    doc["info"]["excerpt"][:100] + "..." if len(doc["info"]["excerpt"]) > 100 else doc["info"]["excerpt"]
-                ])
-    
-    print(f"\nResults saved to {output_file}")
-    print(f"Detailed information saved to {details_file}")
+    # Print summary to console
     print("\nSummary of Presidents by Year:")
-    
     for year in years:
-        presidents_list = sorted(presidents_by_year[year])
-        president_info = [f"{p} ({president_mentions[p]} mentions)" for p in presidents_list]
-        year_str = year if year != "Unknown" else "Unknown Year"
-        print(f"{year_str}: {', '.join(president_info)}")
+        print(f"{year}: {', '.join(sorted(presidents_by_year[year]))}")
+    
+    print("\nTop 5 References by Year:")
+    for year in TARGET_YEARS:
+        references = top_references_by_year.get(year, [])
+        if references:
+            print(f"\n{year}:")
+            for i, ref in enumerate(references):
+                print(f"  {i+1}. {ref['title']} by {ref['author']} ({ref['date']})")
+        else:
+            print(f"\n{year}: No references found")
+
+def main():
+    """Main function."""
+    print("Starting DPRG President Search...")
+    all_mentions, top_references_by_year = collect_all_mentions()
+    save_results(all_mentions, top_references_by_year)
+    print("\nResults saved to output directory.")
 
 if __name__ == "__main__":
-    run_president_search() 
+    main() 
