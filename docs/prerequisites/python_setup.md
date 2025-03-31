@@ -1,6 +1,6 @@
 # Installing Python 3.10+
 
-DprgArchiveAgent requires Python 3.10 or higher. This guide walks you through installing Python on different operating systems.
+DprgArchiveAgent requires Python 3.10 or 3.11. Higher versions are not yet compatible. This guide walks you through installing Python on different operating systems.
 
 ## Windows
 

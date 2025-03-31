@@ -6,7 +6,7 @@ This guide provides information for developers working on the DPRG Archive Agent
 
 ### Prerequisites
 
-1. Python 3.8 or higher
+1. Python 3.10 or 3.11 (higher versions not yet compatible)
 2. Git
 3. Virtual environment tool (venv, conda, etc.)
 4. Code editor (VS Code recommended)

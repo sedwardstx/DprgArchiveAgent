@@ -6,7 +6,7 @@ This guide walks you through setting up the DprgArchiveAgent and configuring it 
 
 Before you begin, ensure you have the following:
 
-- [Python 3.10 or 3.11, higher versions not yet validated](prerequisites/python_setup.md)
+- [Python 3.10 or 3.11, higher versions not yet compatible](prerequisites/python_setup.md)
 - [Rust and Cargo](prerequisites/rust_setup.md) (required for some Python dependencies)
 - [A Pinecone account with API key](prerequisites/pinecone_setup.md)
 - [An OpenAI account with API key](prerequisites/openai_setup.md)

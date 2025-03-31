@@ -45,7 +45,7 @@ The DPRG Archive Agent provides an intelligent interface to search and interact 
    cd DprgArchiveAgent
    ```
 
-2. Create and activate a virtual environment:
+2. Create and activate a virtual environment (requires Python 3.10 or 3.11, higher versions not yet compatible):
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate

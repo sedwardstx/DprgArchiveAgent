@@ -4,7 +4,7 @@ This guide provides instructions for deploying the DPRG Archive Agent in various
 
 ## Prerequisites
 
-1. Python 3.8 or higher
+1. Python 3.10 or 3.11 (higher versions not yet compatible)
 2. Docker (optional)
 3. Git
 4. Required API keys and credentials
