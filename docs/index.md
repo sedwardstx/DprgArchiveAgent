@@ -1,36 +1,139 @@
-# DprgArchiveAgent Documentation
+# DPRG Archive Agent Documentation
 
-Welcome to the documentation for DprgArchiveAgent, an AI-powered search interface for querying the DPRG archive data stored in Pinecone vector indexes.
+Welcome to the DPRG Archive Agent documentation. This guide will help you understand, set up, and use the DPRG Archive Agent effectively.
 
-## Overview
+## Table of Contents
 
-DprgArchiveAgent provides a seamless interface to search through DPRG archives using both dense and sparse vector indexes. The system intelligently routes queries to the appropriate index based on the query type and content, providing optimal search results with either semantic (meaning-based) or keyword search capabilities.
+### Getting Started
+- [Setup and Configuration](setup_and_configuration.md)
+- [CLI Usage Guide](cli_usage.md)
+- [API Reference](api_reference.md)
 
-## Documentation Sections
+### Integration Guides
+- [WordPress Integration](wordpress_integration.md)
+- [Security and Performance Examples](security_and_performance_examples.md)
 
-- [Setup and Configuration](setup_and_configuration.md): How to set up the project and configure the environment
-- [CLI Usage Guide](cli_usage.md): Documentation for the command-line interface
-- [API Usage Guide](api_usage.md): Documentation for the REST API
-- [Example Usage Scenarios](examples.md): Practical examples for both CLI and API
+### Development
+- [Development Guide](development_guide.md)
+- [Contributing Guidelines](contributing.md)
+- [Code Style Guide](code_style_guide.md)
 
-## Features
+### Testing
+- [Testing Guide](testing_guide.md)
+- [Test Coverage Report](test_coverage.md)
 
-- Search DPRG archives with natural language queries
-- Access both dense and sparse vector indexes
-- Filter results by metadata (author, date, keywords, etc.)
-- CLI interface for quick searches
-- REST API for integration with other applications
-- Hybrid search combining both dense and sparse search results
-
-## Architecture
-
-The system comprises the following key components:
-
-1. **Vector Index Clients**: Interfaces with the Pinecone dense and sparse vector indexes
-2. **Query Processing**: Processes user queries and determines which index strategy to use
-3. **Search Tools**: Tools for searching archives with various filters and parameters
-4. **User Interfaces**: Both CLI and API interfaces for interacting with the system
+### Deployment
+- [Deployment Guide](deployment_guide.md)
+- [Monitoring and Logging](monitoring.md)
 
 ## Quick Start
 
-For a quick start, see the [Setup and Configuration](setup_and_configuration.md) guide followed by the [Example Usage Scenarios](examples.md) documentation. 
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/DprgArchiveAgent.git
+   cd DprgArchiveAgent
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your API keys and configuration
+   ```
+
+4. Start the API server:
+   ```bash
+   python -m src.api
+   ```
+
+## Key Features
+
+- **Advanced Search Capabilities**
+  - Semantic search using dense vectors
+  - Keyword-based search using sparse vectors
+  - Hybrid search combining both approaches
+  - Metadata filtering (year, month, author)
+
+- **Interactive Chat Interface**
+  - Natural language queries
+  - Context-aware responses
+  - Document references
+  - Conversation history
+
+- **WordPress Integration**
+  - Easy-to-use shortcodes
+  - Responsive UI components
+  - Advanced filtering options
+  - Real-time search results
+
+## Configuration
+
+The DPRG Archive Agent can be configured through environment variables. See the [Setup and Configuration](setup_and_configuration.md) guide for detailed information about:
+
+- Essential settings (API keys)
+- Vector store configuration
+- Search parameters
+- Performance tuning
+- Debug options
+
+## Security and Performance
+
+For detailed information about implementing security measures and optimizing performance, see:
+
+- [Security and Performance Examples](security_and_performance_examples.md)
+  - Rate limiting
+  - Input validation
+  - Nonce implementation
+  - Error handling
+  - Response caching
+  - Lazy loading
+  - Asset optimization
+
+## WordPress Integration
+
+The DPRG Archive Agent can be integrated into WordPress websites. See the [WordPress Integration](wordpress_integration.md) guide for:
+
+- Plugin structure
+- UI components
+- Security considerations
+- Performance optimization
+- Maintenance guidelines
+
+## Development
+
+For developers working on the DPRG Archive Agent:
+
+- [Development Guide](development_guide.md) - Setting up the development environment
+- [Contributing Guidelines](contributing.md) - How to contribute to the project
+- [Code Style Guide](code_style_guide.md) - Coding standards and best practices
+
+## Testing
+
+Comprehensive testing information:
+
+- [Testing Guide](testing_guide.md) - Running and writing tests
+- [Test Coverage Report](test_coverage.md) - Current test coverage status
+
+## Deployment
+
+Information about deploying the DPRG Archive Agent:
+
+- [Deployment Guide](deployment_guide.md) - Deployment procedures and requirements
+- [Monitoring and Logging](monitoring.md) - Monitoring setup and log management
+
+## Support
+
+For additional support:
+
+1. Check the [Setup and Configuration](setup_and_configuration.md) guide
+2. Review the [CLI Usage Guide](cli_usage.md)
+3. Consult the [API Reference](api_reference.md)
+4. Submit issues through the GitHub repository
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 
