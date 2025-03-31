@@ -14,7 +14,8 @@ import time
 DEBUG = True
 
 # Target years for our search (as requested by user)
-TARGET_YEARS = list(range(1997, 2016))  # 1997-2015
+## TARGET_YEARS = list(range(1997, 2016))  # 1997-2015
+TARGET_YEARS = list(range(2006, 2007))  # 1997-2015
 
 def run_search(query, search_type="hybrid", top_k=150, min_score=0.1):
     """Run a search using the CLI tool and return the results."""
