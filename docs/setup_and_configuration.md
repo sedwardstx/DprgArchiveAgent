@@ -98,18 +98,47 @@ API_WORKERS=4     # Number of worker processes
 
 #### Search Settings
 
-```
-# Search settings
-DEFAULT_TOP_K=10              # Default number of results to return
-MIN_SCORE_THRESHOLD=0.7       # Minimum similarity score (0-1)
+The search functionality can be configured through the following settings in your `.env` file:
 
-# Hybrid search weights
-DENSE_WEIGHT=0.7              # Weight for dense vector results
-SPARSE_WEIGHT=0.3             # Weight for sparse vector results
-
-# Embedding model
-EMBEDDING_MODEL=text-embedding-3-large  # OpenAI embedding model
+```env
+# Search Configuration
+SEARCH_TYPE=dense           # Options: dense, sparse, hybrid
+TOP_K=10                  # Number of results to return per query
+MIN_SCORE=0.5            # Minimum similarity score threshold (0-1)
+MAX_TOKENS=512           # Maximum tokens for text processing
+CHUNK_SIZE=1000          # Size of text chunks for processing
+CHUNK_OVERLAP=200        # Overlap between chunks
 ```
+
+### Search Type Options
+
+1. **Dense Search** (default)
+   - Uses semantic embeddings for search
+   - Better for natural language queries
+   - More computationally intensive
+   - Higher accuracy for semantic matches
+
+2. **Sparse Search**
+   - Uses keyword-based search
+   - Faster processing
+   - Better for exact matches
+   - Lower resource usage
+
+3. **Hybrid Search**
+   - Combines both dense and sparse search
+   - Balances speed and accuracy
+   - Uses weighted scoring
+   - Recommended for most use cases
+
+### Performance Tuning
+
+Adjust these settings based on your needs:
+
+- `TOP_K`: Increase for more results, decrease for faster response
+- `MIN_SCORE`: Lower for more matches, higher for better quality
+- `MAX_TOKENS`: Adjust based on your text length
+- `CHUNK_SIZE`: Larger chunks for more context, smaller for faster processing
+- `CHUNK_OVERLAP`: More overlap for better context preservation
 
 ## Verifying Installation
 
