@@ -245,6 +245,20 @@ The chat interface supports several special commands:
 | `exit` | `quit`, `bye`, `goodbye` | End the chat session |
 | `reset` | `clear`, `restart` | Clear conversation history and start fresh without exiting |
 
+### Adjusting Search Parameters
+
+You can dynamically adjust search parameters during a chat session using natural language commands:
+
+| Parameter | Example Commands | Description |
+|-----------|-----------------|-------------|
+| `top_k` | `set top-k to 20`, `return 30 results` | Change the number of documents retrieved (1-100) |
+| `temperature` | `set temperature to 0.5` | Adjust response creativity (0.0-1.0) |
+| `min_score` | `change min-score to 0.2` | Modify relevance threshold (0.0-1.0) |
+| `search_type` | `use search type hybrid` | Change search algorithm (dense, sparse, hybrid) |
+| `max_tokens` | `set max tokens to 1000` | Adjust maximum response length (100-2000) |
+
+Parameter adjustments take effect immediately for your next query without needing to restart the chat session.
+
 ### Summarizing Documents
 
 You can ask the agent to summarize a specific document in full, rather than just working with the excerpt shown in the Referenced Documents table:

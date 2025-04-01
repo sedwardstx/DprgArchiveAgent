@@ -639,6 +639,67 @@ def chat(
                 console.print("[italic]All previous context and filters have been reset.[/italic]")
                 continue
             
+            # Check for parameter adjustment commands
+            param_patterns = [
+                # top_k patterns
+                (r'(?:set|change|update|use)\s+(?:top[-\s]?k|results)\s+(?:to|=|as)\s+(\d+)', 'top_k'),
+                (r'(?:show|get|retrieve|find|return)\s+(\d+)\s+(?:results|documents)', 'top_k'),
+                # temperature patterns
+                (r'(?:set|change|update|use)\s+temperature\s+(?:to|=|as)\s+(0\.\d+)', 'temperature'),
+                # min_score patterns
+                (r'(?:set|change|update|use)\s+(?:min[-\s]?score|threshold)\s+(?:to|=|as)\s+(0\.\d+)', 'min_score'),
+                # search_type patterns
+                (r'(?:set|change|update|use)\s+(?:search[-\s]?type|search)\s+(?:to|=|as)\s+(dense|sparse|hybrid)', 'search_type'),
+                # max_tokens patterns
+                (r'(?:set|change|update|use)\s+(?:max[-\s]?tokens|tokens)\s+(?:to|=|as)\s+(\d+)', 'max_tokens'),
+            ]
+            
+            param_changed = False
+            for pattern, param_name in param_patterns:
+                match = re.search(pattern, user_input.lower())
+                if match:
+                    # Extract the new value
+                    new_value = match.group(1)
+                    
+                    # Convert to appropriate type
+                    if param_name == 'top_k' or param_name == 'max_tokens':
+                        new_value = int(new_value)
+                        # Set reasonable limits
+                        if param_name == 'top_k':
+                            new_value = max(1, min(100, new_value))
+                        elif param_name == 'max_tokens':
+                            new_value = max(100, min(2000, new_value))
+                    elif param_name == 'temperature' or param_name == 'min_score':
+                        new_value = float(new_value)
+                        # Set reasonable limits
+                        if param_name == 'temperature':
+                            new_value = max(0.0, min(1.0, new_value))
+                        elif param_name == 'min_score':
+                            new_value = max(0.0, min(1.0, new_value))
+                    
+                    # Update the parameter
+                    if param_name == 'top_k':
+                        top_k = new_value
+                    elif param_name == 'temperature':
+                        temperature = new_value
+                    elif param_name == 'min_score':
+                        min_score = new_value
+                    elif param_name == 'search_type':
+                        search_type = new_value
+                    elif param_name == 'max_tokens':
+                        max_tokens = new_value
+                    
+                    # Confirm the change
+                    console.print(f"[bold blue]Agent[/bold blue]: [italic]Parameter {param_name} has been set to {new_value}.[/italic]")
+                    param_changed = True
+                    break
+            
+            if param_changed:
+                # Remove the parameter adjustment message from conversation 
+                # so it's not included in the context
+                conversation.pop()
+                continue
+            
             # Add user message to conversation
             conversation.append(ChatMessage(role="user", content=user_input))
             
