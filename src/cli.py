@@ -517,23 +517,38 @@ def chat(
             
             # Display referenced documents if any
             if hasattr(response, "referenced_documents") and response.referenced_documents:
+                # First, apply min_score filter to referenced documents
+                filtered_by_score = [doc for doc in response.referenced_documents 
+                                    if not hasattr(doc, "score") or doc.score >= min_score]
+                
                 # Extract document IDs mentioned in the response content
                 doc_pattern = r'Document (\d+):'
                 mentioned_docs = re.findall(doc_pattern, response.message.content)
                 mentioned_doc_ids = [int(doc_id) for doc_id in mentioned_docs]
                 
+                # Map the original indices to the filtered indices for document numbering
+                original_to_filtered = {}
+                for i, doc in enumerate(response.referenced_documents):
+                    if not hasattr(doc, "score") or doc.score >= min_score:
+                        original_to_filtered[i+1] = len(original_to_filtered) + 1
+                
                 # Only show documents that are actually referenced in the response
                 filtered_docs = []
                 if mentioned_doc_ids:
                     for i, doc in enumerate(response.referenced_documents):
+                        # Skip documents below min_score
+                        if hasattr(doc, "score") and doc.score < min_score:
+                            continue
                         if i+1 in mentioned_doc_ids:
-                            filtered_docs.append((i+1, doc))
+                            filtered_docs.append((original_to_filtered.get(i+1, i+1), doc))
                 else:
-                    # If no specific document numbers mentioned, show all documents
-                    filtered_docs = [(i+1, doc) for i, doc in enumerate(response.referenced_documents)]
+                    # If no specific document numbers mentioned, show all documents that meet min_score
+                    filtered_docs = [(original_to_filtered.get(i+1, i+1), doc) 
+                                    for i, doc in enumerate(response.referenced_documents)
+                                    if not hasattr(doc, "score") or doc.score >= min_score]
                 
                 if filtered_docs:
-                    docs_table = Table(title="Referenced Documents", box=box.ROUNDED)
+                    docs_table = Table(title=f"Referenced Documents (min_score: {min_score})", box=box.ROUNDED)
                     docs_table.add_column("ID", style="bold cyan", width=4)
                     docs_table.add_column("Score", justify="right", style="cyan", width=6)
                     docs_table.add_column("Title", style="green", width=30)
@@ -792,23 +807,38 @@ def chat(
                 
                 # Display referenced documents if any
                 if hasattr(response, "referenced_documents") and response.referenced_documents:
+                    # First, apply min_score filter to referenced documents
+                    filtered_by_score = [doc for doc in response.referenced_documents 
+                                        if not hasattr(doc, "score") or doc.score >= min_score]
+                    
                     # Extract document IDs mentioned in the response content
                     doc_pattern = r'Document (\d+):'
                     mentioned_docs = re.findall(doc_pattern, response.message.content)
                     mentioned_doc_ids = [int(doc_id) for doc_id in mentioned_docs]
                     
+                    # Map the original indices to the filtered indices for document numbering
+                    original_to_filtered = {}
+                    for i, doc in enumerate(response.referenced_documents):
+                        if not hasattr(doc, "score") or doc.score >= min_score:
+                            original_to_filtered[i+1] = len(original_to_filtered) + 1
+                    
                     # Only show documents that are actually referenced in the response
                     filtered_docs = []
                     if mentioned_doc_ids:
                         for i, doc in enumerate(response.referenced_documents):
+                            # Skip documents below min_score
+                            if hasattr(doc, "score") and doc.score < min_score:
+                                continue
                             if i+1 in mentioned_doc_ids:
-                                filtered_docs.append((i+1, doc))
+                                filtered_docs.append((original_to_filtered.get(i+1, i+1), doc))
                     else:
-                        # If no specific document numbers mentioned, show all documents
-                        filtered_docs = [(i+1, doc) for i, doc in enumerate(response.referenced_documents)]
+                        # If no specific document numbers mentioned, show all documents that meet min_score
+                        filtered_docs = [(original_to_filtered.get(i+1, i+1), doc) 
+                                        for i, doc in enumerate(response.referenced_documents)
+                                        if not hasattr(doc, "score") or doc.score >= min_score]
                     
                     if filtered_docs:
-                        docs_table = Table(title="Referenced Documents", box=box.ROUNDED)
+                        docs_table = Table(title=f"Referenced Documents (min_score: {min_score})", box=box.ROUNDED)
                         docs_table.add_column("ID", style="bold cyan", width=4)
                         docs_table.add_column("Score", justify="right", style="cyan", width=6)
                         docs_table.add_column("Title", style="green", width=30)
