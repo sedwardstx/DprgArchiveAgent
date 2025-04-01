@@ -470,7 +470,8 @@ class ArchiveAgent:
                 max_tokens=request.max_tokens or max_tokens,
                 temperature=request.temperature or temperature,
                 search_top_k=request.search_top_k or 5,
-                use_search_type=request.use_search_type or "dense"
+                use_search_type=request.use_search_type or "dense",
+                fallback_model=request.fallback_model or "gpt-3.5-turbo"
             )
             
             # Generate chat response using the process method
@@ -479,7 +480,10 @@ class ArchiveAgent:
                 temperature=chat_request.temperature,
                 max_tokens=chat_request.max_tokens,
                 search_type=chat_request.use_search_type,
-                search_top_k=chat_request.search_top_k
+                search_top_k=chat_request.search_top_k,
+                model=chat_request.model,
+                fallback_model=chat_request.fallback_model,
+                log_level=request.log_level if hasattr(request, "log_level") else None
             )
             
             # Convert ChatResponse to ChatCompletionResponse

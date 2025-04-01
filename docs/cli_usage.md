@@ -207,10 +207,15 @@ This starts an interactive chat session where you can ask questions about the DP
 
 ```
 Options:
-  -t, --type TEXT          Search type to use for retrieving context: dense, sparse, or hybrid  [default: dense]
-  -k, --top-k INTEGER      Number of documents to retrieve for context  [default: 5]
-  --temperature FLOAT      Temperature for response generation  [default: 0.7]
-  --help                   Show this message and exit.
+  -t, --type TEXT           Search type to use for retrieving context: dense, sparse, or hybrid  [default: hybrid]
+  -k, --top-k INTEGER       Number of documents to retrieve for context  [default: 5]
+  --temperature FLOAT       Temperature for response generation  [default: 0.7]
+  --min-score FLOAT         Minimum score threshold for relevant documents [default: 0.3]
+  --max-tokens INTEGER      Maximum tokens for response generation [default: 500]
+  --log-level TEXT          Logging verbosity: debug, info, warning, error, critical [default: info]
+  --gpt-model TEXT          OpenAI GPT model to use [default: gpt-4]
+  --fallback-model TEXT     Fallback OpenAI GPT model [default: gpt-3.5-turbo]
+  --help                    Show this message and exit.
 ```
 
 ### Example Chat Session
@@ -256,6 +261,9 @@ You can adjust the search parameters directly from the chat interface using simp
 | `min-score` | `set min-score to 0.5`, `set threshold to 0.4` | Modify relevance threshold (0.0-1.0) |
 | `search-type` | `set search-type to dense`, `use sparse search` | Change search algorithm (dense, sparse, hybrid) |
 | `max-tokens` | `set max-tokens to 1000` | Adjust maximum response length (100-2000) |
+| `log-level` | `set log-level to debug`, `set verbosity to info` | Change logging verbosity (debug, info, warning, error, critical) |
+| `gpt-model` | `set gpt-model to gpt-4`, `use model gpt-4-turbo` | Set OpenAI model for chat completions |
+| `fallback-model` | `set fallback-model to gpt-3.5-turbo` | Set backup model if primary model fails |
 
 ### Displaying Current Search Parameters
 
@@ -319,3 +327,27 @@ The CLI respects the configuration set in your `.env` file. If you encounter err
 3. Verify your network connection
 
 See the [Setup and Configuration](setup_and_configuration.md) guide for more details. 
+
+| Parameter | Example Commands | Description |
+| --- | --- | --- |
+| `top-k` | `set top-k to 20`, `return 30 results` | Change the number of documents retrieved (1-50) |
+| `temperature` | `set temperature to 0.8` | Adjust response creativity (0.0-1.0) |
+| `min-score` | `set min-score to 0.5`, `set threshold to 0.4` | Modify relevance threshold (0.0-1.0) |
+| `search-type` | `set search-type to dense`, `use sparse search` | Change search algorithm (dense, sparse, hybrid) |
+| `max-tokens` | `set max-tokens to 1000` | Adjust maximum response length (100-2000) |
+| `log-level` | `set log-level to debug`, `set verbosity to info` | Change logging verbosity (debug, info, warning, error, critical) |
+| `gpt-model` | `set gpt-model to gpt-4`, `use model gpt-4-turbo` | Set OpenAI model for chat completions |
+| `fallback-model` | `set fallback-model to gpt-3.5-turbo` | Set backup model if primary model fails |
+
+```
+Options:
+  -t, --type TEXT           Search type to use for retrieving context: dense, sparse, or hybrid  [default: hybrid]
+  -k, --top-k INTEGER       Number of documents to retrieve for context  [default: 5]
+  --temperature FLOAT       Temperature for response generation  [default: 0.7]
+  --min-score FLOAT         Minimum score threshold for relevant documents [default: 0.3]
+  --max-tokens INTEGER      Maximum tokens for response generation [default: 500]
+  --log-level TEXT          Logging verbosity: debug, info, warning, error, critical [default: info]
+  --gpt-model TEXT          OpenAI GPT model to use [default: gpt-4]
+  --fallback-model TEXT     Fallback OpenAI GPT model [default: gpt-3.5-turbo]
+  --help                    Show this message and exit.
+``` 

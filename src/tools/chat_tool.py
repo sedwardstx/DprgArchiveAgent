@@ -31,6 +31,9 @@ class ChatTool:
         max_tokens: Optional[int] = None,
         search_type: Optional[str] = None,
         search_top_k: Optional[int] = None,
+        model: Optional[str] = None,
+        fallback_model: Optional[str] = None,
+        log_level: Optional[str] = None
     ) -> ChatResponse:
         """
         Process a chat request.
@@ -41,6 +44,9 @@ class ChatTool:
             max_tokens: Optional max tokens override
             search_type: Optional search type override
             search_top_k: Optional search top_k override
+            model: Optional model override
+            fallback_model: Optional fallback model override
+            log_level: Optional logging level override
             
         Returns:
             Chat response
@@ -49,6 +55,15 @@ class ChatTool:
             Exception: If there's an error during processing
         """
         start_time = time.time()
+        
+        # Set logging level if provided
+        if log_level:
+            log_level_value = getattr(logging, log_level.upper(), None)
+            if log_level_value:
+                logger.setLevel(log_level_value)
+                logging.getLogger("src").setLevel(log_level_value)
+                logger.debug(f"Set logging level to {log_level.upper()}")
+        
         logger.info(f"Processing chat request with {len(request.messages)} messages")
         
         try:
@@ -57,7 +72,8 @@ class ChatTool:
                 messages=request.messages,
                 temperature=temperature or request.temperature,
                 max_tokens=max_tokens or request.max_tokens,
-                model=request.model
+                model=model or request.model,
+                fallback_model=fallback_model or request.fallback_model
             )
             
             # Create response
@@ -83,7 +99,8 @@ class ChatTool:
         messages: List[Message],
         temperature: float = 0.7,
         max_tokens: int = 500,
-        model: str = "gpt-4"
+        model: str = "gpt-4",
+        fallback_model: str = "gpt-3.5-turbo"
     ) -> Any:
         """
         Get chat completion from OpenAI.
@@ -93,6 +110,7 @@ class ChatTool:
             temperature: Sampling temperature
             max_tokens: Maximum tokens to generate
             model: Model to use
+            fallback_model: Model to try if the primary model fails
             
         Returns:
             OpenAI chat completion
@@ -106,17 +124,35 @@ class ChatTool:
                     for msg in messages
                 ]
                 
-                # Get completion using provided client
-                response = await self.openai_client.chat.completions.create(
-                    model=model,
-                    messages=formatted_messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens
-                )
-                
-                return response
+                try:
+                    # Get completion using provided client with primary model
+                    response = await self.openai_client.chat.completions.create(
+                        model=model,
+                        messages=formatted_messages,
+                        temperature=temperature,
+                        max_tokens=max_tokens
+                    )
+                    
+                    return response
+                except Exception as primary_error:
+                    logger.warning(f"Error with primary model {model}: {str(primary_error)}")
+                    
+                    if fallback_model and fallback_model != model:
+                        logger.info(f"Trying fallback model: {fallback_model}")
+                        # Try the fallback model
+                        response = await self.openai_client.chat.completions.create(
+                            model=fallback_model,
+                            messages=formatted_messages,
+                            temperature=temperature,
+                            max_tokens=max_tokens
+                        )
+                        
+                        return response
+                    else:
+                        # Re-raise the original error
+                        raise primary_error
             else:
-                # Use the default client
+                # Use the default client with fallback support
                 return await get_chat_completion(
                     messages=[
                         {"role": msg.role, "content": msg.content}
@@ -124,7 +160,8 @@ class ChatTool:
                     ],
                     temperature=temperature,
                     max_tokens=max_tokens,
-                    model=model
+                    model=model,
+                    fallback_model=fallback_model
                 )
                 
         except Exception as e:

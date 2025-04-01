@@ -110,6 +110,8 @@ class ChatRequest(BaseModel):
     temperature: Optional[float] = 0.7
     search_top_k: Optional[int] = 5
     use_search_type: Optional[str] = "dense"
+    fallback_model: Optional[str] = "gpt-3.5-turbo"
+    log_level: Optional[str] = "info"
 
 
 class ChatCompletionRequest(BaseModel):
@@ -121,6 +123,8 @@ class ChatCompletionRequest(BaseModel):
     search_top_k: Optional[int] = 5
     use_search_type: Optional[str] = "dense"
     min_score: Optional[float] = None
+    fallback_model: Optional[str] = "gpt-3.5-turbo"
+    log_level: Optional[str] = "info"
 
 
 class ChatResponse(BaseModel):

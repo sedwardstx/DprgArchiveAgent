@@ -451,7 +451,10 @@ def chat(
     search_type: str = typer.Option("hybrid", "--search-type", "--type", "-t", help="Search type: dense, sparse, or hybrid"),
     temperature: float = typer.Option(0.7, help="Temperature for chat completion"),
     max_tokens: int = typer.Option(500, help="Maximum tokens for chat completion"),
-    min_score: float = typer.Option(0.3, help="Minimum score threshold for relevant documents")
+    min_score: float = typer.Option(0.3, help="Minimum score threshold for relevant documents"),
+    log_level: str = typer.Option("info", help="Logging verbosity level: debug, info, warning, error, critical"),
+    gpt_model: str = typer.Option("gpt-4", help="OpenAI GPT model to use for chat completions"),
+    fallback_model: str = typer.Option("gpt-3.5-turbo", help="Fallback OpenAI GPT model if primary model fails")
 ):
     """
     Chat with the DPRG Archive Agent using Retrieval-Augmented Generation (RAG).
@@ -470,6 +473,12 @@ def chat(
         chat --query "Outdoor Contest rules" --min-score 0.4 --top-k 10  # More context
     """
     console = Console()
+    
+    # Set logging level based on input parameter
+    set_log_level = getattr(logging, log_level.upper())
+    logging.getLogger().setLevel(set_log_level)
+    logging.getLogger("src").setLevel(set_log_level)
+    logger.info(f"Logging level set to {log_level.upper()}")
     
     console.print(
         Panel.fit(
@@ -507,7 +516,10 @@ def chat(
                 use_search_type=search_type,
                 temperature=temperature,
                 max_tokens=max_tokens,
-                min_score=min_score  # Pass the min_score parameter
+                model=gpt_model,
+                fallback_model=fallback_model,
+                log_level=log_level,
+                min_score=min_score
             )
             
             # Indicate that we're thinking
@@ -667,6 +679,12 @@ def chat(
                 (r'(?:set|change|update|use)\s+(?:search[-_\s]?type|search)\s+(?:to|=|as)\s+(dense|sparse|hybrid)', 'search_type'),
                 # max_tokens patterns - accept both dash and underscore formats
                 (r'(?:set|change|update|use)\s+(?:max[-_\s]?tokens|tokens)\s+(?:to|=|as)\s+(\d+)', 'max_tokens'),
+                # log_level patterns
+                (r'(?:set|change|update|use)\s+(?:log[-_\s]?level|verbosity|logging)\s+(?:to|=|as)\s+(debug|info|warning|error|critical)', 'log_level'),
+                # gpt_model patterns
+                (r'(?:set|change|update|use)\s+(?:gpt[-_\s]?model|model|llm)\s+(?:to|=|as)\s+(gpt-[a-zA-Z0-9.\-]+)', 'gpt_model'),
+                # fallback_model patterns
+                (r'(?:set|change|update|use)\s+(?:fallback[-_\s]?model|backup[-_\s]?model)\s+(?:to|=|as)\s+(gpt-[a-zA-Z0-9.\-]+)', 'fallback_model'),
             ]
             
             param_changed = False
@@ -703,6 +721,17 @@ def chat(
                         search_type = new_value
                     elif param_name == 'max_tokens':
                         max_tokens = new_value
+                    elif param_name == 'log_level':
+                        log_level = new_value
+                        # Update the logging level
+                        set_log_level = getattr(logging, log_level.upper())
+                        logging.getLogger().setLevel(set_log_level)
+                        logging.getLogger("src").setLevel(set_log_level)
+                        logger.info(f"Logging level set to {log_level.upper()}")
+                    elif param_name == 'gpt_model':
+                        gpt_model = new_value
+                    elif param_name == 'fallback_model':
+                        fallback_model = new_value
                     
                     # Confirm the change
                     console.print(f"[bold blue]Agent[/bold blue]: [italic]Parameter {param_name} has been set to {new_value}.[/italic]")
@@ -729,6 +758,9 @@ def chat(
                     settings_table.add_row("min-score", f"{min_score:.2f}", "Minimum relevance threshold (0.0-1.0)")
                     settings_table.add_row("search-type", search_type, "Search algorithm (dense, sparse, hybrid)")
                     settings_table.add_row("max-tokens", str(max_tokens), "Maximum response length (100-2000)")
+                    settings_table.add_row("log-level", log_level, "Logging verbosity (debug, info, warning, error, critical)")
+                    settings_table.add_row("gpt-model", gpt_model, "OpenAI GPT model for chat completion")
+                    settings_table.add_row("fallback-model", fallback_model, "Fallback OpenAI GPT model")
                     
                     console.print(settings_table)
                     param_changed = True
@@ -795,7 +827,11 @@ def chat(
                     search_top_k=top_k,
                     use_search_type=search_type,
                     temperature=temperature,
-                    max_tokens=max_tokens
+                    max_tokens=max_tokens,
+                    model=gpt_model,
+                    fallback_model=fallback_model,
+                    log_level=log_level,
+                    min_score=min_score
                 )
                 
                 # If we identified a document to fetch, add it directly to the system prompt
@@ -823,7 +859,11 @@ def chat(
                                 search_top_k=top_k,
                                 use_search_type=search_type,
                                 temperature=temperature,
-                                max_tokens=max_tokens
+                                max_tokens=max_tokens,
+                                model=gpt_model,
+                                fallback_model=fallback_model,
+                                log_level=log_level,
+                                min_score=min_score
                             )
                 
                 # Indicate that we're thinking
