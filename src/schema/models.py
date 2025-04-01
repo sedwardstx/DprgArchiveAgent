@@ -16,6 +16,7 @@ class ArchiveMetadata(BaseModel):
     has_url: Optional[bool] = None
     keywords: Optional[List[str]] = None
     title: Optional[str] = None
+    text: Optional[str] = None  # Full document text for excerpt generation
 
 
 class ArchiveDocument(BaseModel):

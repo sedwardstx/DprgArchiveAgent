@@ -3,6 +3,7 @@ Search tool for the DPRG Archive Agent.
 """
 import time
 import logging
+import re
 from typing import Dict, List, Any, Optional, Tuple, Union
 
 from ..config import DEFAULT_TOP_K, MIN_SCORE_THRESHOLD
@@ -30,6 +31,81 @@ class SearchTool:
         self.sparse_client = sparse_client or SparseVectorClient()
         self.hybrid_client = hybrid_client or HybridSearchClient()
         logger.info("Search tool initialized")
+    
+    def find_excerpt_with_terms(self, full_text: str, search_terms: List[str], max_length: int = 150) -> str:
+        """
+        Find an excerpt from the full text that contains at least one of the search terms.
+        
+        Args:
+            full_text: The full document text
+            search_terms: List of search terms to look for
+            max_length: Maximum length of the excerpt
+            
+        Returns:
+            An excerpt containing at least one search term, or a default excerpt if no terms found
+        """
+        if not full_text or not search_terms:
+            return full_text[:max_length] if full_text else ""
+        
+        # Normalize text and search terms for case-insensitive matching
+        full_text_lower = full_text.lower()
+        search_terms_lower = [term.lower() for term in search_terms if term]
+        
+        # Create a regex pattern with all search terms for efficient searching
+        pattern = r'|'.join(re.escape(term) for term in search_terms_lower if term)
+        if not pattern:
+            return full_text[:max_length]
+            
+        # Find all matches
+        matches = list(re.finditer(pattern, full_text_lower))
+        if not matches:
+            # No match found, return beginning of text
+            return full_text[:max_length]
+        
+        # Find the best match to use as center of excerpt
+        best_match = matches[0]  # Start with first match
+        
+        # Try to find an excerpt that includes multiple search terms if possible
+        for i, match in enumerate(matches):
+            start_pos = max(0, match.start() - max_length // 2)
+            end_pos = min(len(full_text), match.end() + max_length // 2)
+            excerpt_lower = full_text_lower[start_pos:end_pos]
+            
+            # Count how many different search terms appear in this excerpt
+            term_count = sum(1 for term in search_terms_lower if term in excerpt_lower)
+            
+            # If this excerpt contains more search terms, use it instead
+            if term_count > 1:
+                best_match = match
+                break
+        
+        # Create excerpt around the best match
+        start_pos = max(0, best_match.start() - max_length // 2)
+        end_pos = min(len(full_text), best_match.end() + max_length // 2)
+        
+        # Adjust to avoid cutting words
+        if start_pos > 0:
+            # Find the next space before the start position
+            space_before = full_text.rfind(" ", 0, start_pos)
+            if space_before >= 0:
+                start_pos = space_before + 1
+        
+        if end_pos < len(full_text):
+            # Find the next space after the end position
+            space_after = full_text.find(" ", end_pos)
+            if space_after >= 0:
+                end_pos = space_after
+        
+        # Get the excerpt with the matched term
+        excerpt = full_text[start_pos:end_pos]
+        
+        # Add ellipsis if needed
+        if start_pos > 0:
+            excerpt = "..." + excerpt
+        if end_pos < len(full_text):
+            excerpt = excerpt + "..."
+        
+        return excerpt
     
     async def search(self, query: SearchQuery) -> Union[SearchResponse, SearchError]:
         """
@@ -113,15 +189,31 @@ class SearchTool:
 
             # Convert results to ArchiveDocument objects if necessary
             docs = []
+            # Collect search terms from the query and keywords for excerpt highlighting
+            search_terms = []
+            # Add the main query terms (split by spaces)
+            search_terms.extend([term.strip() for term in query.query.split() if len(term.strip()) > 2])
+            # Add keywords if provided
+            if query.keywords:
+                search_terms.extend(query.keywords)
+                
             for result in results:
                 try:
                     # Check if result is already an ArchiveDocument
                     if isinstance(result, ArchiveDocument):
-                        docs.append(result)
+                        doc = result
                     else:
                         # Convert dictionary to ArchiveDocument
                         doc = ArchiveDocument.from_pinecone_match(result)
-                        docs.append(doc)
+                    
+                    # Find a better excerpt that contains search terms
+                    if doc.metadata and doc.metadata.text:
+                        doc.text_excerpt = self.find_excerpt_with_terms(
+                            doc.metadata.text, 
+                            search_terms
+                        )
+                    
+                    docs.append(doc)
                 except Exception as e:
                     logger.error(f"Error converting result to ArchiveDocument: {e}")
                     continue
