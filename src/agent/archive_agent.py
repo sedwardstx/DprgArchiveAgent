@@ -3,6 +3,7 @@ Main agent for the DPRG Archive.
 """
 import logging
 import time
+import re
 from typing import Dict, List, Any, Optional, Union
 
 from ..schema.models import (
@@ -237,7 +238,6 @@ class ArchiveAgent:
                 # Extract author information if present
                 if "by " in query.lower() and "@" in query:
                     # Find email addresses which are likely author identifiers
-                    import re
                     email_match = re.search(r'[\w.+-]+@[\w-]+\.[\w.-]+', query)
                     if email_match:
                         author_filter = email_match.group(0)
@@ -360,7 +360,6 @@ class ArchiveAgent:
                     # Extract author information if present
                     if "by " in user_query.lower() and "@" in user_query:
                         # Find email addresses which are likely author identifiers
-                        import re
                         email_match = re.search(r'[\w.+-]+@[\w-]+\.[\w.-]+', user_query)
                         if email_match:
                             author_filter = email_match.group(0)
