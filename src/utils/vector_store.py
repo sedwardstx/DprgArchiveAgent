@@ -105,13 +105,23 @@ class DenseVectorClient(BaseVectorClient):
             vector = await get_embedding(query)
             logger.info(f"Generated embedding with dimension: {len(vector)}")
             
+            # Format filter for Pinecone - handle keywords specially
+            formatted_filter = {}
+            if filter:
+                for key, value in filter.items():
+                    if key == "keywords" and isinstance(value, list) and len(value) > 0:
+                        # For keywords, use $in operator to check if any keyword matches
+                        formatted_filter[key] = {"$in": value}
+                    else:
+                        formatted_filter[key] = value
+            
             # Execute search
-            logger.info(f"Executing dense search with top_k={top_k}, filter={filter}")
+            logger.info(f"Executing dense search with top_k={top_k}, filter={formatted_filter}")
             # Query using Pinecone v2.2.4 API
             results = self.index.query(
                 vector=vector,
                 top_k=top_k,
-                filter=filter,
+                filter=formatted_filter,
                 include_metadata=True,
                 namespace=PINECONE_NAMESPACE
             )
@@ -204,13 +214,23 @@ class SparseVectorClient(BaseVectorClient):
                 "values": values
             }
             
+            # Format filter for Pinecone - handle keywords specially
+            formatted_filter = {}
+            if filter:
+                for key, value in filter.items():
+                    if key == "keywords" and isinstance(value, list) and len(value) > 0:
+                        # For keywords, use $in operator to check if any keyword matches
+                        formatted_filter[key] = {"$in": value}
+                    else:
+                        formatted_filter[key] = value
+            
             # Execute search
-            logger.info(f"Executing sparse search with top_k={top_k}, filter={filter}")
+            logger.info(f"Executing sparse search with top_k={top_k}, filter={formatted_filter}")
             # Query using Pinecone v2.2.4 API
             results = self.index.query(
                 top_k=top_k,
                 sparse_vector=sparse_vector,
-                filter=filter,
+                filter=formatted_filter,
                 include_metadata=True,
                 namespace=PINECONE_NAMESPACE
             )
@@ -282,19 +302,29 @@ class HybridSearchClient(BaseVectorClient):
             List of search results
         """
         try:
-            logger.info(f"Executing hybrid search with query: '{query}', top_k={top_k}, filter={filter}")
+            # Format filter for Pinecone - handle keywords specially
+            formatted_filter = {}
+            if filter:
+                for key, value in filter.items():
+                    if key == "keywords" and isinstance(value, list) and len(value) > 0:
+                        # For keywords, use $in operator to check if any keyword matches
+                        formatted_filter[key] = {"$in": value}
+                    else:
+                        formatted_filter[key] = value
+            
+            logger.info(f"Executing hybrid search with query: '{query}', top_k={top_k}, filter={formatted_filter}")
             
             # Run both dense and sparse searches in parallel
             dense_results = await self.dense_client.search(
                 query=query,
                 top_k=top_k * 2,  # Get more results to ensure we have enough after hybrid fusion
-                filter=filter,
+                filter=formatted_filter,
                 min_score=None  # Don't filter at this stage
             )
             sparse_results = await self.sparse_client.search(
                 query=query,
                 top_k=top_k * 2,  # Get more results to ensure we have enough after hybrid fusion
-                filter=filter,
+                filter=formatted_filter,
                 min_score=None  # Don't filter at this stage
             )
             

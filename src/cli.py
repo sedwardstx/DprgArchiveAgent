@@ -200,7 +200,7 @@ def search(
     year: Optional[int] = typer.Option(None, "--year", "-y", help="Filter by year"),
     month: Optional[int] = typer.Option(None, "--month", "-m", help="Filter by month"),
     day: Optional[int] = typer.Option(None, "--day", "-d", help="Filter by day"),
-    keywords: Optional[str] = typer.Option(None, "--keywords", "-kw", help="Comma-separated list of keywords"),
+    keywords: Optional[List[str]] = typer.Option(None, "--keyword", "-kw", help="Filter by keyword (can be used multiple times)"),
     title: Optional[str] = typer.Option(None, "--title", help="Filter by title"),
     min_score: Optional[float] = typer.Option(0.3, "--min-score", "-s", help="Minimum semantic relevance score (0.0-1.0)"),
     search_type: str = typer.Option("dense", "--type", "-t", help="Search type: dense, sparse, or hybrid"),
@@ -220,6 +220,7 @@ def search(
       search "outdoor robot navigation"
       search "UMBMark calibration" --type hybrid --min-score 0.2
       search "GPS coordinates" --author "dpa@io.isem.smu.edu" --year 2008
+      search "competition" --keyword "dprg" --keyword "video"
     """
     try:
         # Validate environment
@@ -247,15 +248,6 @@ def search(
             console.print("No filters applied", style="italic")
             log_debug("No filter option enabled, setting min_score to 0.0")
 
-        # Process keywords if provided
-        keyword_list = None
-        if keywords:
-            try:
-                keyword_list = [k.strip() for k in keywords.split(",") if k.strip()]
-            except Exception as e:
-                console.print(f"[bold red]error:[/bold red] Invalid keywords format: {str(e)}")
-                raise typer.Exit(code=1)
-
         # Build search query
         search_query = SearchQuery(
             query=query,
@@ -264,7 +256,7 @@ def search(
             year=year,
             month=month,
             day=day,
-            keywords=keyword_list,
+            keywords=keywords,
             title=title,
             min_score=min_score,
             search_type=search_type,
