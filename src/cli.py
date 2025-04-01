@@ -150,12 +150,12 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
         return
 
     # Create table for results
-    table = Table(show_header=True, header_style="bold")
-    table.add_column("Score", justify="right", style="cyan")
-    table.add_column("Title", style="green")
-    table.add_column("Author", style="yellow")
-    table.add_column("Date", style="magenta")
-    table.add_column("Excerpt", style="white")
+    table = Table(show_header=True, header_style="bold", box=box.ROUNDED)
+    table.add_column("Score", justify="right", style="cyan", width=6)
+    table.add_column("Title", style="green", width=30)
+    table.add_column("Author", style="yellow", width=30)
+    table.add_column("Date", style="magenta", width=12)
+    table.add_column("Excerpt", style="white", width=60)
 
     # Add results to table
     for result in results.results:
@@ -176,12 +176,13 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
             author = result.metadata.author or ""
             excerpt = result.text_excerpt
             
+            # Add results to table - use a longer excerpt that wraps
             table.add_row(
                 f"{result.score:.3f}",
                 title,
                 author,
                 date_str,
-                excerpt[:100] + "..." if len(excerpt) > 100 else excerpt
+                excerpt  # No manual truncation - let the table wrap it
             )
         except Exception as e:
             log_debug(f"Error formatting result: {str(e)}")

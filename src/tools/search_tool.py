@@ -32,7 +32,7 @@ class SearchTool:
         self.hybrid_client = hybrid_client or HybridSearchClient()
         logger.info("Search tool initialized")
     
-    def find_excerpt_with_terms(self, full_text: str, search_terms: List[str], max_length: int = 150) -> str:
+    def find_excerpt_with_terms(self, full_text: str, search_terms: List[str], max_length: int = 250) -> str:
         """
         Find an excerpt from the full text that contains at least one of the search terms.
         
@@ -49,21 +49,39 @@ class SearchTool:
         
         # Normalize text and search terms for case-insensitive matching
         full_text_lower = full_text.lower()
-        search_terms_lower = [term.lower() for term in search_terms if term]
+        
+        # Process search terms - for short terms, only do exact matches
+        # For longer terms (like keywords), allow partial matches
+        search_terms_patterns = []
+        for term in search_terms:
+            if not term:
+                continue
+            term = term.lower()
+            # For short terms (less than 5 chars), only match whole words
+            if len(term) < 5:
+                search_terms_patterns.append(rf'\b{re.escape(term)}\b')
+            else:
+                # For longer terms, also match partial words
+                search_terms_patterns.append(re.escape(term))
         
         # Create a regex pattern with all search terms for efficient searching
-        pattern = r'|'.join(re.escape(term) for term in search_terms_lower if term)
-        if not pattern:
+        if not search_terms_patterns:
             return full_text[:max_length]
-            
+        
+        pattern = r'|'.join(search_terms_patterns)
+        
         # Find all matches
         matches = list(re.finditer(pattern, full_text_lower))
         if not matches:
+            logger.debug(f"No matches found for terms {search_terms} in text: {full_text[:100]}...")
             # No match found, return beginning of text
             return full_text[:max_length]
         
+        logger.debug(f"Found {len(matches)} matches for search terms in document")
+        
         # Find the best match to use as center of excerpt
         best_match = matches[0]  # Start with first match
+        best_term_count = 1
         
         # Try to find an excerpt that includes multiple search terms if possible
         for i, match in enumerate(matches):
@@ -72,12 +90,18 @@ class SearchTool:
             excerpt_lower = full_text_lower[start_pos:end_pos]
             
             # Count how many different search terms appear in this excerpt
-            term_count = sum(1 for term in search_terms_lower if term in excerpt_lower)
+            term_count = 0
+            for term in search_terms:
+                if term and term.lower() in excerpt_lower:
+                    term_count += 1
             
-            # If this excerpt contains more search terms, use it instead
-            if term_count > 1:
+            # If this excerpt contains more search terms than our current best, use it instead
+            if term_count > best_term_count:
                 best_match = match
-                break
+                best_term_count = term_count
+                # If we found an excerpt with all terms, no need to check further
+                if term_count == len([t for t in search_terms if t]):
+                    break
         
         # Create excerpt around the best match
         start_pos = max(0, best_match.start() - max_length // 2)
@@ -112,10 +136,14 @@ class SearchTool:
         Search for documents matching the query.
         """
         try:
-            # Validate query
-            if not query.query:
+            # Validate query - special case for metadata searches that might use "*" wildcard
+            is_metadata_search = False
+            if query.query == "*":
+                is_metadata_search = True
+                logger.info("Detected metadata search with wildcard query")
+            elif not query.query:
                 return SearchError(error="Query cannot be empty")
-            if len(query.query) > 1000:
+            elif len(query.query) > 1000:
                 return SearchError(error="Query is too long (max 1000 characters)")
             
             # Validate dates
@@ -191,11 +219,26 @@ class SearchTool:
             docs = []
             # Collect search terms from the query and keywords for excerpt highlighting
             search_terms = []
-            # Add the main query terms (split by spaces)
-            search_terms.extend([term.strip() for term in query.query.split() if len(term.strip()) > 2])
-            # Add keywords if provided
-            if query.keywords:
-                search_terms.extend(query.keywords)
+            
+            if is_metadata_search:
+                # For metadata search, prioritize the keywords/filters as search terms
+                if query.keywords:
+                    search_terms.extend(query.keywords)
+                if title_filter:
+                    search_terms.append(title_filter)
+                # Add any other filter values that might be useful
+                if query.author:
+                    # Don't include author email as a search term normally
+                    pass
+            else:
+                # Add the main query terms (split by spaces)
+                search_terms.extend([term.strip() for term in query.query.split() if len(term.strip()) > 2])
+                # Add keywords if provided
+                if query.keywords:
+                    search_terms.extend(query.keywords)
+            
+            # Log the search terms we'll be using for excerpts
+            logger.debug(f"Using search terms for excerpts: {search_terms}")
                 
             for result in results:
                 try:
