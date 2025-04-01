@@ -203,24 +203,16 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
             author = result.metadata.author or ""
             excerpt = result.text_excerpt
             
-            # Highlight search terms with special syntax Rich will understand
+            # Highlight search terms with marker brackets - this will work in any terminal
             if search_terms and excerpt:
-                # Use Rich's actual highlighting, which works in all terminals
-                # Create a Text object we can style directly
-                highlighted_excerpt = Text(excerpt)
                 for term in search_terms:
                     if len(term) < 3:
                         continue
                     
-                    # Find all instances of the term with case-insensitive matching
-                    pattern = re.compile(re.escape(term), re.IGNORECASE)
-                    for match in pattern.finditer(excerpt):
-                        start, end = match.span()
-                        # This directly modifies the Text object with styling
-                        highlighted_excerpt.stylize("reverse", start, end)
-            else:
-                # No terms to highlight
-                highlighted_excerpt = Text(excerpt)
+                    # Use regex for case-insensitive replacement
+                    pattern = re.compile(f"({re.escape(term)})", re.IGNORECASE)
+                    # Replace with marker brackets around the term
+                    excerpt = pattern.sub(r"<<<\1>>>", excerpt)
             
             # Add results to table
             table.add_row(
@@ -228,7 +220,7 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
                 title,
                 author,
                 date_str,
-                highlighted_excerpt
+                excerpt
             )
         except Exception as e:
             log_debug(f"Error formatting result: {str(e)}")
