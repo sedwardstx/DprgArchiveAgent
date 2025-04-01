@@ -234,6 +234,16 @@ During the chat session:
 - The agent will retrieve relevant documents and answer based on those documents
 - The agent will show you which documents it referenced
 - Type 'exit' or 'quit' to end the session
+- Type 'reset', 'clear', or 'restart' to clear conversation history and start fresh
+
+### Special Chat Commands
+
+The chat interface supports several special commands:
+
+| Command | Aliases | Description |
+|---------|---------|-------------|
+| `exit` | `quit`, `bye`, `goodbye` | End the chat session |
+| `reset` | `clear`, `restart` | Clear conversation history and start fresh without exiting |
 
 ## Environment Configuration
 
