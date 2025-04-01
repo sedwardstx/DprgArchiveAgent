@@ -6,7 +6,7 @@ from typing import Dict, List, Any, Optional, Tuple, Union
 from abc import ABC, abstractmethod
 
 # Import for Pinecone client v2.2.4
-import pinecone
+from pinecone import Pinecone
 from ..config import (
     PINECONE_API_KEY,
     PINECONE_ENVIRONMENT,
@@ -32,13 +32,15 @@ class BaseVectorClient(ABC):
         logger.info(f"Initializing Pinecone client with API key: {PINECONE_API_KEY[:5]}...")
         # Initialize Pinecone client for v2.2.4
         try:
-            pinecone.init(api_key=PINECONE_API_KEY, environment=PINECONE_ENVIRONMENT)
+            # Create a Pinecone client instance
+            self.pc = Pinecone(api_key=PINECONE_API_KEY, environment=PINECONE_ENVIRONMENT)
             
             # List available indices
-            indices = pinecone.list_indexes()
+            indices = self.pc.list_indexes()
             logger.info(f"Available Pinecone indices: {indices}")
         except Exception as e:
             logger.error(f"Error initializing Pinecone: {str(e)}")
+            self.pc = None
             # Continue without raising to allow tests to run
         
         logger.info(f"Initialized {self.__class__.__name__}")
@@ -63,8 +65,12 @@ class DenseVectorClient(BaseVectorClient):
         logger.info(f"Initializing dense index with name: {DENSE_INDEX_NAME}")
         try:
             # Initialize index for Pinecone v2.2.4
-            self.index = pinecone.Index(DENSE_INDEX_NAME)
-            logger.info(f"Successfully initialized {self.__class__.__name__} with index {DENSE_INDEX_NAME}")
+            if self.pc is not None:
+                self.index = self.pc.Index(DENSE_INDEX_NAME)
+                logger.info(f"Successfully initialized {self.__class__.__name__} with index {DENSE_INDEX_NAME}")
+            else:
+                self.index = None
+                logger.warning("Pinecone client is not initialized, index will be None")
         except Exception as e:
             logger.error(f"Error initializing dense index: {str(e)}")
             # Allow tests to run even if index initialization fails
@@ -152,8 +158,12 @@ class SparseVectorClient(BaseVectorClient):
         logger.info(f"Initializing sparse index with name: {SPARSE_INDEX_NAME}")
         try:
             # Initialize index for Pinecone v2.2.4
-            self.index = pinecone.Index(SPARSE_INDEX_NAME)
-            logger.info(f"Successfully initialized {self.__class__.__name__} with index {SPARSE_INDEX_NAME}")
+            if self.pc is not None:
+                self.index = self.pc.Index(SPARSE_INDEX_NAME)
+                logger.info(f"Successfully initialized {self.__class__.__name__} with index {SPARSE_INDEX_NAME}")
+            else:
+                self.index = None
+                logger.warning("Pinecone client is not initialized, index will be None")
         except Exception as e:
             logger.error(f"Error initializing sparse index: {str(e)}")
             # Allow tests to run even if index initialization fails
