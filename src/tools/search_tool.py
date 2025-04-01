@@ -237,7 +237,7 @@ class SearchTool:
                 continue
             if keywords and not all(k in (result.metadata.keywords or []) for k in keywords):
                 continue
-            if title and result.metadata.title != title:
+            if title and result.metadata.title and title.lower() not in result.metadata.title.lower():
                 continue
                 
             filtered_results.append(result)

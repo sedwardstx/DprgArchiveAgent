@@ -105,13 +105,16 @@ class DenseVectorClient(BaseVectorClient):
             vector = await get_embedding(query)
             logger.info(f"Generated embedding with dimension: {len(vector)}")
             
-            # Format filter for Pinecone - handle keywords specially
+            # Format filter for Pinecone - handle keywords and title specially
             formatted_filter = {}
             if filter:
                 for key, value in filter.items():
                     if key == "keywords" and isinstance(value, list) and len(value) > 0:
                         # For keywords, use $in operator to check if any keyword matches
                         formatted_filter[key] = {"$in": value}
+                    elif key == "title" and value:
+                        # For title, use $text.match for partial matching
+                        formatted_filter[key] = {"$text": {"$match": value}}
                     else:
                         formatted_filter[key] = value
             
@@ -214,13 +217,16 @@ class SparseVectorClient(BaseVectorClient):
                 "values": values
             }
             
-            # Format filter for Pinecone - handle keywords specially
+            # Format filter for Pinecone - handle keywords and title specially
             formatted_filter = {}
             if filter:
                 for key, value in filter.items():
                     if key == "keywords" and isinstance(value, list) and len(value) > 0:
                         # For keywords, use $in operator to check if any keyword matches
                         formatted_filter[key] = {"$in": value}
+                    elif key == "title" and value:
+                        # For title, use $text.match for partial matching
+                        formatted_filter[key] = {"$text": {"$match": value}}
                     else:
                         formatted_filter[key] = value
             
@@ -302,13 +308,16 @@ class HybridSearchClient(BaseVectorClient):
             List of search results
         """
         try:
-            # Format filter for Pinecone - handle keywords specially
+            # Format filter for Pinecone - handle keywords and title specially
             formatted_filter = {}
             if filter:
                 for key, value in filter.items():
                     if key == "keywords" and isinstance(value, list) and len(value) > 0:
                         # For keywords, use $in operator to check if any keyword matches
                         formatted_filter[key] = {"$in": value}
+                    elif key == "title" and value:
+                        # For title, use $text.match for partial matching
+                        formatted_filter[key] = {"$text": {"$match": value}}
                     else:
                         formatted_filter[key] = value
             
