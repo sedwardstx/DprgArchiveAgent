@@ -152,19 +152,28 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
 
     # Get search terms to highlight from the query and any metadata
     search_terms = []
-    # For normal search, add query terms
-    if query != "Metadata Search" and query != "*":
+    
+    # For metadata searches, look for keywords in the results themselves
+    if query == "Metadata Search" or query == "*":
+        # Check if any results have search_terms attached
+        for result in results.results:
+            if hasattr(result, "search_terms") and result.search_terms:
+                search_terms.extend(result.search_terms)
+                break
+    else:
+        # For regular searches, use query terms too
         search_terms.extend([term.strip() for term in query.split() if len(term.strip()) > 2])
     
-    # Extract any keywords used in the search
-    keywords = []
-    for doc in results.results:
-        if hasattr(doc, "search_terms") and doc.search_terms:
-            keywords.extend(doc.search_terms)
+    # Add keywords from any result (they should all have the same search terms)
+    for result in results.results:
+        if hasattr(result, "search_terms") and result.search_terms:
+            search_terms.extend(result.search_terms)
             break
     
     # Remove duplicates and empty strings
-    search_terms = list(set([term.lower() for term in search_terms + keywords if term]))
+    search_terms = list(set([term.lower() for term in search_terms if term and len(term) > 2]))
+    
+    # Log what we're highlighting
     logger.debug(f"Terms to highlight: {search_terms}")
 
     # Create table for results
@@ -194,29 +203,32 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
             author = result.metadata.author or ""
             excerpt = result.text_excerpt
             
-            # Highlight search terms in the excerpt
+            # Highlight search terms in the excerpt using Rich markup
             if search_terms and excerpt:
+                # Create a Rich Text object with the excerpt
                 highlighted_excerpt = Text(excerpt)
                 for term in search_terms:
-                    # Skip short terms to avoid too many highlights
-                    if len(term) <= 2:
+                    # Make sure term is at least 3 chars to avoid highlighting common words
+                    if len(term) < 3:
                         continue
-                    
-                    # Use regex for case-insensitive matching
-                    pattern = re.compile(re.escape(term), re.IGNORECASE)
-                    for match in pattern.finditer(excerpt):
+                        
+                    # For case-insensitive search
+                    term_pattern = re.compile(re.escape(term), re.IGNORECASE)
+                    for match in term_pattern.finditer(excerpt):
                         start, end = match.span()
-                        highlighted_excerpt.stylize("bold yellow", start, end)
+                        # Apply yellow highlight to the matching text
+                        highlighted_excerpt.stylize("black on yellow", start, end)
             else:
-                highlighted_excerpt = excerpt
+                # No search terms to highlight
+                highlighted_excerpt = Text(excerpt)
             
-            # Add results to table - use a longer excerpt that wraps
+            # Add results to table
             table.add_row(
                 f"{result.score:.3f}",
                 title,
                 author,
                 date_str,
-                highlighted_excerpt  # Now using the highlighted version
+                highlighted_excerpt
             )
         except Exception as e:
             log_debug(f"Error formatting result: {str(e)}")
