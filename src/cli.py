@@ -626,6 +626,19 @@ def chat(
                 console.print("[bold blue]Agent[/bold blue]: Goodbye! Thanks for chatting.")
                 break
             
+            # Check for reset command
+            if user_input.lower() in ["reset", "clear", "restart"]:
+                # Reset conversation to initial state
+                conversation = [
+                    ChatMessage(
+                        role="system",
+                        content="You are an expert on the DPRG (Dallas Personal Robotics Group) archive."
+                    )
+                ]
+                console.print("[bold blue]Agent[/bold blue]: Conversation history has been cleared. Let's start fresh!")
+                console.print("[italic]All previous context and filters have been reset.[/italic]")
+                continue
+            
             # Add user message to conversation
             conversation.append(ChatMessage(role="user", content=user_input))
             
