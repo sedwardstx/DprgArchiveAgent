@@ -251,11 +251,11 @@ You can adjust the search parameters directly from the chat interface using simp
 
 | Parameter | Example Commands | Description |
 | --- | --- | --- |
-| `top_k` | `set top-k to 20`, `return 30 results` | Change the number of documents retrieved (1-50) |
+| `top-k` | `set top-k to 20`, `return 30 results` | Change the number of documents retrieved (1-50) |
 | `temperature` | `set temperature to 0.8` | Adjust response creativity (0.0-1.0) |
-| `min_score` | `set min-score to 0.5`, `set threshold to 0.4` | Modify relevance threshold (0.0-1.0) |
-| `search_type` | `set search-type to dense`, `use sparse search` | Change search algorithm (dense, sparse, hybrid) |
-| `max_tokens` | `set max-tokens to 1000` | Adjust maximum response length (100-2000) |
+| `min-score` | `set min-score to 0.5`, `set threshold to 0.4` | Modify relevance threshold (0.0-1.0) |
+| `search-type` | `set search-type to dense`, `use sparse search` | Change search algorithm (dense, sparse, hybrid) |
+| `max-tokens` | `set max-tokens to 1000` | Adjust maximum response length (100-2000) |
 
 ### Displaying Current Search Parameters
 

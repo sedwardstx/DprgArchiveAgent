@@ -656,17 +656,17 @@ def chat(
             
             # Check for parameter adjustment commands
             param_patterns = [
-                # top_k patterns
-                (r'(?:set|change|update|use)\s+(?:top[-\s]?k|results)\s+(?:to|=|as)\s+(\d+)', 'top_k'),
+                # top_k patterns - accept both dash and underscore formats
+                (r'(?:set|change|update|use)\s+(?:top[-_\s]?k|results)\s+(?:to|=|as)\s+(\d+)', 'top_k'),
                 (r'(?:show|get|retrieve|find|return)\s+(\d+)\s+(?:results|documents)', 'top_k'),
                 # temperature patterns
                 (r'(?:set|change|update|use)\s+temperature\s+(?:to|=|as)\s+(0\.\d+)', 'temperature'),
-                # min_score patterns
-                (r'(?:set|change|update|use)\s+(?:min[-\s]?score|threshold)\s+(?:to|=|as)\s+(0\.\d+)', 'min_score'),
-                # search_type patterns
-                (r'(?:set|change|update|use)\s+(?:search[-\s]?type|search)\s+(?:to|=|as)\s+(dense|sparse|hybrid)', 'search_type'),
-                # max_tokens patterns
-                (r'(?:set|change|update|use)\s+(?:max[-\s]?tokens|tokens)\s+(?:to|=|as)\s+(\d+)', 'max_tokens'),
+                # min_score patterns - accept both dash and underscore formats
+                (r'(?:set|change|update|use)\s+(?:min[-_\s]?score|threshold)\s+(?:to|=|as)\s+(0\.\d+)', 'min_score'),
+                # search_type patterns - accept both dash and underscore formats
+                (r'(?:set|change|update|use)\s+(?:search[-_\s]?type|search)\s+(?:to|=|as)\s+(dense|sparse|hybrid)', 'search_type'),
+                # max_tokens patterns - accept both dash and underscore formats
+                (r'(?:set|change|update|use)\s+(?:max[-_\s]?tokens|tokens)\s+(?:to|=|as)\s+(\d+)', 'max_tokens'),
             ]
             
             param_changed = False
@@ -723,12 +723,12 @@ def chat(
                     settings_table.add_column("Value", style="green", width=10)
                     settings_table.add_column("Description", style="white", width=50)
                     
-                    # Add current parameter values to the table
-                    settings_table.add_row("top_k", str(top_k), "Number of documents retrieved (1-50)")
+                    # Add current parameter values to the table with dashed format for consistency
+                    settings_table.add_row("top-k", str(top_k), "Number of documents retrieved (1-50)")
                     settings_table.add_row("temperature", f"{temperature:.1f}", "Response creativity (0.0-1.0)")
-                    settings_table.add_row("min_score", f"{min_score:.2f}", "Minimum relevance threshold (0.0-1.0)")
-                    settings_table.add_row("search_type", search_type, "Search algorithm (dense, sparse, hybrid)")
-                    settings_table.add_row("max_tokens", str(max_tokens), "Maximum response length (100-2000)")
+                    settings_table.add_row("min-score", f"{min_score:.2f}", "Minimum relevance threshold (0.0-1.0)")
+                    settings_table.add_row("search-type", search_type, "Search algorithm (dense, sparse, hybrid)")
+                    settings_table.add_row("max-tokens", str(max_tokens), "Maximum response length (100-2000)")
                     
                     console.print(settings_table)
                     param_changed = True
