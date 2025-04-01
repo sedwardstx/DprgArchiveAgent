@@ -448,7 +448,7 @@ def search_metadata(
 def chat(
     query: Optional[str] = typer.Option(None, help="One-shot query instead of interactive chat"),
     top_k: int = typer.Option(5, help="Number of results to retrieve for context"),
-    search_type: str = typer.Option("hybrid", help="Search type: dense, sparse, or hybrid"),
+    search_type: str = typer.Option("hybrid", "--search-type", "--type", "-t", help="Search type: dense, sparse, or hybrid"),
     temperature: float = typer.Option(0.7, help="Temperature for chat completion"),
     max_tokens: int = typer.Option(500, help="Maximum tokens for chat completion"),
     min_score: float = typer.Option(0.3, help="Minimum score threshold for relevant documents")
@@ -515,14 +515,87 @@ def chat(
                 # Get response from agent with all relevant parameters
                 response = run_async_safely(archive_agent.chat(request))
             
+            # Display referenced documents if any
+            if hasattr(response, "referenced_documents") and response.referenced_documents:
+                # Extract document IDs mentioned in the response content
+                doc_pattern = r'Document (\d+):'
+                mentioned_docs = re.findall(doc_pattern, response.message.content)
+                mentioned_doc_ids = [int(doc_id) for doc_id in mentioned_docs]
+                
+                # Only show documents that are actually referenced in the response
+                filtered_docs = []
+                if mentioned_doc_ids:
+                    for i, doc in enumerate(response.referenced_documents):
+                        if i+1 in mentioned_doc_ids:
+                            filtered_docs.append((i+1, doc))
+                else:
+                    # If no specific document numbers mentioned, use the top 3
+                    filtered_docs = [(i+1, doc) for i, doc in enumerate(response.referenced_documents[:3])]
+                
+                if filtered_docs:
+                    docs_table = Table(title="Referenced Documents", box=box.ROUNDED)
+                    docs_table.add_column("ID", style="bold cyan", width=4)
+                    docs_table.add_column("Title", style="green")
+                    docs_table.add_column("Author", style="yellow")
+                    docs_table.add_column("Date", style="magenta")
+                    
+                    for doc_id, doc in filtered_docs:
+                        # Format date if available
+                        date_str = ""
+                        if doc.metadata.year:
+                            date_str = f"{doc.metadata.year}"
+                            if doc.metadata.month:
+                                date_str += f"-{doc.metadata.month}"
+                                if doc.metadata.day:
+                                    date_str += f"-{doc.metadata.day}"
+                        
+                        docs_table.add_row(
+                            f"{doc_id}",
+                            doc.metadata.title or "Untitled",
+                            doc.metadata.author or "Unknown",
+                            date_str or "Unknown"
+                        )
+                    
+                    console.print(docs_table)
+            
             # Display agent response
             if hasattr(response, "message"):
                 console.print("\n[bold blue]Agent[/bold blue]:")
-                console.print(Markdown(response.message.content))
-                return 0  # Success
+                
+                # Check if response contains a list of documents
+                if re.search(r'Document \d+:', response.message.content):
+                    # Separate introduction from document list if present
+                    parts = re.split(r'(Document \d+:.*)', response.message.content, 1)
+                    
+                    if len(parts) > 1:
+                        # Print any introduction text
+                        if parts[0].strip():
+                            console.print(Markdown(parts[0].strip()))
+                        
+                        # Create a table for the documents
+                        docs_content_table = Table(box=box.ROUNDED)
+                        docs_content_table.add_column("ID", style="bold cyan", width=4)
+                        docs_content_table.add_column("Details", style="white")
+                        
+                        # Find all document entries in the response
+                        doc_entries = re.finditer(r'Document (\d+):(.*?)(?=Document \d+:|$)', 
+                                                 parts[1] + " ", re.DOTALL)
+                        
+                        for match in doc_entries:
+                            doc_id = match.group(1)
+                            doc_details = match.group(2).strip()
+                            docs_content_table.add_row(doc_id, doc_details)
+                        
+                        console.print(docs_content_table)
+                    else:
+                        # If we couldn't split properly, just show the original text
+                        console.print(Markdown(response.message.content))
+                else:
+                    # No document list, just print the response as is
+                    console.print(Markdown(response.message.content))
             else:
                 console.print("[bold red]Error:[/bold red] Failed to get a response")
-                return 1  # Error
+            return 0  # Success
         except Exception as e:
             console.print(f"[bold red]Error:[/bold red] {str(e)}")
             return 1  # Error
@@ -558,33 +631,82 @@ def chat(
                 
                 # Display referenced documents if any
                 if hasattr(response, "referenced_documents") and response.referenced_documents:
-                    docs_table = Table(title="Referenced Documents", box=box.ROUNDED)
-                    docs_table.add_column("Title", style="cyan")
-                    docs_table.add_column("Author", style="green")
-                    docs_table.add_column("Date", style="yellow")
+                    # Extract document IDs mentioned in the response content
+                    doc_pattern = r'Document (\d+):'
+                    mentioned_docs = re.findall(doc_pattern, response.message.content)
+                    mentioned_doc_ids = [int(doc_id) for doc_id in mentioned_docs]
                     
-                    for doc in response.referenced_documents[:3]:  # Show top 3 docs
-                        # Format date if available
-                        date_str = ""
-                        if doc.metadata.year:
-                            date_str = f"{doc.metadata.year}"
-                            if doc.metadata.month:
-                                date_str += f"-{doc.metadata.month}"
-                                if doc.metadata.day:
-                                    date_str += f"-{doc.metadata.day}"
+                    # Only show documents that are actually referenced in the response
+                    filtered_docs = []
+                    if mentioned_doc_ids:
+                        for i, doc in enumerate(response.referenced_documents):
+                            if i+1 in mentioned_doc_ids:
+                                filtered_docs.append((i+1, doc))
+                    else:
+                        # If no specific document numbers mentioned, use the top 3
+                        filtered_docs = [(i+1, doc) for i, doc in enumerate(response.referenced_documents[:3])]
+                    
+                    if filtered_docs:
+                        docs_table = Table(title="Referenced Documents", box=box.ROUNDED)
+                        docs_table.add_column("ID", style="bold cyan", width=4)
+                        docs_table.add_column("Title", style="green")
+                        docs_table.add_column("Author", style="yellow")
+                        docs_table.add_column("Date", style="magenta")
                         
-                        docs_table.add_row(
-                            doc.metadata.title or "Untitled",
-                            doc.metadata.author or "Unknown",
-                            date_str or "Unknown"
-                        )
-                    
-                    console.print(docs_table)
+                        for doc_id, doc in filtered_docs:
+                            # Format date if available
+                            date_str = ""
+                            if doc.metadata.year:
+                                date_str = f"{doc.metadata.year}"
+                                if doc.metadata.month:
+                                    date_str += f"-{doc.metadata.month}"
+                                    if doc.metadata.day:
+                                        date_str += f"-{doc.metadata.day}"
+                            
+                            docs_table.add_row(
+                                f"{doc_id}",
+                                doc.metadata.title or "Untitled",
+                                doc.metadata.author or "Unknown",
+                                date_str or "Unknown"
+                            )
+                        
+                        console.print(docs_table)
                 
                 # Display agent response
                 if hasattr(response, "message"):
                     console.print("\n[bold blue]Agent[/bold blue]:")
-                    console.print(Markdown(response.message.content))
+                    
+                    # Check if response contains a list of documents
+                    if re.search(r'Document \d+:', response.message.content):
+                        # Separate introduction from document list if present
+                        parts = re.split(r'(Document \d+:.*)', response.message.content, 1)
+                        
+                        if len(parts) > 1:
+                            # Print any introduction text
+                            if parts[0].strip():
+                                console.print(Markdown(parts[0].strip()))
+                            
+                            # Create a table for the documents
+                            docs_content_table = Table(box=box.ROUNDED)
+                            docs_content_table.add_column("ID", style="bold cyan", width=4)
+                            docs_content_table.add_column("Details", style="white")
+                            
+                            # Find all document entries in the response
+                            doc_entries = re.finditer(r'Document (\d+):(.*?)(?=Document \d+:|$)', 
+                                                     parts[1] + " ", re.DOTALL)
+                            
+                            for match in doc_entries:
+                                doc_id = match.group(1)
+                                doc_details = match.group(2).strip()
+                                docs_content_table.add_row(doc_id, doc_details)
+                            
+                            console.print(docs_content_table)
+                        else:
+                            # If we couldn't split properly, just show the original text
+                            console.print(Markdown(response.message.content))
+                    else:
+                        # No document list, just print the response as is
+                        console.print(Markdown(response.message.content))
                     
                     # Add assistant message to conversation history
                     conversation.append(response.message)
