@@ -203,24 +203,29 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
             author = result.metadata.author or ""
             excerpt = result.text_excerpt
             
-            # Highlight search terms with marker brackets - this will work in any terminal
+            # Create a Rich Text object for the excerpt that can have mixed styles
+            text_excerpt = Text(excerpt, style="white")
+            
+            # Highlight search terms in yellow while keeping the rest white
             if search_terms and excerpt:
                 for term in search_terms:
                     if len(term) < 3:
                         continue
                     
-                    # Use regex for case-insensitive replacement
-                    pattern = re.compile(f"({re.escape(term)})", re.IGNORECASE)
-                    # Replace with marker brackets around the term
-                    excerpt = pattern.sub(r"<<<\1>>>", excerpt)
+                    # Find all instances of the term (case-insensitive)
+                    pattern = re.compile(re.escape(term), re.IGNORECASE)
+                    for match in pattern.finditer(excerpt):
+                        start, end = match.span()
+                        # Apply yellow highlight to just the matched term
+                        text_excerpt.stylize("bold yellow", start, end)
             
-            # Add results to table
+            # Add results to table with properly styled excerpt
             table.add_row(
                 f"{result.score:.3f}",
                 title,
                 author,
                 date_str,
-                excerpt
+                text_excerpt  # Use the styled Text object
             )
         except Exception as e:
             log_debug(f"Error formatting result: {str(e)}")
