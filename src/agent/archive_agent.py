@@ -327,8 +327,11 @@ class ArchiveAgent:
                             logger.info(f"Fallback metadata search found {len(metadata_results.results)} results")
                             search_results = metadata_results
                 
+                # Extract user query for use in building the system prompt
+                user_query_text = query if isinstance(query, str) else query
+                
                 # Build system prompt with context
-                system_prompt = self._build_system_prompt(search_results.results)
+                system_prompt = self._build_system_prompt(search_results.results, user_query_text)
                 
                 # Create chat request
                 request = ChatCompletionRequest(
@@ -443,7 +446,7 @@ class ArchiveAgent:
                                 search_results = metadata_results
                     
                     # Build system prompt with context
-                    system_prompt = self._build_system_prompt(search_results.results)
+                    system_prompt = self._build_system_prompt(search_results.results, user_query)
                     
                     # Replace the system message if it exists, or add it if it doesn't
                     has_system_message = False
@@ -495,12 +498,13 @@ class ArchiveAgent:
                 error=f"Chat failed: {str(e)}"
             )
     
-    def _build_system_prompt(self, documents: List[ArchiveDocument]) -> str:
+    def _build_system_prompt(self, documents: List[ArchiveDocument], query_text: str = "") -> str:
         """
         Build a system prompt with context from retrieved documents.
         
         Args:
             documents: List of relevant documents from the archive
+            query_text: The user's query text, used to detect query type
             
         Returns:
             System prompt with context
@@ -509,18 +513,46 @@ class ArchiveAgent:
         good_documents = [doc for doc in documents if not hasattr(doc, 'score') or doc.score >= 0.5]
         
         if not documents:
-            # No documents found at all, use a prompt that enables using general knowledge
-            return """You are a helpful assistant for the DPRG (Dallas Personal Robotics Group) archive.
+            # Determine if this is likely a query about a specific procedure, test, or method
+            procedure_keywords = ["test", "procedure", "method", "technique", "algorithm", "protocol", "steps"]
+            is_procedure_query = any(kw in query_text.lower() for kw in procedure_keywords) if query_text else False
+            
+            base_prompt = """You are a helpful assistant for the DPRG (Dallas Personal Robotics Group) archive.
             
             I could not find any specific information in the DPRG archive that matches the user's query.
             
-            Start your response by informing the user that you don't have relevant information in the DPRG archive.
+            Start your response by informing the user that you don't have relevant information in the DPRG archive."""
             
-            After this disclaimer, you may use your general knowledge to provide a helpful response to their question.
-            When using your general knowledge, make it clear that you are providing information based on your 
-            general knowledge and not from the DPRG archive.
-            
-            Be accurate, informative, and helpful."""
+            if is_procedure_query:
+                # Enhanced prompt for procedure-related queries
+                return base_prompt + """
+                
+                After this disclaimer, use your general knowledge to provide a DETAILED and COMPREHENSIVE response,
+                especially since the user appears to be asking about a specific procedure, test, or method.
+                
+                If the query is about a technical procedure or test:
+                1. Explain what the procedure/test is used for
+                2. Provide the complete step-by-step methodology
+                3. Include any equipment or requirements needed
+                4. Explain how results are interpreted
+                5. Mention any limitations or variations of the procedure
+                
+                Make your response as thorough and practical as possible, as if writing a technical guide
+                that someone could follow to perform the procedure. If you're uncertain about specific details,
+                acknowledge this but provide the best information available.
+                
+                Clearly indicate that this information comes from your general knowledge, not the DPRG archive.
+                
+                Be accurate, informative, and comprehensive."""
+            else:
+                # Standard prompt for non-procedure queries
+                return base_prompt + """
+                
+                After this disclaimer, you may use your general knowledge to provide a helpful response to their question.
+                When using your general knowledge, make it clear that you are providing information based on your 
+                general knowledge and not from the DPRG archive.
+                
+                Be accurate, informative, and helpful."""
         
         elif not good_documents:
             # Documents found but all with low relevance scores
