@@ -55,7 +55,7 @@ class SearchTool:
                 return SearchError(error="Invalid search type. Must be one of: dense, sparse, hybrid")
 
             # Build filters from query fields
-            filters = {}
+            filters = query.metadata_filters or {}
             if query.author:
                 filters["author"] = query.author
             if query.year:
@@ -74,21 +74,42 @@ class SearchTool:
             if filters:
                 logger.debug(f"Using filters: {filters}")
 
-            # Execute search based on type
-            search_type = query.search_type or "dense"
-            if search_type == "dense":
-                results = await self.dense_search(query.query, filters=filters, top_k=query.top_k, min_score=query.min_score)
-            elif search_type == "sparse":
-                results = await self.sparse_search(query.query, filters=filters, top_k=query.top_k, min_score=query.min_score)
-            else:  # hybrid
-                results = await self.hybrid_search(query.query, filters=filters, top_k=query.top_k, min_score=query.min_score)
+            # Determine search type - explicit search_type parameter takes precedence
+            search_type = "dense"
+            if query.search_type:
+                search_type = query.search_type
+            elif query.use_hybrid:
+                search_type = "hybrid"
+            elif query.use_sparse:
+                search_type = "sparse"
+            elif query.use_dense:
+                search_type = "dense"
 
-            # Convert results to ArchiveDocument objects
+            # Set default min_score if not provided
+            min_score = query.min_score if query.min_score is not None else 0.7
+            top_k = query.top_k if query.top_k else 10
+
+            # Execute search based on type
+            start_time = time.time()
+            if search_type == "dense":
+                results = await self.dense_search(query.query, filters=filters, top_k=top_k, min_score=min_score)
+            elif search_type == "sparse":
+                results = await self.sparse_search(query.query, filters=filters, top_k=top_k, min_score=min_score)
+            else:  # hybrid
+                results = await self.hybrid_search(query.query, filters=filters, top_k=top_k, min_score=min_score)
+            elapsed_time = time.time() - start_time
+
+            # Convert results to ArchiveDocument objects if necessary
             docs = []
             for result in results:
                 try:
-                    doc = ArchiveDocument.from_pinecone_match(result)
-                    docs.append(doc)
+                    # Check if result is already an ArchiveDocument
+                    if isinstance(result, ArchiveDocument):
+                        docs.append(result)
+                    else:
+                        # Convert dictionary to ArchiveDocument
+                        doc = ArchiveDocument.from_pinecone_match(result)
+                        docs.append(doc)
                 except Exception as e:
                     logger.error(f"Error converting result to ArchiveDocument: {e}")
                     continue
@@ -99,7 +120,7 @@ class SearchTool:
                 total=len(docs),
                 query=query.query,
                 search_type=search_type,
-                elapsed_time=0.0  # TODO: Implement timing
+                elapsed_time=elapsed_time
             )
             return response
 
@@ -132,14 +153,19 @@ class SearchTool:
             # Combine and deduplicate results
             seen_ids = set()
             combined_results = []
+            
             for result in dense_results + sparse_results:
-                result_id = result.get('id')
-                if result_id not in seen_ids:
+                # Get the ID based on whether it's an ArchiveDocument or dict
+                result_id = result.id if isinstance(result, ArchiveDocument) else result.get('id')
+                if result_id and result_id not in seen_ids:
                     seen_ids.add(result_id)
                     combined_results.append(result)
             
             # Sort by score and take top_k
-            combined_results.sort(key=lambda x: x.get('score', 0), reverse=True)
+            combined_results.sort(
+                key=lambda x: x.score if isinstance(x, ArchiveDocument) else x.get('score', 0), 
+                reverse=True
+            )
             return combined_results[:top_k]
         except Exception as e:
             logger.error(f"Error in hybrid search: {e}")

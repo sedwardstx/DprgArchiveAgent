@@ -9,7 +9,7 @@ description = "A tool for searching and chatting with the DPRG archive"
 requires-python = ">=3.8"
 dependencies = [
     "openai>=1.0.0",
-    "pinecone-client>=2.0.0",
+    "pinecone-client==2.2.4",
     "numpy>=1.24.0",
     "rich>=10.0.0",
     "typer>=0.9.0",
