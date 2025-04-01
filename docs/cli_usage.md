@@ -247,17 +247,28 @@ The chat interface supports several special commands:
 
 ### Adjusting Search Parameters
 
-You can dynamically adjust search parameters during a chat session using natural language commands:
+You can adjust the search parameters directly from the chat interface using simple commands:
 
 | Parameter | Example Commands | Description |
-|-----------|-----------------|-------------|
+| --- | --- | --- |
 | `top_k` | `set top-k to 20`, `return 30 results` | Change the number of documents retrieved (1-50) |
-| `temperature` | `set temperature to 0.5` | Adjust response creativity (0.0-1.0) |
-| `min_score` | `change min-score to 0.2` | Modify relevance threshold (0.0-1.0) |
-| `search_type` | `use search type hybrid` | Change search algorithm (dense, sparse, hybrid) |
-| `max_tokens` | `set max tokens to 1000` | Adjust maximum response length (100-2000) |
+| `temperature` | `set temperature to 0.8` | Adjust response creativity (0.0-1.0) |
+| `min_score` | `set min-score to 0.5`, `set threshold to 0.4` | Modify relevance threshold (0.0-1.0) |
+| `search_type` | `set search-type to dense`, `use sparse search` | Change search algorithm (dense, sparse, hybrid) |
+| `max_tokens` | `set max-tokens to 1000` | Adjust maximum response length (100-2000) |
 
-Parameter adjustments take effect immediately for your next query without needing to restart the chat session.
+### Displaying Current Search Parameters
+
+You can view the current search parameters by asking the agent:
+
+```
+> show current settings
+> display parameters 
+> what settings are you using
+> list current configuration
+```
+
+This will display a table showing all adjustable parameters, their current values, and descriptions.
 
 ### Summarizing Documents
 

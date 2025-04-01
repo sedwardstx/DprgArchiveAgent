@@ -709,6 +709,31 @@ def chat(
                     param_changed = True
                     break
             
+            # Check for settings display request
+            settings_display_patterns = [
+                r'(?:show|display|list|what\s+are|tell\s+me)\s+(?:the\s+)?(?:current\s+)?(?:settings|parameters|configuration|values|options)',
+                r'(?:what\s+settings|which\s+parameters)\s+(?:are\s+)?(?:we|you)\s+(?:using|set\s+to)',
+            ]
+            
+            for pattern in settings_display_patterns:
+                if re.search(pattern, user_input.lower()):
+                    # Create a table to display current settings
+                    settings_table = Table(title="Current Search Parameters", box=box.ROUNDED)
+                    settings_table.add_column("Parameter", style="cyan", width=15)
+                    settings_table.add_column("Value", style="green", width=10)
+                    settings_table.add_column("Description", style="white", width=50)
+                    
+                    # Add current parameter values to the table
+                    settings_table.add_row("top_k", str(top_k), "Number of documents retrieved (1-50)")
+                    settings_table.add_row("temperature", f"{temperature:.1f}", "Response creativity (0.0-1.0)")
+                    settings_table.add_row("min_score", f"{min_score:.2f}", "Minimum relevance threshold (0.0-1.0)")
+                    settings_table.add_row("search_type", search_type, "Search algorithm (dense, sparse, hybrid)")
+                    settings_table.add_row("max_tokens", str(max_tokens), "Maximum response length (100-2000)")
+                    
+                    console.print(settings_table)
+                    param_changed = True
+                    break
+            
             if param_changed:
                 # Remove the parameter adjustment message from conversation 
                 # so it's not included in the context
