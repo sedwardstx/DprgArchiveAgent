@@ -666,7 +666,7 @@ def chat(
                         new_value = int(new_value)
                         # Set reasonable limits
                         if param_name == 'top_k':
-                            new_value = max(1, min(100, new_value))
+                            new_value = max(1, min(50, new_value))  # Lower max from 100 to 50 to prevent token limit errors
                         elif param_name == 'max_tokens':
                             new_value = max(100, min(2000, new_value))
                     elif param_name == 'temperature' or param_name == 'min_score':

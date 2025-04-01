@@ -251,7 +251,7 @@ You can dynamically adjust search parameters during a chat session using natural
 
 | Parameter | Example Commands | Description |
 |-----------|-----------------|-------------|
-| `top_k` | `set top-k to 20`, `return 30 results` | Change the number of documents retrieved (1-100) |
+| `top_k` | `set top-k to 20`, `return 30 results` | Change the number of documents retrieved (1-50) |
 | `temperature` | `set temperature to 0.5` | Adjust response creativity (0.0-1.0) |
 | `min_score` | `change min-score to 0.2` | Modify relevance threshold (0.0-1.0) |
 | `search_type` | `use search type hybrid` | Change search algorithm (dense, sparse, hybrid) |
