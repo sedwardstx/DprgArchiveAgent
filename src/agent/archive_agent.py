@@ -532,6 +532,49 @@ class ArchiveAgent:
         If you cannot find the specific information requested in the context, say so clearly, but try to provide the most relevant information from what's available.
         Focus on information from the provided documents, and be specific about what document contains which information."""
 
+    async def get_document_by_id(self, doc_id: str) -> Optional[ArchiveDocument]:
+        """
+        Retrieve a full document by its ID.
+        
+        Args:
+            doc_id: The document ID to retrieve
+            
+        Returns:
+            The ArchiveDocument object with the full text, or None if not found
+        """
+        try:
+            # Use dense client to retrieve the document
+            # This is an ID lookup, so use a high score threshold
+            logger.info(f"Retrieving document with ID: {doc_id}")
+            
+            # Since we're doing an ID lookup, use the filter directly
+            filter_dict = {"id": doc_id}
+            
+            # Use dummy query - we're filtering by ID
+            results = await self.search_tool.dense_client.search(
+                query="",  # Dummy query
+                top_k=1,  # We only need one result
+                filter=filter_dict,
+                min_score=0.0  # No score threshold for ID lookups
+            )
+            
+            if not results:
+                logger.warning(f"Document with ID {doc_id} not found")
+                return None
+                
+            # Convert to ArchiveDocument
+            doc = ArchiveDocument.from_pinecone_match(results[0])
+            
+            # If we have the full text in metadata, use it
+            if doc.metadata and getattr(doc.metadata, "text", None):
+                # Replace the text_excerpt with the full text
+                doc.text_excerpt = doc.metadata.text
+                
+            return doc
+        except Exception as e:
+            logger.error(f"Error retrieving document by ID {doc_id}: {str(e)}")
+            return None
+
 
 # Create singleton instance
 archive_agent = ArchiveAgent() 

@@ -643,6 +643,50 @@ def chat(
             conversation.append(ChatMessage(role="user", content=user_input))
             
             try:
+                # Check if user is asking for a summary of a specific document
+                doc_id_to_fetch = None
+                doc_number_to_fetch = None
+                
+                # Look for patterns like "summarize document 3" or "summarize this post"
+                summarize_patterns = [
+                    r'summarize\s+(?:document|doc)\s+(\d+)',  # summarize document 3
+                    r'summary\s+(?:of|for)\s+(?:document|doc)\s+(\d+)',  # summary of document 3
+                    r'summarize\s+(?:this|the|that)\s+(?:document|doc|post|message)',  # summarize this post
+                    r'(?:provide|give|create)\s+(?:a|the)\s+summary\s+(?:of|for)\s+(?:document|doc)\s+(\d+)',  # provide a summary of document 4
+                    r'(?:can\s+you|could\s+you)?\s*summarize\s+(?:this|the|that|document|doc)\s+(\d+)?'  # can you summarize document 5
+                ]
+                
+                # If the user just mentioned one document in the previous conversation,
+                # assume they're referring to that document
+                last_doc_mentioned = None
+                if len(conversation) > 1:
+                    # Check assistant's last message for document references
+                    for msg in reversed(conversation[:-1]):  # Skip the just-added user message
+                        if msg.role == "assistant":
+                            doc_mentions = re.findall(r'Document (\d+):', msg.content)
+                            if doc_mentions and len(doc_mentions) == 1:
+                                last_doc_mentioned = int(doc_mentions[0])
+                                break
+                
+                # Check user input against patterns
+                for pattern in summarize_patterns:
+                    match = re.search(pattern, user_input.lower())
+                    if match:
+                        # If the pattern has a capturing group, use it as the document number
+                        if match.groups() and match.group(1):
+                            doc_number_to_fetch = int(match.group(1))
+                        # Otherwise, if there was one document in the previous conversation, use that
+                        elif last_doc_mentioned:
+                            doc_number_to_fetch = last_doc_mentioned
+                        break
+                
+                # If we found a document number, look up the corresponding document ID
+                if doc_number_to_fetch is not None and hasattr(response, "referenced_documents") and response.referenced_documents:
+                    if 0 < doc_number_to_fetch <= len(response.referenced_documents):
+                        # Adjust for 0-based indexing
+                        doc_id_to_fetch = response.referenced_documents[doc_number_to_fetch - 1].id
+                        console.print(f"[dim]Retrieving full document {doc_number_to_fetch} for summary...[/dim]")
+                
                 # Create chat request
                 request = ChatCompletionRequest(
                     messages=conversation,
@@ -651,6 +695,34 @@ def chat(
                     temperature=temperature,
                     max_tokens=max_tokens
                 )
+                
+                # If we identified a document to fetch, add it directly to the system prompt
+                if doc_id_to_fetch:
+                    with console.status("[bold blue]Retrieving full document...[/bold blue]", spinner="dots"):
+                        # Get the full document
+                        full_doc = run_async_safely(archive_agent.get_document_by_id(doc_id_to_fetch))
+                        
+                        if full_doc:
+                            # Modify the user request to be more explicit
+                            new_user_message = f"Please summarize the following document (Document {doc_number_to_fetch}):\n\n" + \
+                                             f"Title: {full_doc.metadata.title or 'Untitled'}\n" + \
+                                             f"Author: {full_doc.metadata.author or 'Unknown'}\n" + \
+                                             f"Date: {full_doc.metadata.year or ''}" + \
+                                             (f"-{full_doc.metadata.month}" if full_doc.metadata.month else "") + \
+                                             (f"-{full_doc.metadata.day}" if full_doc.metadata.day else "") + \
+                                             f"\n\nFull Text:\n{full_doc.text_excerpt}"
+                            
+                            # Replace the last user message with our enhanced version
+                            conversation[-1] = ChatMessage(role="user", content=new_user_message)
+                            
+                            # Update the request
+                            request = ChatCompletionRequest(
+                                messages=conversation,
+                                search_top_k=top_k,
+                                use_search_type=search_type,
+                                temperature=temperature,
+                                max_tokens=max_tokens
+                            )
                 
                 # Indicate that we're thinking
                 with console.status("[bold blue]Thinking...[/bold blue]", spinner="dots"):
