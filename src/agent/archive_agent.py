@@ -228,17 +228,78 @@ class ArchiveAgent:
         try:
             # If query is a string, perform search and build context
             if isinstance(query, str):
-                # Search for relevant documents with a lower threshold for RAG
-                # Create a search query with a lower threshold specifically for chat
+                # Extract possible metadata filters from the query
+                author_filter = None
+                title_filter = None
+                year_filter = None
+                keyword_filters = []
+                
+                # Extract author information if present
+                if "by " in query.lower() and "@" in query:
+                    # Find email addresses which are likely author identifiers
+                    import re
+                    email_match = re.search(r'[\w.+-]+@[\w-]+\.[\w.-]+', query)
+                    if email_match:
+                        author_filter = email_match.group(0)
+                        logger.info(f"Extracted author filter: {author_filter}")
+                
+                # Extract title information if mentioned
+                title_indicators = ["titled", "with title", "title", "called", "name", '"', "'"]
+                for indicator in title_indicators:
+                    if indicator in query.lower():
+                        # Extract text in quotes if present
+                        quote_match = re.search(r'["\'](.+?)["\']', query)
+                        if quote_match:
+                            title_filter = quote_match.group(1)
+                            logger.info(f"Extracted title filter from quotes: {title_filter}")
+                            break
+                        
+                        # Try to find title after the indicator
+                        parts = query.lower().split(indicator, 1)
+                        if len(parts) > 1 and len(parts[1].strip()) > 3:
+                            # Use the next few words as a potential title
+                            potential_title = parts[1].strip().split()[:4]
+                            title_filter = " ".join(potential_title)
+                            logger.info(f"Extracted potential title filter: {title_filter}")
+                            break
+                
+                # Check for specific keywords that might be important
+                important_keywords = ["robotic", "presentation", "meeting", "contest", "competition"]
+                for keyword in important_keywords:
+                    if keyword.lower() in query.lower():
+                        keyword_filters.append(keyword)
+                        logger.info(f"Added keyword filter: {keyword}")
+                
+                # Extract year if present (4 digits that could be a year)
+                year_match = re.search(r'\b(19\d{2}|20\d{2})\b', query)
+                if year_match:
+                    year_filter = int(year_match.group(1))
+                    logger.info(f"Extracted year filter: {year_filter}")
+                
+                # Now create a search query with these filters for better context
                 search_query = SearchQuery(
                     query=query,
                     search_type="hybrid",
                     min_score=0.3,  # Lower threshold for chat context
                     top_k=10,       # Retrieve more documents for better context
-                    filters={}       # No additional filters
+                    author=author_filter,
+                    title=title_filter,
+                    year=year_filter,
+                    keywords=keyword_filters if keyword_filters else None
                 )
                 
-                # Perform the search with the lower threshold
+                # If we have specific metadata filters but no good query text,
+                # consider doing a metadata search instead
+                if (author_filter or title_filter or keyword_filters) and len(query.split()) > 10:
+                    logger.info("Using extracted metadata for searching instead of full query")
+                    # Create a shortened, more focused query from the metadata
+                    focused_query = " ".join([k for k in keyword_filters])
+                    if title_filter:
+                        focused_query = f"{focused_query} {title_filter}"
+                    search_query.query = focused_query if focused_query.strip() else query
+                
+                # Perform the search with the enhanced filters
+                logger.info(f"Searching with query: {search_query.query} and filters: author={search_query.author}, title={search_query.title}, keywords={search_query.keywords}")
                 search_results = await self.search(search_query)
                 
                 if isinstance(search_results, SearchError):
@@ -249,6 +310,22 @@ class ArchiveAgent:
                 # Check if any documents were found
                 if not search_results.results:
                     logger.warning(f"No relevant documents found for query: {query}")
+                    
+                    # Try a fallback search with just the metadata if we have specific filters
+                    if author_filter or title_filter or year_filter or keyword_filters:
+                        logger.info("Trying metadata-only search as fallback")
+                        metadata_results = await self.search_by_metadata(
+                            author=author_filter,
+                            title=title_filter,
+                            year=year_filter,
+                            keywords=keyword_filters if keyword_filters else None,
+                            top_k=10,
+                            min_score=0.0  # No threshold for metadata search
+                        )
+                        
+                        if not isinstance(metadata_results, SearchError) and metadata_results.results:
+                            logger.info(f"Fallback metadata search found {len(metadata_results.results)} results")
+                            search_results = metadata_results
                 
                 # Build system prompt with context
                 system_prompt = self._build_system_prompt(search_results.results)
@@ -274,19 +351,71 @@ class ArchiveAgent:
                         break
                 
                 if user_query:
+                    # Extract possible metadata filters from the query (same as above)
+                    author_filter = None
+                    title_filter = None
+                    year_filter = None
+                    keyword_filters = []
+                    
+                    # Extract author information if present
+                    if "by " in user_query.lower() and "@" in user_query:
+                        # Find email addresses which are likely author identifiers
+                        import re
+                        email_match = re.search(r'[\w.+-]+@[\w-]+\.[\w.-]+', user_query)
+                        if email_match:
+                            author_filter = email_match.group(0)
+                            logger.info(f"Extracted author filter: {author_filter}")
+                    
+                    # Extract title information if mentioned
+                    title_indicators = ["titled", "with title", "title", "called", "name", '"', "'"]
+                    for indicator in title_indicators:
+                        if indicator in user_query.lower():
+                            # Extract text in quotes if present
+                            quote_match = re.search(r'["\'](.+?)["\']', user_query)
+                            if quote_match:
+                                title_filter = quote_match.group(1)
+                                logger.info(f"Extracted title filter from quotes: {title_filter}")
+                                break
+                            
+                            # Try to find title after the indicator
+                            parts = user_query.lower().split(indicator, 1)
+                            if len(parts) > 1 and len(parts[1].strip()) > 3:
+                                # Use the next few words as a potential title
+                                potential_title = parts[1].strip().split()[:4]
+                                title_filter = " ".join(potential_title)
+                                logger.info(f"Extracted potential title filter: {title_filter}")
+                                break
+                    
+                    # Check for specific keywords that might be important
+                    important_keywords = ["robotic", "presentation", "meeting", "contest", "competition"]
+                    for keyword in important_keywords:
+                        if keyword.lower() in user_query.lower():
+                            keyword_filters.append(keyword)
+                            logger.info(f"Added keyword filter: {keyword}")
+                    
+                    # Extract year if present (4 digits that could be a year)
+                    year_match = re.search(r'\b(19\d{2}|20\d{2})\b', user_query)
+                    if year_match:
+                        year_filter = int(year_match.group(1))
+                        logger.info(f"Extracted year filter: {year_filter}")
+                    
                     # Use min_score from the request or default to 0.3
                     min_score_value = request.min_score if hasattr(request, 'min_score') and request.min_score is not None else 0.3
                     
-                    # Create a search query with the request parameters
+                    # Create a search query with these filters for better context
                     search_query = SearchQuery(
                         query=user_query,
                         search_type=request.use_search_type or "hybrid",
                         min_score=min_score_value,
                         top_k=request.search_top_k or 10,
-                        filters={}
+                        author=author_filter,
+                        title=title_filter,
+                        year=year_filter,
+                        keywords=keyword_filters if keyword_filters else None
                     )
                     
-                    # Perform the search with the parameters from the request
+                    # Perform the search with enhanced filters
+                    logger.info(f"Searching with query: {search_query.query} and filters: author={search_query.author}, title={search_query.title}, keywords={search_query.keywords}")
                     search_results = await self.search(search_query)
                     
                     if isinstance(search_results, SearchError):
@@ -297,6 +426,22 @@ class ArchiveAgent:
                     # Check if any documents were found
                     if not search_results.results:
                         logger.warning(f"No relevant documents found for query: {user_query}")
+                        
+                        # Try a fallback search with just the metadata if we have specific filters
+                        if author_filter or title_filter or year_filter or keyword_filters:
+                            logger.info("Trying metadata-only search as fallback")
+                            metadata_results = await self.search_by_metadata(
+                                author=author_filter,
+                                title=title_filter,
+                                year=year_filter,
+                                keywords=keyword_filters if keyword_filters else None,
+                                top_k=10,
+                                min_score=0.0  # No threshold for metadata search
+                            )
+                            
+                            if not isinstance(metadata_results, SearchError) and metadata_results.results:
+                                logger.info(f"Fallback metadata search found {len(metadata_results.results)} results")
+                                search_results = metadata_results
                     
                     # Build system prompt with context
                     system_prompt = self._build_system_prompt(search_results.results)
