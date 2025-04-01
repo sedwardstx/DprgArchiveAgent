@@ -54,8 +54,10 @@ class SearchTool:
             if query.search_type and query.search_type not in ["dense", "sparse", "hybrid"]:
                 return SearchError(error="Invalid search type. Must be one of: dense, sparse, hybrid")
 
-            # Build filters from query fields
+            # Build filters from query fields, but save title for client-side filtering
             filters = query.metadata_filters or {}
+            title_filter = None
+            
             if query.author:
                 filters["author"] = query.author
             if query.year:
@@ -67,12 +69,16 @@ class SearchTool:
             if query.keywords:
                 filters["keywords"] = query.keywords
             if query.title:
-                filters["title"] = query.title
+                # Save title for client-side filtering
+                title_filter = query.title
+                # Don't add title to filters sent to Pinecone
 
             # Log actual query and filters for debugging
             logger.debug(f"Executing search with query: {query.query}")
             if filters:
                 logger.debug(f"Using filters: {filters}")
+            if title_filter:
+                logger.debug(f"Will apply title filter client-side: {title_filter}")
 
             # Determine search type - explicit search_type parameter takes precedence
             search_type = "dense"
@@ -89,14 +95,20 @@ class SearchTool:
             min_score = query.min_score if query.min_score is not None else 0.7
             top_k = query.top_k if query.top_k else 10
 
+            # If we have a title filter, increase top_k for initial search to ensure
+            # we get enough results after client-side filtering
+            server_top_k = top_k
+            if title_filter:
+                server_top_k = max(50, top_k * 3)  # Get more results to filter
+
             # Execute search based on type
             start_time = time.time()
             if search_type == "dense":
-                results = await self.dense_search(query.query, filters=filters, top_k=top_k, min_score=min_score)
+                results = await self.dense_search(query.query, filters=filters, top_k=server_top_k, min_score=min_score)
             elif search_type == "sparse":
-                results = await self.sparse_search(query.query, filters=filters, top_k=top_k, min_score=min_score)
+                results = await self.sparse_search(query.query, filters=filters, top_k=server_top_k, min_score=min_score)
             else:  # hybrid
-                results = await self.hybrid_search(query.query, filters=filters, top_k=top_k, min_score=min_score)
+                results = await self.hybrid_search(query.query, filters=filters, top_k=server_top_k, min_score=min_score)
             elapsed_time = time.time() - start_time
 
             # Convert results to ArchiveDocument objects if necessary
@@ -113,6 +125,18 @@ class SearchTool:
                 except Exception as e:
                     logger.error(f"Error converting result to ArchiveDocument: {e}")
                     continue
+
+            # Apply title filter client-side if needed
+            if title_filter and docs:
+                filtered_docs = []
+                for doc in docs:
+                    if doc.metadata and doc.metadata.title and title_filter.lower() in doc.metadata.title.lower():
+                        filtered_docs.append(doc)
+                docs = filtered_docs
+                
+                # Ensure we only return top_k after filtering
+                if len(docs) > top_k:
+                    docs = docs[:top_k]
 
             # Return response
             response = SearchResponse(
