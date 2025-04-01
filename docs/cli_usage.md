@@ -245,6 +245,23 @@ The chat interface supports several special commands:
 | `exit` | `quit`, `bye`, `goodbye` | End the chat session |
 | `reset` | `clear`, `restart` | Clear conversation history and start fresh without exiting |
 
+### Summarizing Documents
+
+You can ask the agent to summarize a specific document in full, rather than just working with the excerpt shown in the Referenced Documents table:
+
+```
+summarize document 3       # Summarize document #3 from the latest results
+summarize this post        # Summarize the only document mentioned in the conversation
+summary of document 2      # Get a summary of document #2
+```
+
+When you ask for a summary, the system will:
+1. Retrieve the complete document text (rather than just the excerpt)
+2. Provide a more comprehensive summary based on the full content
+3. Include details about the document's author, title, and date
+
+This is particularly useful when you want to understand the complete content of a document without having to read through all the raw text.
+
 ## Environment Configuration
 
 The CLI respects the configuration set in your `.env` file. If you encounter errors:
