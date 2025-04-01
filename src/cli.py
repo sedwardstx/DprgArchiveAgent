@@ -529,15 +529,17 @@ def chat(
                         if i+1 in mentioned_doc_ids:
                             filtered_docs.append((i+1, doc))
                 else:
-                    # If no specific document numbers mentioned, use the top 3
-                    filtered_docs = [(i+1, doc) for i, doc in enumerate(response.referenced_documents[:3])]
+                    # If no specific document numbers mentioned, show all documents
+                    filtered_docs = [(i+1, doc) for i, doc in enumerate(response.referenced_documents)]
                 
                 if filtered_docs:
                     docs_table = Table(title="Referenced Documents", box=box.ROUNDED)
                     docs_table.add_column("ID", style="bold cyan", width=4)
-                    docs_table.add_column("Title", style="green")
-                    docs_table.add_column("Author", style="yellow")
-                    docs_table.add_column("Date", style="magenta")
+                    docs_table.add_column("Score", justify="right", style="cyan", width=6)
+                    docs_table.add_column("Title", style="green", width=30)
+                    docs_table.add_column("Author", style="yellow", width=20)
+                    docs_table.add_column("Date", style="magenta", width=12)
+                    docs_table.add_column("Excerpt", style="white", width=40, overflow="fold")
                     
                     for doc_id, doc in filtered_docs:
                         # Format date if available
@@ -549,11 +551,16 @@ def chat(
                                 if doc.metadata.day:
                                     date_str += f"-{doc.metadata.day}"
                         
+                        # Create a Rich Text object for the excerpt that can have mixed styles
+                        text_excerpt = Text(doc.text_excerpt[:100] + "..." if len(doc.text_excerpt) > 100 else doc.text_excerpt, style="white")
+                        
                         docs_table.add_row(
                             f"{doc_id}",
+                            f"{doc.score:.3f}" if hasattr(doc, "score") else "N/A",
                             doc.metadata.title or "Untitled",
                             doc.metadata.author or "Unknown",
-                            date_str or "Unknown"
+                            date_str or "Unknown",
+                            text_excerpt
                         )
                     
                     console.print(docs_table)
@@ -643,15 +650,17 @@ def chat(
                             if i+1 in mentioned_doc_ids:
                                 filtered_docs.append((i+1, doc))
                     else:
-                        # If no specific document numbers mentioned, use the top 3
-                        filtered_docs = [(i+1, doc) for i, doc in enumerate(response.referenced_documents[:3])]
+                        # If no specific document numbers mentioned, show all documents
+                        filtered_docs = [(i+1, doc) for i, doc in enumerate(response.referenced_documents)]
                     
                     if filtered_docs:
                         docs_table = Table(title="Referenced Documents", box=box.ROUNDED)
                         docs_table.add_column("ID", style="bold cyan", width=4)
-                        docs_table.add_column("Title", style="green")
-                        docs_table.add_column("Author", style="yellow")
-                        docs_table.add_column("Date", style="magenta")
+                        docs_table.add_column("Score", justify="right", style="cyan", width=6)
+                        docs_table.add_column("Title", style="green", width=30)
+                        docs_table.add_column("Author", style="yellow", width=20)
+                        docs_table.add_column("Date", style="magenta", width=12)
+                        docs_table.add_column("Excerpt", style="white", width=40, overflow="fold")
                         
                         for doc_id, doc in filtered_docs:
                             # Format date if available
@@ -663,11 +672,16 @@ def chat(
                                     if doc.metadata.day:
                                         date_str += f"-{doc.metadata.day}"
                             
+                            # Create a Rich Text object for the excerpt that can have mixed styles
+                            text_excerpt = Text(doc.text_excerpt[:100] + "..." if len(doc.text_excerpt) > 100 else doc.text_excerpt, style="white")
+                            
                             docs_table.add_row(
                                 f"{doc_id}",
+                                f"{doc.score:.3f}" if hasattr(doc, "score") else "N/A",
                                 doc.metadata.title or "Untitled",
                                 doc.metadata.author or "Unknown",
-                                date_str or "Unknown"
+                                date_str or "Unknown",
+                                text_excerpt
                             )
                         
                         console.print(docs_table)
