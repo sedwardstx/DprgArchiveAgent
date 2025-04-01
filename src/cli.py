@@ -184,6 +184,9 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
     table.add_column("Date", style="magenta", width=12)
     table.add_column("Excerpt", style="white", width=60)
 
+    # Detect if we're running in a PowerShell environment
+    is_powershell = "POWERSHELL_DISTRIBUTION_CHANNEL" in os.environ or platform.system() == "Windows"
+
     # Add results to table
     for result in results.results:
         try:
@@ -203,22 +206,24 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
             author = result.metadata.author or ""
             excerpt = result.text_excerpt
             
-            # Highlight search terms in the excerpt using simple markup
+            # Highlight search terms based on environment
             if search_terms and excerpt:
-                # Use Rich's Markdown highlighting approach
-                for term in search_terms:
-                    if len(term) < 3:
-                        continue
-                    
-                    # Prepare regex for case-insensitive replacement
-                    pattern = re.compile(f"({re.escape(term)})", re.IGNORECASE)
-                    # Replace with bold yellow highlight markup
-                    excerpt = pattern.sub(r"[black on yellow]\1[/black on yellow]", excerpt)
-                
-                # Create a markup object from the highlighted excerpt
-                highlighted_excerpt = excerpt
-            else:
-                highlighted_excerpt = excerpt
+                if is_powershell:
+                    # For PowerShell, use ** markers for terms to make them stand out
+                    for term in search_terms:
+                        if len(term) < 3:
+                            continue
+                        
+                        pattern = re.compile(f"({re.escape(term)})", re.IGNORECASE)
+                        excerpt = pattern.sub(r"**\1**", excerpt)
+                else:
+                    # For other terminals, use Rich's markup
+                    for term in search_terms:
+                        if len(term) < 3:
+                            continue
+                        
+                        pattern = re.compile(f"({re.escape(term)})", re.IGNORECASE)
+                        excerpt = pattern.sub(r"[bold yellow]\1[/bold yellow]", excerpt)
             
             # Add results to table
             table.add_row(
@@ -226,7 +231,7 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
                 title,
                 author,
                 date_str,
-                highlighted_excerpt
+                excerpt
             )
         except Exception as e:
             log_debug(f"Error formatting result: {str(e)}")
