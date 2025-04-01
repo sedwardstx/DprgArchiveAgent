@@ -203,24 +203,22 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
             author = result.metadata.author or ""
             excerpt = result.text_excerpt
             
-            # Highlight search terms in the excerpt using Rich markup
+            # Highlight search terms in the excerpt using simple markup
             if search_terms and excerpt:
-                # Create a Rich Text object with the excerpt
-                highlighted_excerpt = Text(excerpt)
+                # Use Rich's Markdown highlighting approach
                 for term in search_terms:
-                    # Make sure term is at least 3 chars to avoid highlighting common words
                     if len(term) < 3:
                         continue
-                        
-                    # For case-insensitive search
-                    term_pattern = re.compile(re.escape(term), re.IGNORECASE)
-                    for match in term_pattern.finditer(excerpt):
-                        start, end = match.span()
-                        # Apply yellow highlight to the matching text
-                        highlighted_excerpt.stylize("black on yellow", start, end)
+                    
+                    # Prepare regex for case-insensitive replacement
+                    pattern = re.compile(f"({re.escape(term)})", re.IGNORECASE)
+                    # Replace with bold yellow highlight markup
+                    excerpt = pattern.sub(r"[black on yellow]\1[/black on yellow]", excerpt)
+                
+                # Create a markup object from the highlighted excerpt
+                highlighted_excerpt = excerpt
             else:
-                # No search terms to highlight
-                highlighted_excerpt = Text(excerpt)
+                highlighted_excerpt = excerpt
             
             # Add results to table
             table.add_row(
