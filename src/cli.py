@@ -736,8 +736,9 @@ def chat(
             
             if param_changed:
                 # Remove the parameter adjustment message from conversation 
-                # so it's not included in the context
-                conversation.pop()
+                # only if there are messages to remove
+                if len(conversation) > 1:  # Only pop if there's more than just the system message
+                    conversation.pop()
                 continue
             
             # Add user message to conversation
