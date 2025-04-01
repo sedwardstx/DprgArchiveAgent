@@ -182,10 +182,7 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
     table.add_column("Title", style="green", width=30)
     table.add_column("Author", style="yellow", width=30)
     table.add_column("Date", style="magenta", width=12)
-    table.add_column("Excerpt", style="white", width=60)
-
-    # Detect if we're running in a PowerShell environment
-    is_powershell = "POWERSHELL_DISTRIBUTION_CHANNEL" in os.environ or platform.system() == "Windows"
+    table.add_column("Excerpt", style="white", width=60, overflow="fold")
 
     # Add results to table
     for result in results.results:
@@ -206,24 +203,24 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
             author = result.metadata.author or ""
             excerpt = result.text_excerpt
             
-            # Highlight search terms based on environment
+            # Highlight search terms with special syntax Rich will understand
             if search_terms and excerpt:
-                if is_powershell:
-                    # For PowerShell, use ** markers for terms to make them stand out
-                    for term in search_terms:
-                        if len(term) < 3:
-                            continue
-                        
-                        pattern = re.compile(f"({re.escape(term)})", re.IGNORECASE)
-                        excerpt = pattern.sub(r"**\1**", excerpt)
-                else:
-                    # For other terminals, use Rich's markup
-                    for term in search_terms:
-                        if len(term) < 3:
-                            continue
-                        
-                        pattern = re.compile(f"({re.escape(term)})", re.IGNORECASE)
-                        excerpt = pattern.sub(r"[bold yellow]\1[/bold yellow]", excerpt)
+                # Use Rich's actual highlighting, which works in all terminals
+                # Create a Text object we can style directly
+                highlighted_excerpt = Text(excerpt)
+                for term in search_terms:
+                    if len(term) < 3:
+                        continue
+                    
+                    # Find all instances of the term with case-insensitive matching
+                    pattern = re.compile(re.escape(term), re.IGNORECASE)
+                    for match in pattern.finditer(excerpt):
+                        start, end = match.span()
+                        # This directly modifies the Text object with styling
+                        highlighted_excerpt.stylize("reverse", start, end)
+            else:
+                # No terms to highlight
+                highlighted_excerpt = Text(excerpt)
             
             # Add results to table
             table.add_row(
@@ -231,7 +228,7 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
                 title,
                 author,
                 date_str,
-                excerpt
+                highlighted_excerpt
             )
         except Exception as e:
             log_debug(f"Error formatting result: {str(e)}")
