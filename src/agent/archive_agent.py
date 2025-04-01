@@ -505,32 +505,70 @@ class ArchiveAgent:
         Returns:
             System prompt with context
         """
+        # Check if there are any documents with reasonably good scores (above 0.5)
+        good_documents = [doc for doc in documents if not hasattr(doc, 'score') or doc.score >= 0.5]
+        
         if not documents:
-            # No documents found, provide a general instruction
+            # No documents found at all, use a prompt that enables using general knowledge
             return """You are a helpful assistant for the DPRG (Dallas Personal Robotics Group) archive.
             
-            I could not find any specific information in the archive that matches your query.
-            If you're asking about a specific topic, I may not have access to that information.
+            I could not find any specific information in the DPRG archive that matches the user's query.
             
-            However, I can provide general information about DPRG, robotics concepts, or suggest related topics.
-            Please let me know if you'd like to ask about something else."""
+            Start your response by informing the user that you don't have relevant information in the DPRG archive.
+            
+            After this disclaimer, you may use your general knowledge to provide a helpful response to their question.
+            When using your general knowledge, make it clear that you are providing information based on your 
+            general knowledge and not from the DPRG archive.
+            
+            Be accurate, informative, and helpful."""
         
-        # Format context into a string
-        context_str = "\n\n".join([
-            f"Document {i+1}:\nTitle: {doc.metadata.title if hasattr(doc.metadata, 'title') else 'Unknown'}\n" +
-            f"Author: {doc.metadata.author if hasattr(doc.metadata, 'author') else 'Unknown'}\n" +
-            f"Content: {doc.text_excerpt}"
-            for i, doc in enumerate(documents)
-        ])
+        elif not good_documents:
+            # Documents found but all with low relevance scores
+            # Format context into a string but add the fallback option
+            context_str = "\n\n".join([
+                f"Document {i+1}:\nTitle: {doc.metadata.title if hasattr(doc.metadata, 'title') else 'Unknown'}\n" +
+                f"Author: {doc.metadata.author if hasattr(doc.metadata, 'author') else 'Unknown'}\n" +
+                f"Content: {doc.text_excerpt}"
+                for i, doc in enumerate(documents)
+            ])
+            
+            return f"""You are a helpful assistant for the DPRG (Dallas Personal Robotics Group) archive.
+            
+            I found some documents in the archive, but they don't appear to be highly relevant to the user's query.
+            Here is the context from these documents:
+            
+            {context_str}
+            
+            First, evaluate if any of these documents are useful for answering the user's question. 
+            If they are, use that information in your response.
+            
+            If the documents don't contain useful information for the query, clearly inform the user that 
+            the DPRG archive doesn't have specific information related to their query. Then, you may use 
+            your general knowledge to provide a helpful response.
+            
+            When using your general knowledge, make it clear that you are providing information based on 
+            your general knowledge and not from the DPRG archive.
+            
+            Be accurate, informative, and helpful."""
         
-        # Create system message with context
-        return f"""You are a helpful assistant for the DPRG (Dallas Personal Robotics Group) archive.
-        Answer questions based on the following context from the archive:
-        
-        {context_str}
-        
-        If you cannot find the specific information requested in the context, say so clearly, but try to provide the most relevant information from what's available.
-        Focus on information from the provided documents, and be specific about what document contains which information."""
+        else:
+            # Documents with good scores found, use the standard prompt
+            # Format context into a string
+            context_str = "\n\n".join([
+                f"Document {i+1}:\nTitle: {doc.metadata.title if hasattr(doc.metadata, 'title') else 'Unknown'}\n" +
+                f"Author: {doc.metadata.author if hasattr(doc.metadata, 'author') else 'Unknown'}\n" +
+                f"Content: {doc.text_excerpt}"
+                for i, doc in enumerate(documents)
+            ])
+            
+            # Create system message with context
+            return f"""You are a helpful assistant for the DPRG (Dallas Personal Robotics Group) archive.
+            Answer questions based on the following context from the archive:
+            
+            {context_str}
+            
+            If you cannot find the specific information requested in the context, say so clearly, but try to provide the most relevant information from what's available.
+            Focus on information from the provided documents, and be specific about what document contains which information."""
 
     async def get_document_by_id(self, doc_id: str) -> Optional[ArchiveDocument]:
         """

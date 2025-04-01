@@ -287,6 +287,29 @@ When you ask for a summary, the system will:
 
 This is particularly useful when you want to understand the complete content of a document without having to read through all the raw text.
 
+### General Knowledge Fallback
+
+When you ask a question that doesn't have relevant information in the DPRG archives, the agent will now:
+
+1. Inform you that no relevant information was found in the archives
+2. Provide a response based on the LLM's general knowledge about the topic
+
+This helps ensure you get useful answers even when the information isn't available in the DPRG-specific documents. The agent will clearly indicate when it's using its general knowledge versus when it's citing DPRG archive information.
+
+Example:
+```
+> Tell me about the Borenstein test for robotics
+Agent: I couldn't find specific information about a "Borenstein test" in the DPRG archives.
+
+Based on general knowledge, Johann Borenstein is known for his work in mobile robotics, 
+particularly in navigation and error correction. He developed methods for dead reckoning error 
+correction in mobile robots, including the UMBmark test (University of Michigan Benchmark), 
+which measures and corrects systematic odometry errors in differential-drive mobile robots.
+
+This test involves driving the robot in square patterns both clockwise and counter-clockwise 
+to identify and quantify systematic errors in the robot's odometry system.
+```
+
 ## Environment Configuration
 
 The CLI respects the configuration set in your `.env` file. If you encounter errors:
