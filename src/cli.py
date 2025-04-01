@@ -588,12 +588,20 @@ def chat(
                         doc_entries = re.finditer(r'Document (\d+):(.*?)(?=Document \d+:|$)', 
                                                  parts[1] + " ", re.DOTALL)
                         
+                        has_entries = False
                         for match in doc_entries:
                             doc_id = match.group(1)
                             doc_details = match.group(2).strip()
-                            docs_content_table.add_row(doc_id, doc_details)
+                            if doc_details:  # Only add rows with actual content
+                                docs_content_table.add_row(doc_id, doc_details)
+                                has_entries = True
                         
-                        console.print(docs_content_table)
+                        # Only show the table if it has content
+                        if has_entries:
+                            console.print(docs_content_table)
+                        else:
+                            # If no details were extracted, just show the original text
+                            console.print(Markdown(response.message.content))
                     else:
                         # If we couldn't split properly, just show the original text
                         console.print(Markdown(response.message.content))
@@ -709,12 +717,20 @@ def chat(
                             doc_entries = re.finditer(r'Document (\d+):(.*?)(?=Document \d+:|$)', 
                                                      parts[1] + " ", re.DOTALL)
                             
+                            has_entries = False
                             for match in doc_entries:
                                 doc_id = match.group(1)
                                 doc_details = match.group(2).strip()
-                                docs_content_table.add_row(doc_id, doc_details)
+                                if doc_details:  # Only add rows with actual content
+                                    docs_content_table.add_row(doc_id, doc_details)
+                                    has_entries = True
                             
-                            console.print(docs_content_table)
+                            # Only show the table if it has content
+                            if has_entries:
+                                console.print(docs_content_table)
+                            else:
+                                # If no details were extracted, just show the original text
+                                console.print(Markdown(response.message.content))
                         else:
                             # If we couldn't split properly, just show the original text
                             console.print(Markdown(response.message.content))
