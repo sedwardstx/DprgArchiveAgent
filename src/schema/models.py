@@ -25,6 +25,7 @@ class ArchiveDocument(BaseModel):
     text_excerpt: str
     metadata: ArchiveMetadata
     score: Optional[float] = None
+    search_terms: Optional[List[str]] = None  # Terms used for searching and highlighting
     
     @classmethod
     def from_pinecone_match(cls, match: Dict[str, Any]) -> "ArchiveDocument":
@@ -42,6 +43,7 @@ class ArchiveDocument(BaseModel):
             has_url=metadata.get("has_url"),
             keywords=metadata.get("keywords"),
             title=metadata.get("title"),
+            text=metadata.get("text_excerpt"),  # Store full text in metadata if available
         )
         
         # Create and return document

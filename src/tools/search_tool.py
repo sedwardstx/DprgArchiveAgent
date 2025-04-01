@@ -256,6 +256,9 @@ class SearchTool:
                             search_terms
                         )
                     
+                    # Store the search terms used for highlighting in the display
+                    doc.search_terms = search_terms
+                    
                     docs.append(doc)
                 except Exception as e:
                     logger.error(f"Error converting result to ArchiveDocument: {e}")

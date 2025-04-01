@@ -11,6 +11,7 @@ import platform
 import traceback
 from datetime import datetime
 from typing import Optional, List, Any, Dict
+import re
 
 import typer
 from rich.console import Console
@@ -149,6 +150,23 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
         console.print("No results found.")
         return
 
+    # Get search terms to highlight from the query and any metadata
+    search_terms = []
+    # For normal search, add query terms
+    if query != "Metadata Search" and query != "*":
+        search_terms.extend([term.strip() for term in query.split() if len(term.strip()) > 2])
+    
+    # Extract any keywords used in the search
+    keywords = []
+    for doc in results.results:
+        if hasattr(doc, "search_terms") and doc.search_terms:
+            keywords.extend(doc.search_terms)
+            break
+    
+    # Remove duplicates and empty strings
+    search_terms = list(set([term.lower() for term in search_terms + keywords if term]))
+    logger.debug(f"Terms to highlight: {search_terms}")
+
     # Create table for results
     table = Table(show_header=True, header_style="bold", box=box.ROUNDED)
     table.add_column("Score", justify="right", style="cyan", width=6)
@@ -176,13 +194,29 @@ def display_results(results: SearchResponse, query: str, search_type: str, min_s
             author = result.metadata.author or ""
             excerpt = result.text_excerpt
             
+            # Highlight search terms in the excerpt
+            if search_terms and excerpt:
+                highlighted_excerpt = Text(excerpt)
+                for term in search_terms:
+                    # Skip short terms to avoid too many highlights
+                    if len(term) <= 2:
+                        continue
+                    
+                    # Use regex for case-insensitive matching
+                    pattern = re.compile(re.escape(term), re.IGNORECASE)
+                    for match in pattern.finditer(excerpt):
+                        start, end = match.span()
+                        highlighted_excerpt.stylize("bold yellow", start, end)
+            else:
+                highlighted_excerpt = excerpt
+            
             # Add results to table - use a longer excerpt that wraps
             table.add_row(
                 f"{result.score:.3f}",
                 title,
                 author,
                 date_str,
-                excerpt  # No manual truncation - let the table wrap it
+                highlighted_excerpt  # Now using the highlighted version
             )
         except Exception as e:
             log_debug(f"Error formatting result: {str(e)}")
